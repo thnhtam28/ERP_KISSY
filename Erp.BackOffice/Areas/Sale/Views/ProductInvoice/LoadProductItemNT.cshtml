@@ -1,0 +1,371 @@
+﻿@model Erp.BackOffice.Sale.Models.ProductInvoiceDetailViewModel
+@using Erp.BackOffice.Helpers
+@{
+    var thanh_tien = Model.Quantity * Model.Price;
+    var tien_ck = Convert.ToDecimal(Model.IrregularDiscountAmount);
+    var tien_ck2 = Convert.ToDecimal(thanh_tien * Model.IrregularDiscount) / 100;
+    Model.FixedDiscountAmount = tien_ck;
+    if (tien_ck2 >0)
+    {
+        Model.IrregularDiscountAmount = tien_ck2;
+    }
+    Model.IrregularDiscountAmountstr = Model.IrregularDiscountAmount.ToString();
+    var thanh_tien_sau_ck = @Common.NVL_NUM_DECIMAL_NEW(thanh_tien) - @Common.NVL_NUM_DECIMAL_NEW(tien_ck);
+
+    //ok
+
+}
+
+
+<tr role="@Model.OrderNo" id="product_item_@Model.OrderNo" data-id="@Model.OrderNo" class="text_data">
+    <td class="text-center td1" style="width: 3.5%;">
+        @(Model.OrderNo + 1)
+        <input class="pricetest" type="text" id="DetailList_@(Model.OrderNo)__PriceTest" name="DetailList[@(Model.OrderNo)].PriceTest" value="@Model.PriceTest" data-val="true" autocomplete="off" hidden />
+        <input class="product_type" type="text" id="DetailList_@(Model.OrderNo)__ProductType" name="DetailList[@(Model.OrderNo)].ProductType" value="@Model.ProductType" data-val="true" autocomplete="off" hidden />
+    </td>
+    <td class="detail_item_id td2" style="width: 24.5%;">
+        @Html.Hidden("DetailList[" + Model.OrderNo + "].ProductId", Model.ProductId)
+        @Model.ProductCode - @Model.ProductName (@Model.Size-@Model.color)
+    </td>
+    @{
+        if (Model.Istab == 1)
+        {
+            <td class=" td3" style="width: 18.4%;">
+                @Html.TextBox("DetailList[" + Model.OrderNo + "].Quantity", Model.Quantity, new { style = "width:43.3%", @class = "numberinput1 detail_item_qty_1 text-right", data_quantity_inventory = Model.QuantityInInventory })
+                <a class="classHover classMinus"
+                  href="javascript:my_functionadd(@Model.Istab,@Model.strcode,0) ">
+                    <i class="fa fa-minus"></i>
+                </a>
+                <a class="classHover classPlus"
+                   href="javascript:my_functionadd(@Model.Istab,@Model.strcode,1)">
+                    <i class="fa fa-plus"></i>
+                </a>
+            </td>
+            <td class="td4" style="width: 14.3%;">
+                @Html.TextBox("DetailList[" + Model.OrderNo + "].Price", @Common.PhanCachHangNgan2(Model.Price), new { style = "width:85px", @class = "detail_item_price_1", autocomplete = "off" })
+            </td>
+            <td class="td5" style="width: 20.5%;">
+                @if (Model.IsMoney == true)
+                {
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscount",0, new { style = "width:65%;float: left;", @class = "numberinput1 detail_item_discount_1 text-right classHidden", autocomplete = "off" })
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscountAmount", @Common.PhanCachHangNgan2(Model.IrregularDiscountAmount), new { style = "width:65%;float: left;", @class = "numberinput2 detail_item_discount_1_amount text-right classBlock", autocomplete = "off" })
+                }
+                else
+                {
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscount", Model.IrregularDiscount, new { style = "width:65%;float: left;", @class = "numberinput1 detail_item_discount_1 text-right classBlock", autocomplete = "off" })
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscountAmount", 0, new { style = "width:65%;float: left;", @class = "numberinput2 detail_item_discount_1_amount text-right classHidden", autocomplete = "off" })
+                }
+
+                <div class="divTd5" style="width: 34%; float: right;">
+                    <div class="toggle-button-cover1">
+                        <div class="button-cover1">
+                            <div class="button1 r" id="button-11">
+
+                                @if (Model.IsMoney == true)
+                                {
+                                    <input id="checkboxDiscount1+@Model.OrderNo+@Model.ProductCode" type="checkbox" class="checkbox toggle_" onclick="ToggleDiscount(@Model.Istab,@Model.OrderNo,@Model.strcode)">
+                                }
+                                else
+                                {
+                                    <input id="checkboxDiscount1+@Model.OrderNo+@Model.ProductCode" type="checkbox" checked class="checkbox toggle_" onclick="ToggleDiscount(@Model.Istab,@Model.OrderNo,@Model.strcode)">
+                                }
+
+
+
+                                <div class="knobs"></div>
+                                <div class="layer1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].ProductCode", Model.ProductCode)</td>
+
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].IsMoney", Model.IsMoney)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionId", Model.PromotionId)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionDetailId", Model.PromotionDetailId)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionValue", Model.PromotionValue)</td>
+
+        }
+        else if (Model.Istab == 2)
+        {
+            <td class=" td3" style="width: 18.4%;">
+                @Html.TextBox("DetailList[" + Model.OrderNo + "].Quantity", Model.Quantity, new { style = "width:43.3%", @class = "numberinput1 detail_item_qty_2 text-right", data_quantity_inventory = Model.QuantityInInventory })
+                <a class="classHover classMinus"
+                  href="javascript:my_functionadd(@Model.Istab,@Model.strcode,0) ">
+                    <i class="fa fa-minus"></i>
+                </a>
+                <a class="classHover classPlus"
+                   href="javascript:my_functionadd(@Model.Istab,@Model.strcode,1)">
+                    <i class="fa fa-plus"></i>
+                </a>
+            </td>
+            <td class="td4" style="width: 14.3%;">
+                @Html.TextBox("DetailList[" + Model.OrderNo + "].Price", @Common.PhanCachHangNgan2(Model.Price), new { style = "width:85px", @class = "detail_item_price_2", autocomplete = "off" })
+
+            </td>
+            <td class="td5" style="width: 20.5%;">
+                @if (Model.IsMoney == true)
+                {
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscount", Model.IrregularDiscount, new { style = "width:65%;float: left;", @class = "numberinput1 detail_item_discount_2 text-right classHidden", autocomplete = "off" })
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscountAmount", @Common.PhanCachHangNgan2(Model.IrregularDiscountAmount), new { style = "width:65%;float: left;", @class = "numberinput2 detail_item_discount_2_amount text-right classBlock", autocomplete = "off" })
+                }
+                else
+                {
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscount", Model.IrregularDiscount, new { style = "width:65%;float: left;", @class = "numberinput1 detail_item_discount_2 text-right classBlock", autocomplete = "off" })
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscountAmount", @Common.PhanCachHangNgan2(Model.IrregularDiscountAmount), new { style = "width:65%;float: left;", @class = "numberinput2 detail_item_discount_2_amount text-right classHidden", autocomplete = "off" })
+                }
+                <div class="divTd5" style="width: 34%; float: right;">
+                    <div class="toggle-button-cover1">
+                        <div class="button-cover1">
+                            <div class="button1 r" id="button-11">
+                                @if (Model.IsMoney == true)
+                                {
+                                    <input id="checkboxDiscount2+@Model.OrderNo+@Model.ProductCode" type="checkbox" class="checkbox toggle_" onclick="ToggleDiscount(@Model.Istab,@Model.OrderNo,@Model.strcode)">
+                                }
+                                else
+                                {
+                                    <input id="checkboxDiscount2+@Model.OrderNo+@Model.ProductCode" type="checkbox" checked class="checkbox toggle_" onclick="ToggleDiscount(@Model.Istab,@Model.OrderNo,@Model.strcode)">
+                                }
+                                
+                                <div class="knobs"></div>
+                                <div class="layer1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].ProductCode", Model.ProductCode)</td>
+
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].IsMoney", Model.IsMoney)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionId", Model.PromotionId)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionDetailId", Model.PromotionDetailId)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionValue", Model.PromotionValue)</td>
+        }
+        else if (Model.Istab == 3)
+        {
+            <td class=" td3" style="width: 18.4%;">
+                @Html.TextBox("DetailList[" + Model.OrderNo + "].Quantity", Model.Quantity, new { style = "width:43.3%", @class = "numberinput1 detail_item_qty_3 text-right", data_quantity_inventory = Model.QuantityInInventory })
+                <a class="classHover classMinus"
+                  href="javascript:my_functionadd(@Model.Istab,@Model.strcode,0) ">
+                    <i class="fa fa-minus"></i>
+                </a>
+                <a class="classHover classPlus"
+                   href="javascript:my_functionadd(@Model.Istab,@Model.strcode,1)">
+                    <i class="fa fa-plus"></i>
+                </a>
+            </td>
+            <td class="td4" style="width: 14.3%;">
+                @Html.TextBox("DetailList[" + Model.OrderNo + "].Price", @Common.PhanCachHangNgan2(Model.Price), new { style = "width:85px", @class = "detail_item_price_3", autocomplete = "off" })
+
+            </td>
+
+            <td class="td5" style="width: 20.5%;">
+                @if (Model.IsMoney == true)
+                {
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscount", Model.IrregularDiscount, new { style = "width:65%;float: left;", @class = "numberinput1 detail_item_discount_3 text-right classHidden", autocomplete = "off" })
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscountAmountstr", @Common.PhanCachHangNgan2(Model.IrregularDiscountAmountstr), new { style = "width:65%;float: left;", @class = "numberinput2 detail_item_discount_3_amount text-right classBlock", autocomplete = "off" })
+                }
+                else
+                {
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscount", Model.IrregularDiscount, new { style = "width:65%;float: left;", @class = "numberinput1 detail_item_discount_3 text-right classBlock", autocomplete = "off" })
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscountAmountstr", @Common.PhanCachHangNgan2(Model.IrregularDiscountAmountstr), new { style = "width:65%;float: left;", @class = "numberinput2 detail_item_discount_3_amount text-right classHidden", autocomplete = "off" })
+                }
+                <div class="divTd5" style="width: 34%; float: right;">
+                    <div class="toggle-button-cover1">
+                        <div class="button-cover1">
+                            <div class="button1 r" id="button-11">
+                                @if (Model.IsMoney == true)
+                                {
+                                    <input id="checkboxDiscount3+@Model.OrderNo+@Model.ProductCode" type="checkbox" class="checkbox toggle_" onclick="ToggleDiscount(@Model.Istab,@Model.OrderNo,@Model.strcode)">
+                                }
+                                else
+                                {
+                                    <input id="checkboxDiscount3+@Model.OrderNo+@Model.ProductCode" type="checkbox" checked class="checkbox toggle_" onclick="ToggleDiscount(@Model.Istab,@Model.OrderNo,@Model.strcode)">
+                                }
+                                <div class="knobs"></div>
+                                <div class="layer1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].ProductCode", Model.ProductCode)</td>
+
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].IsMoney", Model.IsMoney)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionId", Model.PromotionId)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionDetailId", Model.PromotionDetailId)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionValue", Model.PromotionValue)</td>
+
+        }
+        else if (Model.Istab == 4)
+        {
+            <td style="width: 18.4%;">
+                @Html.TextBox("DetailList[" + Model.OrderNo + "].Quantity", Model.Quantity, new { style = "width:43.3%", @class = "numberinput1 detail_item_qty_4 text-right", data_quantity_inventory = Model.QuantityInInventory })
+                <a class="classHover classMinus"
+                  href="javascript:my_functionadd(@Model.Istab,@Model.strcode,0) ">
+                    <i class="fa fa-minus"></i>
+                </a>
+                <a class="classHover classPlus"
+                   href="javascript:my_functionadd(@Model.Istab,@Model.strcode,1)">
+                    <i class="fa fa-plus"></i>
+                </a>
+            </td>
+            <td style="width: 14.3%;">
+                @Html.TextBox("DetailList[" + Model.OrderNo + "].Price", @Common.PhanCachHangNgan2(Model.Price), new { style = "width:85px", @class = "detail_item_price_4", autocomplete = "off" })
+
+            </td>
+
+            <td style="width: 20.5%;">
+                @if (Model.IsMoney == true)
+                {
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscount", Model.IrregularDiscount, new { style = "width:65%;float: left;", @class = "numberinput1 detail_item_discount_4 text-right classHidden", autocomplete = "off" })
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscountAmountstr", @Common.PhanCachHangNgan2(Model.IrregularDiscountAmountstr), new { style = "width:65%;float: left;", @class = "numberinput2 detail_item_discount_4_amount text-right classBlock", autocomplete = "off" })
+                }
+                else
+                {
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscount", Model.IrregularDiscount, new { style = "width:65%;float: left;", @class = "numberinput1 detail_item_discount_4 text-right classBlock", autocomplete = "off" })
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscountAmountstr", @Common.PhanCachHangNgan2(Model.IrregularDiscountAmountstr), new { style = "width:65%;float: left;", @class = "numberinput2 detail_item_discount_4_amount text-right classHidden", autocomplete = "off" })
+                }
+                <div class="divTd5" style="width: 34%; float: right;">
+                    <div class="toggle-button-cover1">
+                        <div class="button-cover1">
+                            <div class="button1 r" id="button-11">
+                                @if (Model.IsMoney == true)
+                                {
+                                    <input id="checkboxDiscount4+@Model.OrderNo+@Model.ProductCode" type="checkbox" class="checkbox toggle_" onclick="ToggleDiscount(@Model.Istab,@Model.OrderNo,@Model.strcode)">
+                                }
+                                else
+                                {
+                                    <input id="checkboxDiscount4+@Model.OrderNo+@Model.ProductCode" type="checkbox" checked class="checkbox toggle_" onclick="ToggleDiscount(@Model.Istab,@Model.OrderNo,@Model.strcode)">
+                                }
+                                <div class="knobs"></div>
+                                <div class="layer1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].ProductCode", Model.ProductCode)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].IsMoney", Model.IsMoney)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionId", Model.PromotionId)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionDetailId", Model.PromotionDetailId)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionValue", Model.PromotionValue)</td>
+
+        }
+        else if (Model.Istab == 5)
+        {
+            <td style="width: 18.4%;">
+                @Html.TextBox("DetailList[" + Model.OrderNo + "].Quantity", Model.Quantity, new { style = "width:43.3%", @class = "numberinput1 detail_item_qty_5 text-right", data_quantity_inventory = Model.QuantityInInventory })
+                <a class="classHover classMinus"
+                  href="javascript:my_functionadd(@Model.Istab,@Model.strcode,0) ">
+                    <i class="fa fa-minus"></i>
+                </a>
+                <a class="classHover classPlus"
+                   href="javascript:my_functionadd(@Model.Istab,@Model.strcode,1)">
+                    <i class="fa fa-plus"></i>
+                </a>
+            </td>
+            <td style="width: 14.3%;">
+                @Html.TextBox("DetailList[" + Model.OrderNo + "].Price", @Common.PhanCachHangNgan2(Model.Price), new { style = "width:85px", @class = "detail_item_price_5", autocomplete = "off" })
+
+            </td>
+            <td style="width: 20.5%;">
+                @if (Model.IsMoney == true)
+                {
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscount", Model.IrregularDiscount, new { style = "width:65%;float: left;", @class = "numberinput1 detail_item_discount_5 text-right classHidden", autocomplete = "off" })
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscountAmountstr", @Common.PhanCachHangNgan2(Model.IrregularDiscountAmountstr), new { style = "width:65%;float: left;", @class = "numberinput2 detail_item_discount_5_amount text-right classBlock", autocomplete = "off" })
+                }
+                else
+                {
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscount", Model.IrregularDiscount, new { style = "width:65%;float: left;", @class = "numberinput1 detail_item_discount_5 text-right classBlock", autocomplete = "off" })
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscountAmountstr", @Common.PhanCachHangNgan2(Model.IrregularDiscountAmountstr), new { style = "width:65%;float: left;", @class = "numberinput2 detail_item_discount_5_amount text-right classHidden", autocomplete = "off" })
+                }
+                <div class="divTd5" style="width: 34%; float: right;">
+                    <div class="toggle-button-cover1">
+                        <div class="button-cover1">
+                            <div class="button1 r" id="button-11">
+                                @if (Model.IsMoney == true)
+                                {
+                                    <input id="checkboxDiscount5+@Model.OrderNo+@Model.ProductCode" type="checkbox" class="checkbox toggle_" onclick="ToggleDiscount(@Model.Istab,@Model.OrderNo,@Model.strcode)">
+                                }
+                                else
+                                {
+                                    <input id="checkboxDiscount5+@Model.OrderNo+@Model.ProductCode" type="checkbox" checked class="checkbox toggle_" onclick="ToggleDiscount(@Model.Istab,@Model.OrderNo,@Model.strcode)">
+                                }
+                                <div class="knobs"></div>
+                                <div class="layer1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].ProductCode", Model.ProductCode)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].IsMoney", Model.IsMoney)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionId", Model.PromotionId)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionDetailId", Model.PromotionDetailId)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionValue", Model.PromotionValue)</td>
+        }
+        else
+        {
+            <td style="width: 18.4%;">
+                @Html.TextBox("DetailList[" + Model.OrderNo + "].Quantity", Model.Quantity, new { style = "width:43.3%", @class = "numberinput1 detail_item_qty_6 text-right", data_quantity_inventory = Model.QuantityInInventory })
+                <a class="classHover classMinus"
+                  href="javascript:my_functionadd(@Model.Istab,@Model.strcode,0) ">
+                    <i class="fa fa-minus"></i>
+                </a>
+                <a class="classHover classPlus"
+                   href="javascript:my_functionadd(@Model.Istab,@Model.strcode,1)">
+                    <i class="fa fa-plus"></i>
+                </a>
+            </td>
+            <td style="width: 14.3%;">
+                @Html.TextBox("DetailList[" + Model.OrderNo + "].Price", @Common.PhanCachHangNgan2(Model.Price), new { style = "width:85px", @class = "detail_item_price_6", autocomplete = "off" })
+
+            </td>
+            <td style="width: 20.5%;">
+                @if (Model.IsMoney == true)
+                {
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscount", Model.IrregularDiscount, new { style = "width:65%;float: left;", @class = "numberinput1 detail_item_discount_6 text-right classHidden", autocomplete = "off" })
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscountAmountstr", @Common.PhanCachHangNgan2(Model.IrregularDiscountAmountstr), new { style = "width:65%;float: left;", @class = "numberinput2 detail_item_discount_6_amount text-right classBlock", autocomplete = "off" })
+                }
+                else
+                {
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscount", Model.IrregularDiscount, new { style = "width:65%;float: left;", @class = "numberinput1 detail_item_discount_6 text-right classBlock", autocomplete = "off" })
+                    @Html.TextBox("DetailList[" + Model.OrderNo + "].IrregularDiscountAmountstr", @Common.PhanCachHangNgan2(Model.IrregularDiscountAmountstr), new { style = "width:65%;float: left;", @class = "numberinput2 detail_item_discount_6_amount text-right classHidden", autocomplete = "off" })
+                }
+                <div class="divTd5" style="width: 34%; float: right;">
+                    <div class="toggle-button-cover1">
+                        <div class="button-cover1">
+                            <div class="button1 r" id="button-11">
+                                @if (Model.IsMoney == true)
+                                {
+                                    <input id="checkboxDiscount6+@Model.OrderNo+@Model.ProductCode" type="checkbox" class="checkbox toggle_" onclick="ToggleDiscount(@Model.Istab,@Model.OrderNo,@Model.strcode)">
+                                }
+                                else
+                                {
+                                    <input id="checkboxDiscount6+@Model.OrderNo+@Model.ProductCode" type="checkbox" checked class="checkbox toggle_" onclick="ToggleDiscount(@Model.Istab,@Model.OrderNo,@Model.strcode)">
+                                }
+                                <div class="knobs"></div>
+                                <div class="layer1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td style="display:none; text-align:right">@Html.Hidden("DetailList[" + Model.OrderNo + "].ProductCode", Model.ProductCode)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].IsMoney", Model.IsMoney)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionId", Model.PromotionId)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionDetailId", Model.PromotionDetailId)</td>
+            <td style="display:none;">@Html.Hidden("DetailList[" + Model.OrderNo + "].PromotionValue", Model.PromotionValue)</td>
+        }
+    }
+    @*mcuong.fit*@
+    <td style="text-align:right;" class="detail_item_total_@Model.Istab">@Common.PhanCachHangNgan2(thanh_tien_sau_ck)</td>
+
+    <td class="text-center" style="width: 3%;">
+        <a class="btn-delete-item">
+            <i class="ace-icon fa fa-times red bigger-120" style="cursor:pointer"></i>
+        </a>
+    </td>
+</tr>

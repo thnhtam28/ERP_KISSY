@@ -1,0 +1,233 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using System.Globalization;
+@model List<ProductInvoiceDetailViewModel>
+@{
+    ViewBag.Title = "Báo cáo doanh số theo sản phẩm";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "Sale_BCDoanhSoTheoSP",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    List<Erp.BackOffice.Sale.Models.ProductViewModel> productList = (List<Erp.BackOffice.Sale.Models.ProductViewModel>)ViewBag.productList;
+    List<Erp.BackOffice.Account.Models.CustomerViewModel> list_Customer = (List<Erp.BackOffice.Account.Models.CustomerViewModel>)ViewBag.list_Customer;
+    List<Erp.Domain.Staff.Entities.Branch> branchList = (List<Erp.Domain.Staff.Entities.Branch>)ViewBag.branchlist;
+    //Calendar calendar = CultureInfo.InvariantCulture.Calendar;
+    int index = 0;
+    //var weekdefault = calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+    //string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+    //string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    //string week = Request["week"] != null ? Request["week"] : weekdefault.ToString();
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+}
+
+<style type="text/css">
+</style>
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+    <span class="input-daterange input-group">
+        @Html.TextBox("start", Request["start"] != null ? Request["start"] : aDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Từ ngày" })
+        <span class="input-group-addon">
+            <i class="fa fa-exchange"></i>
+        </span>
+        @Html.TextBox("end", Request["end"] != null ? Request["end"] : retDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Đến ngày" })
+    </span>
+
+    @Html.DropDownList("Paymethod", SelectListHelper.GetSelectList_Category("FormPayment", Request["Paymethod"], "Name", "Hình thức thanh toán"), new { @class = "form-control" })
+
+}
+
+<div class="table-responsive" id="BaoCaoDoanhThu">
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th class="text-center" rowspan="3" style="width:40px;">STT</th>
+                <th class="text-center" rowspan="3">Cửa Hàng</th>
+                @*<th class="text-center" rowspan="3">Tỉnh/TP</th>
+                    <th class="text-center" rowspan="3">Quận/huyện</th>
+                    <th class="text-center" rowspan="3">Địa chỉ</th>*@
+                <th class="text-center" colspan="@(productList.Count()*2)" style="width:400px;">Sản phẩm</th>
+                <th class="text-center" rowspan="3" style="width:80px;">Tổng tiền</th>
+                <th class="text-center" rowspan="3" style="width:80px;">Số lượng</th>
+            </tr>
+            <tr class="">
+                @foreach (var item in productList.OrderBy(x => x.Name))
+                {
+                    <th class="text-center" colspan="2">@item.Name</th>
+                }
+            </tr>
+            <tr class="">
+                @foreach (var item in productList.OrderBy(x => x.Name))
+                {
+                    <th class="text-center" style="width:100px;">Tổng tiền</th>
+                    <th class="text-center" style="width:100px;">Số lượng</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var ii in branchList.OrderBy(x => x.Id))
+            {
+                index++;
+                <tr class="@(index%2==0?"alert-warning":"")">
+                    <td class="" style="width:40px;">@(index)</td>
+                    <td class="">@(ii.Name)</td>
+                    @*<td class="">@(ii.ProvinceName)</td>
+                        <td class="">@(ii.DistrictName)</td>
+                        <td class="">@(ii.Address)</td>*@
+                    @foreach (var item in productList.OrderBy(x => x.Name))
+                    {
+                        var list = Model.Where(x => x.ProductId == item.Id && x.BranchId == ii.Id);
+                        if (list.Count() > 0)
+                        {
+                            <td class="text-right numberinput">
+                                @(CommonSatic.ToCurrencyStr(list.Sum(a => a.Amount), null))
+                                @*<a onclick="OpenPopup('@Url.Action("DoanhThuNgay", "SaleReport", new { area = "Sale", startDate = ViewBag.aDateTime, endDate = ViewBag.retDateTime, branchId = "", productId = item.Id, IsPopup = "true" })', 'Trang chi tiết doanh số theo sản phẩm', 0, 500)">
+                                        @(CommonSatic.ToCurrencyStr(list.Sum(a => a.Amount),null))
+                                    </a>*@
+                            </td>
+                            <td class="text-right numberinput">
+                                @(CommonSatic.ToCurrencyStr(list.Sum(a => a.Quantity), null))
+                            </td>
+                        }
+                        else
+                        {
+                            <td class="text-right">0</td>
+                            <td class="text-right">0</td>
+                        }
+                    }
+                    <td class="text-right red numberinput" data-name="" style="width:80px;">
+                        @(CommonSatic.ToCurrencyStr(Model.Where(x => x.BranchId == ii.Id).Sum(x => x.Amount), null))
+                    </td>
+                    <td class="text-right red numberinput" data-name="" style="width:80px;">
+                        @(CommonSatic.ToCurrencyStr(Model.Where(x => x.BranchId == ii.Id).Sum(x => x.Quantity), null))
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+        <thead>
+            <tr class="">
+                <td class="text-center" style="font-weight:bold" colspan="2">Tổng</td>
+                @if (productList.Count() > 0)
+                {
+                    foreach (var item in productList.OrderBy(x => x.Name))
+                    {
+                        var aa = Model.Where(x => x.ProductId == item.Id);
+                        if (aa.Count() > 0)
+                        {
+                            <td class="text-right numberinput" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(aa.Sum(x => x.Amount), null))</td>
+                            <td class="text-right numberinput" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(aa.Sum(x => x.Quantity), null))</td>
+                        }
+                        else
+                        {
+                            <td class="text-right red" style="font-weight:bold">0</td>
+                            <td class="text-right red" style="font-weight:bold">0</td>
+                        }
+                    }
+                }
+                else
+                {
+                    <td class="text-right red" style="font-weight:bold"></td>
+                    <td class="text-right red" style="font-weight:bold"></td>
+                }
+                <td class="text-right red numberinput" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Amount), null))</td>
+                <td class="text-right red numberinput" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Quantity), null))</td>
+            </tr>
+        </thead>
+    </table>
+
+</div>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <button onclick="tableToExcel('CTable', 'BaoCaoDoanhThu')" class="btn btn-primary btn-sm btn-white btn-success">
+        <i class="ace-icon fa fa-download"></i>
+        Xuất Excel
+    </button>
+}
+<script src="~/Scripts/jquery.floatThead.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#CTable").floatThead({ top: 30 });
+    });
+</script>
+@section Scripts {
+    <script type="text/javascript">
+
+        var tableToExcel = (function () {
+
+            var uri = 'data:application/vnd.ms-excel;base64,'
+                , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+                , base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                , format = function (s, c) { return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; }) }
+            return function (table, name) {
+                $('.numberinput').each(function (index, tr) {
+                    var ii = $(tr).text();
+                    $(tr).text(removeComma(ii));
+                });
+                if (!table.nodeType) table = document.getElementById(table)
+                var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML }
+                window.location.href = uri + base64(format(template, ctx))
+                $('.numberinput').each(function (index, tr) {
+                    var ii = $(tr).text();
+                    $(tr).text(numeral(ii).format('0,0'));
+                });
+            }
+        })()
+    </script>
+    <script>
+                            //$(function () {
+                            //    $("#quarter").val(currentQuarter);
+
+                            //    var single = "month";
+
+                            //    $("#single1").change(function () {
+                            //        if ($(this).val() == 'month') {
+                            //            $("#month").show();
+                            //            $("#week").hide();
+                            //            $("#quarter").hide();
+                            //            single = "month";
+                            //        }
+                            //    });
+
+                            //    $("#single2").change(function () {
+                            //        if ($(this).val() == 'quarter') {
+                            //            $("#month").hide();
+                            //            $("#week").hide();
+                            //            $("#quarter").show();
+                            //            single = "quarter";
+                            //        }
+                            //    });
+                            //    $("#single3").change(function () {
+                            //        if ($(this).val() == 'week') {
+                            //            $("#month").hide();
+                            //            $("#quarter").hide();
+                            //            $("#week").show();
+                            //            single = "week";
+                            //        }
+                            //    });
+                            //});
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

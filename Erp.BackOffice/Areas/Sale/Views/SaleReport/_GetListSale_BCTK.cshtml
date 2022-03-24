@@ -1,0 +1,186 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using PagedList.Mvc;
+
+@model PagedList.IPagedList<ProductViewModel>
+    @{
+        Layout = null;
+        int index = 1;
+        var setting = Erp.BackOffice.Helpers.Common.GetSetting("hiden_solo_handung");
+        var setting2 = Erp.BackOffice.Helpers.Common.GetSetting("hiden_gianhap");
+        var a = ViewBag.currentSize;
+        List<Erp.Domain.Sale.Entities.Warehouse> Warehouse = (List<Erp.Domain.Sale.Entities.Warehouse>)ViewBag.Warehouse;
+        List<Sale_BaoCaoTonKhoViewModel> data = (List<Sale_BaoCaoTonKhoViewModel>)ViewBag.data;
+
+        
+    }
+    <style>
+        .display_none {
+            display: none;
+        }
+
+        tr:hover {
+            background: #fef4bb !important;
+        }
+
+        #fot_table {
+            float: right;
+            margin-right: 2px;
+            text-align: right;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+            #fot_table .col {
+                margin: 0 5px;
+            }
+
+                #fot_table .col input {
+                    width: 30px;
+                }
+
+            #fot_table #number_page {
+                margin-top: 5px;
+            }
+
+                #fot_table #number_page input {
+                    text-align: center;
+                }
+
+            #fot_table .pagination-container {
+                margin-right: -5px;
+            }
+    </style>
+    <table id="cTable" class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr class="" style="display:none">
+                <th class="" colspan="12" style="text-align:center"><h4>BÁO CÁO TỒN KHO</h4></th>
+            </tr>
+            <tr>
+
+                <th style="width:20%;text-align:center">Mã sản phẩm</th>
+                <th style="width:20%;text-align:center">Tên sản phẩm</th>
+                @*<th style="width:100px;text-align:center">Nhóm sản phẩm</th>*@
+                @*<th style="width:100px;text-align:center">Nhà sản xuất</th>*@
+                <th style="width:10%;text-align:center">Tổng</th>
+                @foreach (var item in Warehouse)
+                {
+                    <th style="width:10%;text-align:center">@item.Name</th>
+                }
+
+
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var tong = data.Where(x => x.ProductCode == item.Code).Sum(x => x.Quantity);
+                <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+
+                    <td>@(item.Code)</td>
+                    <td>@(item.Name)</td>
+
+                    <td>@tong</td>
+                    @foreach (var i in Warehouse)
+                    {
+                        var sl = data.Where(x => x.ProductCode == item.Code && x.WarehouseName == i.Name).Sum(x => x.Quantity);
+
+                        <td>@sl</td>
+                    }
+
+
+
+                </tr>
+            }
+        </tbody>
+        <thead style="position:fixed;bottom: 80px;right: 0.75%; width: 20.3%">
+
+            @*<tr>
+                    <td colspan="10" style="text-align:right;width: 110px"><b>Tổng</b></td>
+                    <td style="text-align:right;width: 110px">@(Common.PhanCachHangNgan(data.Sum(x => x.Quantity)))</td>
+
+                    <td style="text-align:right;width: 110px">@(CommonSatic.ToCurrencyStr(data.Sum(x => Math.Round(x.Quantity.Value * x.Price.Value, 0)), null))</td>
+                </tr>*@
+        </thead>
+    </table>
+    <!-- Thêm mã phân trang -->
+    <br />
+    <div id="fot_table" class="row">
+        <div class="col">
+            @using (Ajax.BeginForm("_GetListSale_BCTK", "SaleReport", new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "react_report" }))
+            {
+                @*@Html.AntiForgeryToken()*@
+                @*<p>
+                        Kích thước trang: @Html.DropDownList("size", (List<SelectListItem>)ViewBag.size, new { @onchange = "this.form.submit();" })
+                    </p>*@
+            }
+            <p>
+                Kích thước trang: @Html.DropDownList("size", (List<SelectListItem>)ViewBag.size)
+            </p>
+        </div>
+        <div id="number_page" class="col">
+            <label>
+                Chuyển trang:
+            </label>
+            <input id="ChuyenTrang" name="ChuyenTrang" style="width :60px; height: 32px; margin-bottom: 5px; border: 1px solid #D5D5D5" placeholder="@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount" />
+        </div>
+        <div class="col">
+            @Html.PagedListPager(Model, page => Url.Action("_GetListSale_BCTK", new { page, size = ViewBag.currentSize }),
+        PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "react_report" })
+        )
+        </div>
+    </div>
+
+
+    <!-- Kết thúc -->
+
+    <script src="~/Scripts/jquery.floatThead.js"></script>
+    <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#cTable").floatThead({ top: 30 });
+        });
+
+        $("#size").change(function () {
+            debugger
+            var size = $("#size").val();
+            $.get('/SaleReport/_GetListSale_BCTK/?size=' + size, function (html) {
+                $("#react_report").html(html);
+            })
+
+        });
+
+        $('#ChuyenTrang').keyup(function (event) {
+            var size = $("#size").val();
+            var page = $('#ChuyenTrang').val();
+            $.get('/SaleReport/_GetListSale_BCTK/?size=' + size + "&page=" + page, function (html) {
+                $("#react_report").html(html);
+            })
+
+        });
+
+        //$("#size").change(function () {
+
+        //    var size = $("#size").val();
+
+
+        //    $.ajax({
+        //        data: { size: size },
+        //        url: '/SaleReport/_GetListSale_BCTK', type: "GET", dataType: "json",
+        //        contentType: 'application/json',
+        //        success: function (result) {
+        //            debugger
+
+        //            $("#cTable").html(result);
+
+        //        }
+
+        //    });
+
+        //});
+
+
+    </script>

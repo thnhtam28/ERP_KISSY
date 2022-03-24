@@ -1,0 +1,131 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+@model List<CustomerViewModel>
+    @{
+        Layout = null;
+
+    }
+    @section HeadOfPage {
+        @Html.ScriptTop_ChosenStyle()
+        <style type="text/css">
+            .imgproduct :hover {
+                border-color: antiquewhite
+            }
+        </style>
+    }
+    @*cái này search cus*@
+    <div class="product-search-box">
+
+        <select id="CustomerSelectList3" name="CustomerSelectList3" style="width:400px">
+
+            @foreach (var item in Model)
+            {
+                <option value="@item.Id" data-selected="0" data-value="@item.Id|@(item.FullName==null?"null":item.FullName) | @(item.Mobile==null?"null":item.Mobile)" data-customer-id="@item.Id" data-customerame="@(item.FullName==null?"null":item.FullName)" data-taxcode="@(item.TaxCode==null?"null":item.TaxCode)" data-bankaccount="@(item.BankAccount==null?"null":item.BankAccount)" data-bankname="@(item.BankName==null?"null":item.BankName)" data-address="@(item.Address==null?"null":item.Address)" data-note="@(item.Note==null?"null":item.Note)">@(item.FullName == null ? "null" : item.FullName)</option>
+
+            }
+        </select>
+    </div>
+
+
+
+    <link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+    <script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#CustomerSelectList3').radComboBox({
+                colTitle: 'ID,Tên Khách Hàng, Số ĐT',
+                colValue: 1,
+                colHide: '1',
+                colSize: '0px,275px',
+                colClass: ',,',
+                width: 508,
+                height: 250,
+                boxSearch: true,
+                customId2: 3,
+                colSearch: 2
+            });
+            //Hiển thị giá và tính thành tiền khi chọn sản phẩm
+
+            $('#CustomerSelectList3').on('change', function () {
+                var $this = $(this);
+                var selected = $this.find("option:selected");
+
+                if (selected.val() == '' || $('#product_item_' + selected.val()).length > 0)
+                    return;
+                if (tab3 == 0 && tab1 == 1 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                    var Istab = 1;
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 1 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                    var Istab = 2;
+                } else if (tab3 == 1 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                    var Istab = 3;
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 1 && tab5 == 0 && tab6 == 0) {
+                    var Istab = 4;
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 1 && tab6 == 0) {
+                    var Istab = 5;
+                } else {
+                    var Istab = 6;
+                }
+
+                var CustomerId = selected.data("customer-id");
+                var CustomerName = selected.data("customerame");
+                var CustomerPhone = selected.text();
+                var TaxCode = selected.data("taxcode");
+                var BankAccount = selected.data("bankaccount");
+                var BankName = selected.data("bankname");
+                var Address = selected.data("address");
+                var Note = selected.data("note");
+                var formdata = {
+                    CustomerId: CustomerId,
+                    CustomerName: CustomerName,
+                    CustomerPhone: CustomerPhone,
+                    TaxCode: TaxCode,
+                    BankAccount: BankAccount,
+                    BankName: BankName,
+                    Address: Address,
+                    Note: Note,
+                    Istab: Istab
+                };
+
+                //Thêm dòng mới
+                ClickEventHandlerSearchCus(true, "/ProductInvoice/LoadCustomerInvoice", ".detailList2", formdata, function () {
+
+
+                    if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+
+                        $("#DiscountTab1").val(0);
+                        tinh_tong_tien1();
+                        totalKm = 0;
+
+                    } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+
+                        $("#DiscountTab2").val(0);
+                        tinh_tong_tien2();
+                        totalKm = 0;
+                    } else {
+
+                        $("#DiscountTab3").val(0);
+                        tinh_tong_tien3();
+                        totalKm = 0;
+                    }
+
+
+                });
+            });
+
+
+            function getOrderNO() {
+                if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+                    var OrderNo = $('.detailList1 tr').length;
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+                    var OrderNo = $('.detailList2 tr').length;
+                } else {
+                    var OrderNo = $('.detailList3 tr').length;
+                }
+                return OrderNo;
+            }
+
+        });
+
+    </script>

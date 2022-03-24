@@ -1,0 +1,106 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+@model List<CustomerViewModel>
+    @{
+        Layout = null;
+
+    }
+    @section HeadOfPage {
+        @Html.ScriptTop_ChosenStyle()
+        <style type="text/css">
+            .imgproduct :hover {
+                border-color: antiquewhite
+            }
+        </style>
+    }
+    <div class="product-search-box">
+        <input id="product_barcode" type="text" placeholder="[F3] Mã sản phẩm..." autocomplete="off" />
+        <select id="CustomerSelectList" name="CustomerSelectList" style="width:400px">
+            <option value="">- Tìm sản phẩm -</option>
+            @foreach (var item in Model)
+            {
+                <option value="@item.Id" data-selected="0" data-value="@item.Id| @(item.customerame) | @( @item.CustomerPhone)|@(Common.PhanCachHangNgan(item.Code))" data-customer-id="@item.CustomerId" data-customerame="@item.customerame" data-taxcode="@(item.TaxCode)" data-bankaccount="@item.BankAccount" data-bankname="@item.BankName" data-address="@(item.Address)" data-note="@item.Note">@item.ProductName</option>
+
+            }
+        </select>
+    </div>
+
+
+
+
+    <link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+    <script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            $('#CustomerSelectList').radComboBox({
+                colTitle: 'ID,Tên Khách Hàng, Số ĐT',
+                colValue: 1,
+                colHide: '1',
+                colSize: '0px,275px,275px',
+                colClass: ',,',
+                width: 600,
+                height: 300,
+                boxSearch: true,
+                colSearch: 2
+            });
+            alert('helllo search');
+            $('#CustomerSelectList').on('change', function () {
+                var $this = $(this);
+                var selected = $this.find("option:selected");
+
+                if (selected.val() == '' || $('#product_item_' + selected.val()).length > 0)
+                    return;
+                if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+
+                    var Istab = 1;
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+
+                    var Istab = 2;
+                } else {
+
+                    var Istab = 3;
+                }
+                var CustomerId = selected.data("customer-id");
+                var CustomerName = selected.data("customerame");
+                var CustomerPhone = selected.text();
+                var TaxCode = selected.data("taxcode");
+                var BankAccount = selected.data("bankaccount");
+                var BankName = selected.data("bankname");
+                var Address = selected.data("address");
+                var Note = selected.data("note");
+                var formdata = {
+                    CustomerId: CustomerId,
+                    CustomerName: CustomerName,
+                    CustomerPhone: CustomerPhone,
+                    TaxCode: TaxCode,
+                    BankAccount: BankAccount,
+                    BankName: BankName,
+                    Address: Address,
+                    Note: Note,
+                    Istab: Istab
+                };
+
+                //Thêm dòng mới
+                ClickEventHandlerSearchCus(true, "/ProductInvoice/LoadCustomerInvoice", ".detailList2", formdata);
+            });
+
+
+
+
+            function getOrderNO() {
+                if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+                    var OrderNo = $('.detailList1 tr').length;
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+                    var OrderNo = $('.detailList2 tr').length;
+                } else {
+                    var OrderNo = $('.detailList3 tr').length;
+                }
+                return OrderNo;
+            }
+
+        });
+
+    </script>

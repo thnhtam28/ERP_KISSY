@@ -1,0 +1,54 @@
+namespace ERP_API.Models
+{
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+    using System.Data.Entity.Spatial;
+
+    public partial class Account_ProcessPayment
+    {
+        public int Id { get; set; }
+
+        public bool? IsDeleted { get; set; }
+
+        public DateTime? CreatedDate { get; set; }
+
+        public int? CreatedUserId { get; set; }
+
+        public DateTime? ModifiedDate { get; set; }
+
+        public int? ModifiedUserId { get; set; }
+
+        public int? AssignedUserId { get; set; }
+
+        [StringLength(150)]
+        public string Name { get; set; }
+
+        public int? OrderNo { get; set; }
+
+        public DateTime? DayPayment { get; set; }
+
+        public int? MoneyPayment { get; set; }
+
+        [StringLength(150)]
+        public string FormPayment { get; set; }
+
+        [StringLength(100)]
+        public string CodeTrading { get; set; }
+
+        [StringLength(150)]
+        public string Bank { get; set; }
+
+        [StringLength(200)]
+        public string Payer { get; set; }
+
+        public int? ContractId { get; set; }
+
+        [StringLength(50)]
+        public string Status { get; set; }
+
+        [StringLength(20)]
+        public string TransactionCode { get; set; }
+    }
+}

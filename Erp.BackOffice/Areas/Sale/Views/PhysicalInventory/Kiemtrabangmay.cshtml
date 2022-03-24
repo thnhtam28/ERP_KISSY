@@ -1,0 +1,703 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model PhysicalInventoryViewModel
+<style>
+    body {
+        overflow: hidden;
+    }
+
+    tr.scrollCode {
+        background-color: cornflowerblue;
+    }
+
+    #popup_archive {
+        position: center;
+        bottom: 30%;
+        left: 20%;
+        width: 50%;
+        height: 450px;
+        max-width: inherit;
+        top: 30%;
+        right: 30%;
+        /*max-height: 100%;*/
+        /* overflow-y:scroll;*/
+    }
+
+    .table-responsive-2 {
+        overflow-y: scroll;
+        max-height: 290px;
+    }
+
+    #tblCustomers {
+        overflow-y: scroll;
+        max-height: 80%;
+    }
+
+    .table-responsive-3 {
+        overflow-y: scroll;
+        max-height: 300px;
+    }
+
+    #popup_archive2 {
+        position: center;
+        bottom: 30%;
+        left: 20%;
+        width: 50%;
+        height: 400px;
+        max-width: inherit;
+        top: 30%;
+        right: 30%;
+        /*max-height: 100%;*/
+        /*overflow-y:scroll;*/
+    }
+
+    #chitiet {
+        position: inherit;
+        bottom: 50%;
+        left: 80%;
+        right: 10%;
+        top: auto;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    .show {
+        display: block;
+    }
+
+    #salerId {
+        height: 34px;
+    }
+</style>
+@{
+    ViewBag.Title = "Kiểm tra bằng máy";
+
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "PhysicalInventory",
+        ActionName = "Kiemtrabangmay",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+
+    int n = 0;
+    int m = 0;
+    int total = 0;
+    var groupList = Model.DetailList.GroupBy(x => new { x.CategoryCode }, (key, group) => new
+    {
+        CategoryCode = key.CategoryCode,
+        ProductList = group.ToList()
+    });
+    string SalerId = Request["salerId"] != null ? Request["salerId"] : "";
+    List<PhysicalInventoryDetailchildrenViewModel> detailchild = (List<PhysicalInventoryDetailchildrenViewModel>)ViewBag.detailchild;
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <script src="~/Scripts/jquery-1.9.1.js"></script>
+    <script src="~/Scripts/jquery.freezeheader.js"></script>
+
+
+
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+
+<body>
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+
+    <div class="row">
+        @*<div class="col-sm-12">
+
+                <p style="width:300px">
+                        @Html.TextBox("txtCode", Request["txtCode"], new { @class = "form-control", autocomplete = "off", placeholder = "Nhập mã..." })
+
+                    </p>
+
+            </div>*@
+
+        <div class="col-sm-8" style="max-height:600px; overflow-y:auto">
+            <div>
+                <table id="tblCustomers" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            @*<th style="width:130px">ID</th>
+                                <th style="width:130px">ID1</th>*@
+                            <th style="width:5%">STT</th>
+                            <th>Mã sản phẩm</th>
+                            <th style="width:15%">Tên sản phẩm</th>
+
+                            <th style="width:10%">SL hệ thống</th>
+                            <th style="width:10%">SL đã kiểm</th>
+                            @*<th style="width:10%">SL đang kiểm</th>*@
+                            <th style="width:10%">SL chênh lệch</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailList">
+                        @*<tr>
+                                <td colspan="9" style="font-weight:bold;font-size:18px;">TOTAL</td>
+                                <td style="text-align:center;font-size:18px;"></td>
+                                <td></td>
+                            </tr>*@
+                        @foreach (var g in groupList)
+                        {
+
+                            @*<tr style="background:#eee">
+                                    <td colspan="7"><b>@g.CategoryCode</b></td>
+
+                                </tr>*@
+                            foreach (var item in g.ProductList)
+                            {
+                                n++;
+                                <tr>
+                                    @*<td>@item.Id</td>
+                                        <td>@item.PhysicalInventoryId</td>*@
+                                    <td>@n</td>
+                                    <td>@item.ProductCode</td>
+                                    <td>@item.ProductName</td>
+
+                                    <td>@Common.PhanCachHangNgan(item.QuantityInInventory)</td>
+                                    <td><input readonly="readonly" name="QuantityRemaining" style="width:70px;" value="@Common.PhanCachHangNgan(item.QuantityRemaining)" /></td>
+                                    @*<td><input class="productA" name="QuantityForcheck" style="width:70px;" value="0" /></td>*@
+                                    <td>@Common.PhanCachHangNgan(item.QuantityDiff)</td>
+                                </tr>
+                            }
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="tabbable">
+                <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tabInvoice">
+                    <li class="active"><a data-toggle="tab" href="#tab1">Thông tin chi tiết</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="detail-view">
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Code, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CreatedDate, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.WarehouseName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            <div class="col-xs-4 control-label"><label for="ProductInboundCode">Mã phiếu nhập</label></div><div class="col-xs-8 control-value"><a target="_blank" href="/ProductInbound/Detail/?TransactionCode=@Model.ProductInboundCode">@Model.ProductInboundCode</a></div>
+                        </div>
+                        <div class="row control-group">
+                            <div class="col-xs-4 control-label"><label for="ProductOutboundCode">Mã phiếu xuất</label></div><div class="col-xs-8 control-value"><a target="_blank" href="/ProductOutbound/Detail/?TransactionCode=@Model.ProductOutboundCode">@Model.ProductOutboundCode</a></div>
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Note, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="button">
+        <div class="mini-popup" style="float:left">
+            @if (detailchild.Any())
+            {
+                <a class="btn btn-mini btn-success" data-toggle="collapse" data-target="#popup_archive">
+                    <i class="ace-icon fa fa-save"></i>
+                    Tiếp tục
+                </a>
+            }
+            else
+            {
+                <a class="btn btn-mini btn-success" data-toggle="collapse" data-target="#popup_archive">
+                    <i class="ace-icon fa fa-save"></i>
+                    Kiểm kê
+                </a>
+            }
+
+        </div>
+
+        @if (detailchild.Any())
+        {
+            <div class="mini-popup" style="float:left">
+                <a class="btn btn-mini" data-toggle="collapse" data-target="#popup_archive2" id="chitiet">
+
+                    Xem chi tiết kiểm kê
+                </a>
+            </div>
+        }
+        <div class="btnEditCheck" style="margin-left:10px;">
+            <a href="@Url.Action("SuaKiemtrabangmay", new { Id = Model.Id })" class="btn btn-primary btn-mini  btn-sm"><i class="fa fa-warning"></i> Chỉnh sửa</a>
+        </div>
+    </div>
+
+    <div id="popup_archive" class="popover fade top">
+        <h3 class="popover-title"><i class="ace-icon fa fa-save"></i> Kiểm kê con</h3>
+        <div class="popover-content">
+            <div class="row-1">
+                <div class="col-sm-12">
+                    <p style="width:300px">
+                        <div style="float:left">
+                            @Html.TextBox("txtCode", Request["txtCode"], new { @class = "form-control", autocomplete = "off", placeholder = "Nhập mã...", style = "border-radius:5px;" })
+                        </div>
+
+                        <div class="row">
+                            @Html.DropDownList("salerId", SelectListHelper.GetSelectList_FullUserName(Request["salerId"], null), new { @class = "", style = "border-radius:5px;" })
+                            <label style=" color red;font-size 12pt;font-weight:bold" id="Testthu"></label>
+                        </div>
+                    </p>
+                    <div class="table-responsive-2">
+                        <table id="tblCustomers-2" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Số lượng</th>
+                                    <th style="width:20%">SL chênh lệch</th>
+                                    <th style="display:none;">STT</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detailList">
+                                @foreach (var g in groupList)
+                                {
+                                    foreach (var item in g.ProductList)
+                                    {
+                                        m++;
+                                        <tr class="hide">
+                                            <td>@item.ProductCode--@item.ProductName</td>
+                                            <td><input class="productB" name="QuantityForcheck" style="width:70px;" value="0" /></td>
+                                            <td>@item.QuantityDiff</td>
+                                            <td style="display:none;">@item.Id</td>
+                                            <td style="display:none;">@item.PhysicalInventoryId</td>
+                                            <td><input class="STT" name="txtSTT" style="display:none;" value="0" /></td>
+                                        </tr>
+                                    }
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="top-10">
+                        <a class="btn btn-mini btn-primary" id="Success">
+                            Cập nhật
+                        </a>
+                        <a class="btn btn-white btn-sm no-border" id="close" data-toggle="collapse" data-target="#popup_archive">Đóng</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="popup_archive2" class="popover fade top">
+        <h3 class="popover-title"><i class="ace-icon fa fa-arrow-circle-right"></i>Chi tiết</h3>
+        <div class="popover-content">
+            <div class="row-1">
+                <div class="col-sm-12">
+                    @*</div>
+
+                        <div class="col-sm-12">*@
+                    <div class="table-responsive-3">
+                        <table id="tblCustomers-3" class="table table-bordered">
+                            <thead>
+                                <tr>
+
+                                    <th style="width:5%">Lần</th>
+
+                                    @*<th style="width:15%">Sản phẩm</th>*@
+                                    <th style="width:20%">Người kiểm</th>
+
+                                    @*<th style="width:10%">Số lượng</th>*@
+                                    <th style="width:15%">Ngày</th>
+                                    <th style="width:15%">Chi tiết</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detailList">
+
+                                @*<tr style="background:#eee">
+                                        <td colspan="7"><b>@g.CategoryCode</b></td>
+
+                                    </tr>*@
+                                @foreach (var item in detailchild)
+                                {
+
+                                    <tr>
+
+                                        <td style="text-align:center">@item.NumberCheck</td>
+                                        <td>@item.UserName</td>
+                                        @*<td>@item.ProductCode-@item.ProductName</td>*@
+
+                                        @*<td>@item.Qty</td>*@
+                                        <td>@item.CreatedDate.ToString("dd/MM/yyyy hh:mm")</td>
+                                        <td>
+                                            <a class="green show-details-btn" title="Chi tiết" data-id="@item.NumberCheck" data-id1="@item.PhysicalInventoryDetailId">
+                                                <i class="ace-icon fa fa-angle-double-down bigger-120"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="top-10">
+
+                        <a class="btn btn-white btn-sm no-border" data-toggle="collapse" data-target="#popup_archive2">Đóng</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        function sortTable() {
+            var table, rows, switching, i, x, y, shouldSwitch;
+            table = document.getElementById("tblCustomers-2");
+            switching = true;
+            /* Make a loop that will continue until
+            no switching has been done: */
+            while (switching) {
+                // Start by saying: no switching is done:
+                switching = false;
+                rows = table.rows;
+                /* Loop through all table rows (except the
+                first, which contains table headers): */
+
+                for (i = 1; i < (rows.length - 1); i++) {
+                    // Start by saying there should be no switching:
+                    shouldSwitch = false;
+                    /* Get the two elements you want to compare,
+                    one from current row and one from the next: */
+
+                    var row = $(rows[i]);
+                    x = row.find('input[name="txtSTT"]').val();
+                    var row1 = $(rows[i + 1]);
+                    y = row1.find('input[name="txtSTT"]').val();
+                    //alert(t1);
+                    // alert(x);
+                    // alert(y);
+
+
+
+                    // Check if the two rows should switch place:
+                    if (parseInt(x) > parseInt(y)) {
+                        // If so, mark as a switch and break the loop:
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+                if (shouldSwitch) {
+                    //alert("hoan doi");
+                    /* If a switch has been marked, make the switch
+                    and mark that a switch has been done: */
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                }
+            }
+        }
+
+        $('#txtCode').keypress(function (e) {
+            if (e.which == 13) {
+                var txtcodekh = $(this).val();
+
+                //alert("ok");
+
+
+
+                $("#tblCustomers-2 TBODY TR").each(function () {
+                    var row = $(this);
+                    row.find('input[name="txtSTT"]').val(1);
+                });
+
+                $("#tblCustomers-2 TBODY TR").each(function () {
+                    var w = $(window);
+                    var row = $(this);
+                    console.log(row);
+                    var customer = {};
+                    var Macustomer = row.find("TD").eq(0).html();
+                    var Macustomer1 = Macustomer.search("--");
+                    var Macustomer2 = Macustomer.substring(0, Macustomer1);
+                    //alert(Macustomer2);
+                    if (txtcodekh.localeCompare(Macustomer2) == 0) {
+                        //alert(txtcodekh);
+                        var body = $("html,.table-responsive-2");
+                        row.addClass('scrollCode');
+
+                        row.find('input[name="QuantityForcheck"]').val(parseInt(row.find('input[name="QuantityForcheck"]').val()) + 1);
+                        row.find('input[name="txtSTT"]').val(0);
+
+                        row.removeClass('hide');
+                        //row.addClass('show');
+                    } else {
+                        $(this).removeClass("scrollCode");
+                    }
+
+                });
+                sortTable();
+                $(this).val("");
+            }
+        });
+
+        //$("body").on("click", "#btnSave", function () {
+        //    //Loop through the Table rows and build a JSON array.
+        //    ShowLoading();
+        //    var customers = new Array();
+        //    var IDIVENTORY = 0;
+        //    $("#tblCustomers TBODY TR").each(function () {
+        //        var row = $(this);
+        //        var customer = {};
+        //        customer.Id = row.find("TD").eq(0).html();
+        //        customer.Giacu = row.find("TD").eq(1).html();
+        //        $(this).closest('tr').find("input").each(function () {
+        //            customer.Giamoi = this.value;
+        //        });
+
+        //        customers.push(customer);
+        //    });
+
+        //    $.ajax({
+        //        type: "POST",
+        //        url: "/PhysicalInventory/Kiemtrabangmay",
+        //        data: JSON.stringify(customers),
+        //        contentType: "application/json; charset=utf-8",
+        //        dataType: "json",
+        //        success: function (r) {
+        //            location.reload();
+        //            HideLoading();
+        //        },
+        //        error: function (r) {
+
+        //            location.reload();
+        //            HideLoading();
+        //        },
+
+        //    });
+
+        //});
+
+        $("body").on("click", "#Success", function () {
+            //Loop through the Table rows and build a JSON array.
+            ShowLoading();
+            var customers = new Array();
+            var IDIVENTORY = 0;
+            $("#tblCustomers-2 TBODY TR").each(function () {
+                var row = $(this);
+                var customer = {};
+                customer.Id = row.find("TD").eq(3).html();
+                //alert(customer.Id);
+                customer.Giacu = row.find("TD").eq(4).html();
+                $(this).closest('tr').find("input").each(function () {
+                    customer.Giamoi = this.value;
+                });
+                customer.iduser = $("#salerId").val();
+                customers.push(customer);
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "/PhysicalInventory/Kiemtrabangmay",
+                data: JSON.stringify(customers),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (r) {
+                    location.reload();
+                    HideLoading();
+                },
+                error: function (r) {
+
+                    location.reload();
+                    HideLoading();
+                },
+
+            });
+
+        });
+
+        //chi tiết
+        $(".show-details-btn").on("click", function (e) {
+            debugger
+            var Id = $(this).data("id");
+            var Id2 = $(this).data("id1");
+            $(this).closest('tr').addClass('grid-row-selected').siblings().removeClass('grid-row-selected');
+            var clicks = $(this).data('clicks');
+            if (clicks) {
+                $("#Details-" + Id).remove();
+            } else {
+
+                console.log(Id);
+                //e.preventDefault();
+                //get load detail productInvoice
+                $.ajax({
+                    url: '/PhysicalInventory/GetListJsonDetailById/',
+                    data: JSON.stringify({ Id: Id, Id2: Id2 }),
+                    dataType: "json",
+                    type: "POST",
+                    contentType: 'application/json; charset=utf-8',
+                    async: true,
+                    success: function (data) {
+                        console.log(data);
+                        var trHTML = '';
+                        trHTML += '<tr id="Details-' + Id + '" class="open" >';
+                        trHTML += '<td colspan="11">';
+                        trHTML += '<div class="table-detail clearfix">'
+                        trHTML += '<div class="row">';
+                        trHTML += ' <table id="tableDetail" class="table table-striped grid-table">';
+                        trHTML += ' <thead>';
+                        trHTML += ' <tr><th class="grid-header">#</th> <th class="grid-header">Sản Phẩm</th><th class="grid-header">Số lượng</th></tr> ';
+                        trHTML += ' <tbody id="listDetail">';
+                        var row = 0;
+                        $.each(data, function (i, item) {
+                            row++;
+                            trHTML += '<tr class="grid-row"><td class="grid-cell">' + row + '</td><td class="grid-cell">' + item.ProductCode + '-' + item.ProductName + '</td><td class="grid-cell">' + item.Qty + '</td></tr>';
+
+                        });
+                        trHTML += '</tbody>';
+                        trHTML += '</table>';
+                        trHTML += '</div>';
+                        trHTML += '</div>';
+                        trHTML += '</td>';
+                        trHTML += '</tr>';
+                        //$('#tableDetail tbody').append(trHTML);
+
+                        $('.grid-row-selected').closest('.grid-row-selected').after(trHTML);
+
+                    },
+                    error: function (xhr) {
+                        alert('error');
+                    }
+                });
+            }
+            $(this).data("clicks", !clicks);
+
+
+
+
+        })
+
+    </script>
+    <script>
+        //Sum value keyup đang kiểm
+        //$(document).on("keyup", "input:text", function () {
+        //    calculateSum();
+        //});
+
+        //function calculateSum() {
+        //    var total = 0;
+        //    $('.productB').each(function () {
+        //        if (!isNaN(parseInt($(this).val())))
+        //            total += parseInt($(this).val());
+        //    });
+        //    $('#tblCustomers-2 tr:first td:eq(1)').html(total);
+
+        //}
+        $(document).on("keyup", "input:text", function () {
+            sumQuantity();
+        });
+        function sumQuantity() {
+            var Total = 0;
+            $('.productB').each(function () {
+                var productB = $(this);
+                Total += parseInt(productB.val());
+            })
+
+            $('#Testthu').html("Tổng SL:" + Total);
+        }
+        $("#close").on("click", function () {
+            $("#tblCustomers-2 TBODY TR").each(function () {
+                var row = $(this);
+                row.find('input[name="QuantityForcheck"]').val(0);
+                row.addClass('hide');
+            });
+
+        });
+
+
+        //var column1 = $('#tblCustomers-3 td:first-child');
+        //modifyTableRowspan(column1);
+
+        function modifyTableRowspan(column) {
+
+            var prevText = "";
+            var counter = 0;
+
+            column.each(function (index) {
+
+
+                var textValue = $(this).text();
+
+                if (index === 0) {
+                    prevText = textValue;
+                }
+
+                if (textValue !== prevText || index === column.length - 1) {
+
+                    var first = index - counter;
+
+                    if (index === column.length - 1) {
+                        counter = counter + 1;
+                    }
+
+                    column.eq(first).attr('rowspan', counter);
+
+
+                    if (index === column.length - 1) {
+                        for (var j = index; j > first; j--) {
+                            column.eq(j).remove();
+                        }
+                    }
+
+                    else {
+
+                        for (var i = index - 1; i > first; i--) {
+                            column.eq(i).remove();
+                        }
+                    }
+
+                    prevText = textValue;
+                    counter = 0;
+                }
+
+                counter++;
+
+            });
+
+        }
+    </script>
+</body>
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    <script src="~/Scripts/jquery.floatThead.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            $("#tblCustomers").floatThead({ top: 30 });
+
+
+        });
+    </script>
+
+
+}

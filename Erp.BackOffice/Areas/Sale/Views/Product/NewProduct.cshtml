@@ -1,0 +1,175 @@
+﻿@model IEnumerable<ProductViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+    @{
+        ViewBag.Title = Wording.IS_NEW;
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "Product",
+            ActionName = "NewProduct",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false,
+            AdvancedSearch = false,
+            SearchOjectAttr = ViewBag.ListOjectAttrSearch
+        };
+
+    }
+<style>
+    #txtSearch {
+        width:30%;
+    }
+</style>
+    @helper GridColumnCommandSanPhamMoi(int id)
+    {
+        /**/
+
+
+        <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+            <button name="DeleteSanPhamMoi" value=@id onclick="DeleteSPMoi(@id)" id="DeleteSPMoi" type="button" class="btn btn-minier btn-danger">
+                <i class="ace-icon fa fa-trash"></i>
+            </button>
+        </div>
+
+    }
+
+    @helper GridColumnName(string productCode, string name, int id, string categoryCode, string unit, string size)
+    {
+        /**/
+
+        name = string.IsNullOrEmpty(name) ? "No Title" : name;
+        <a href="@Url.Action("Edit", "Product", new { Id = id,IsPopup="true"})"><b>@name</b>   </a><br />
+        if (!string.IsNullOrEmpty(unit))
+        {
+            <span>@unit</span>
+        }
+        if (!string.IsNullOrEmpty(size))
+        {
+            <span> | @size</span>
+        }
+    }
+
+    @helper GridColumnCategoryCode(string productCode, string categoryCode)
+    {
+        /**/
+
+        if (!string.IsNullOrEmpty(productCode))
+        {
+            <p style="font-size:14px;padding-left:5px;">@productCode.Substring(0, 3) - @categoryCode</p>
+        }
+        else
+        {
+            <p style="font-size:10px">@categoryCode</p>
+        }
+    }
+
+    @helper GridColumnCategoryValue(object value)
+    {
+        /**/
+
+        var attr = Erp.BackOffice.Helpers.Common.GetCategoryByValueOrId("value", value);
+        <span>@(attr != null ? attr.Name : "")</span>
+    }
+
+    @helper CheckDeleteColumns(int Id)
+    {
+        /**/
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+            <span class="lbl"></span>
+        </label>
+    }
+
+    @helper BuildCheckAll()
+    {
+        /**/
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+        /**/
+    }
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <p>
+            @*@Html.TextBox("txtCode", Request["txtCode"], new { @class = "", autocomplete = "off", placeholder = "Mã sản phẩm" })*@
+            @Html.TextBox("txtSearch", Request["txtSearch"], new { @class = "", autocomplete = "off", placeholder = "Tìm sản phẩm ..." })
+            @Html.DropDownList("NHOMSANPHAM_ID", SelectListHelper.GetSelectList_NhomSP("NHOMSANPHAM_ID", Request["CategoryCode"]), "Danh mục", new Dictionary<string, object> { { "class", "" }, { "data-val-required", "Bắt buộc chọn." } })
+            @*@Html.DropDownList("LOAISANPHAM_ID", SelectListHelper.GetSelectList_LoaiSP("LOAISANPHAM_ID", Request["LOAISANPHAM_ID"]), "Loại sản phẩm", new Dictionary<string, object> { { "class", "" }, { "data-val-required", "Bắt buộc chọn." } })*@
+            @*@Html.TextBox("txtMinPrice", Request["txtMinPrice"], new { @class = "form-control", autocomplete = "off", placeholder = "Giá thấp nhất..." })
+                @Html.TextBox("txtMaxPrice", Request["txtMaxPrice"], new { @class = "form-control", autocomplete = "off", placeholder = "Giá cao nhất..." })*@
+            @*<span class="input-numberic input-group">
+                    @Html.TextBox("txtMinPrice", Request["txtMinPrice"] != null ? Request["txtMinPrice"] : "", new { @class = "form-control input-numberic", autocomplete = "off", placeholder = "Giá thấp nhất..." })
+                    <span class="input-group-addon">
+                        <i class="fa fa-exchange"></i>
+                    </span>
+                    @Html.TextBox("txtMaxPrice", Request["txtMaxPrice"] != null ? Request["txtMaxPrice"] : "", new { @class = "form-control input-numberic", autocomplete = "off", placeholder = "Giá cao nhất..." })
+                </span>*@
+        </p>
+    }
+    <div class="text-danger">@ViewBag.errors</div>
+
+    @*<div>
+            <a class="btn btn-primary btn-sm btn-white" onclick="OpenPopup('/Product/IndexSearch2?IsPopup=true&pruductid=@Model.Id', 'Tìm kiếm dữ liệu', 800, 600)"><i></i><span>Thêm sản phẩm</span></a>
+        </div>*@
+
+    <div class="table-responsive">
+        <div>
+            <a class="btn btn-sm btn-success" style="margin-bottom:20px;border-radius:5px;" onclick="OpenPopup('/Product/IndexSearch3', 'Tìm kiếm dữ liệu', 800, 600)"><i></i><span>Thêm sản phẩm mới</span></a>
+        </div>
+        @Html.Grid(Model).Columns(columns =>
+   {
+       columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(40).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+       columns.Add(u => u.Code).Titled(Wording.ProductCode).SetWidth(100);
+
+       columns.Add().Titled(Wording.Name).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Name, u.Id, u.CategoryCode, u.Unit, u.Size));
+       //columns.Add().Titled("Chiết khấu").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => u.DiscountStaff+" "+(u.IsMoneyDiscount==true?"VNĐ":"%"));
+       //columns.Add(u => u.Unit).Titled(Wording.Unit).SetWidth(80);
+       //columns.Add(u => u.Size).Titled("Dung tích").SetWidth(80);
+       //columns.Add().Titled(Wording.PriceInbound).SetWidth(100).RenderValueAs(u => Erp.BackOffice.Helpers.Common.PhanCachHangNgan(u.PriceInbound)).Css("text-right");
+       columns.Add().Titled("Giá bán").Sortable(false).Sanitized(false).Encoded(false).SetWidth(100).RenderValueAs(u => u.PriceOutbound.ToCurrencyStr(null)).Css("text-right");
+       columns.Add(u => u.CategoryCode).Titled("Danh mục").SetWidth(200).Sanitized(false).Encoded(false).RenderValueAs(n => GridColumnCategoryCode(n.Code, n.ProductGroupName));
+       columns.Add(u => u.STT_ISNEW).Titled("Độ ưu tiên").SetWidth(100).Sanitized(false).Encoded(false).Css("text-center");
+       //columns.Add(u => u.CreatedDate).Titled(Wording.CreatedDate).SetWidth(130).Format("{0:dd/MM/yyyy HH:mm}");
+       //columns.Add(u => u.ModifiedDate).Titled(Wording.ModifiedDate).SetWidth(130).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+       columns.Add(u => u.Id).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommandSanPhamMoi(u.Id)).SetWidth(85);
+   }).WithPaging(10)
+    </div>
+    <button class="btn btn-mini btn-light" id="btnBack" onClick="history.go(-1); return false;"><i class="ace-icon fa fa-hand-o-left"></i>Trở lại</button>
+    @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("CapNhatDoUuTien", "Product", "Sale"))
+    {
+        <a class=" btn btn-info btn-minier" href="@Url.Action("CapNhatDoUuTien", pageSetting.ModuleName)">
+            <i class="ace-icon fa fa-edit"></i>
+            Sửa độ ưu tiên
+        </a>
+    }
+    @*<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>*@
+    <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+    <script type="text/javascript">
+
+
+        function DeleteSPMoi(id) {
+            $.ajax({
+                type: "POST",
+                url: "/Product/Xoasanphammoi",
+                data: {
+                    id: id.toString(),
+
+                },
+                success: function (r) {
+                    location.reload();
+                    HideLoading();
+                }
+            });
+        }
+
+
+
+    </script>
+

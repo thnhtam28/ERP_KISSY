@@ -1,0 +1,536 @@
+﻿@model IEnumerable<CustomerViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = Wording.PageIndex_Customer;
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Customer",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    int rowNumber = ViewBag.Tongdong;
+    int stt = 0;
+    int numberOfItem = ViewBag.AmountPage;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    //if(Request["grid-page"] == null)
+    //{
+    //    currentPage = 1;
+    //}
+    //else
+    //{
+    //    currentPage = Convert.ToInt32(Request["trang"]);
+    //}
+    int tongPage = (rowNumber / numberOfItem) + 1;
+    var top1 = "";
+    string Status = Request["Status"] != null ? Request["Status"] : "";
+    var url = Request.Url;
+    int sopage = ViewBag.AmountPage;
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+<style>
+    .modal-content {
+        width: 550px;
+        margin-left: 180px;
+    }
+</style>
+<style>
+    .popover {
+        width: 100% !important;
+    }
+
+    .itemdiv > .body > .text {
+        padding-bottom: 0px !important;
+        /* padding-left: 7px; */
+        /* font-size: 13px; */
+    }
+
+    .itemdiv {
+        padding-right: 3px;
+        min-height: 10px;
+    }
+
+    .pagination {
+        margin-top: 14px;
+        margin-right: 5px;
+    }
+
+    #hdCTable {
+        z-index: 2;
+    }
+</style>
+
+@helper GridColumnAction(int? Id, string TargetModule, string TargetCode, string TargetName, bool isPopup)
+{
+    if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("LiabilitiesDetail", "TransactionLiabilities", "Account"))
+    {
+        <a class="btn btn-white btn-danger btn-minier" onclick="OpenPopup('@Url.Action("LiabilitiesDetail", "TransactionLiabilities", new { TargetModule = TargetModule, TargetCode = TargetCode, TargetName = TargetName, popup = true })', 'Chi tiết công nợ', 0, 500)">
+            <i class="ace-icon fa fa-money"></i> Công nợ
+        </a>
+    }
+    if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "CommisionCustomer", "Sale"))
+    {
+        <a class="btn btn-white btn-success btn-minier" onclick="OpenPopup('@Url.Action("Create", "CommisionCustomer", new { area = "Sale", CustomerId = Id, popup = true })', 'Cài đặt chiết khấu', 500, 700)">
+            <i class="ace-icon fa fa-cog"></i>
+            Chiết khấu
+        </a>
+    }
+}
+
+@helper GridColumnAction2(int CustomerId, bool isPopup)
+{
+
+}
+
+@helper GridColumnName(string Phone, string FullName, string FirstName, string LastName, string TaxCode, string BankAccount, string BankName, string Address, string DistrictName, string WardName, string ProvinceName, string code, int id, string note, string Image, bool isPopup = false, string jsCallback = null)
+{
+
+
+    FirstName = string.IsNullOrEmpty(FirstName) == false ? FirstName : "";
+    LastName = string.IsNullOrEmpty(LastName) == false ? LastName : "";
+    <div class="itemdiv commentdiv">
+        <div class="user">
+            <div class="ace-thumbnails">
+                <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image,"uploads_image_path_customer","user"))" title="@FirstName" data-rel="colorbox" class="cboxElement">
+                    <img id="myImg" alt="@FirstName" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image,"uploads_image_path_customer", "user"))">
+                </a>
+            </div>
+        </div>
+        <div class="body">
+            <div class="name" data-toggle="tooltip" title="Tên khách hàng">
+                @if (!isPopup)
+                {
+                    <a href="@Url.Action("Detail", "Customer", new { Id = id })"> @FullName</a>
+                }
+                else
+                {
+                    var wardName = string.IsNullOrEmpty(WardName) == false ? ("-" + WardName) : "";
+                    var districtName = string.IsNullOrEmpty(DistrictName) == false ? ("-" + DistrictName) : "";
+                    var provinceName = string.IsNullOrEmpty(ProvinceName) == false ? ("-" + ProvinceName) : "";
+                    var address = Address + wardName + districtName + provinceName;
+                    <a onclick="parent.ClosePopupAndReloadPage(@id,'@(FirstName+LastName)','@TaxCode','@BankName','@BankAccount','@address','@Phone')">@(LastName + FirstName)</a>
+                }
+                @if (!string.IsNullOrEmpty(note))
+                {
+                    <span class="help-button" data-rel="tooltip" data-placement="bottom" data-original-title="@note">?</span>
+                }
+            </div>
+            <div class="text" data-toggle="tooltip" title="Mã khách hàng">
+                @code
+            </div>
+        </div>
+    </div>
+}
+@helper GridColumnNameAddress(string DistrictName, string WardName, string ProvinceName, string Address)
+{
+    <p data-toggle="tooltip" title="Địa chỉ - Phường/Xã">
+        <i class="fa fa-map-marker"></i> @(Address == null ? "chưa có" : Address) - @(WardName == null ? "chưa có" : WardName)
+    </p>
+    <span data-toggle="tooltip" title="Quận/huyện - Thành phố/Tỉnh">
+        <i class="fa fa-globe"></i> @(DistrictName == null ? "chưa có" : DistrictName) - @(ProvinceName == null ? "chưa có" : ProvinceName)
+    </span>
+
+}
+
+@helper GridColumnContact(string Phone, string Email, int id, bool isPopup = false)
+{
+
+    @*<p data-toggle="tooltip" title="Tên người liên hệ">
+            <i class="fa fa-user-circle-o"></i>
+            @if (!isPopup)
+            {
+        <a href="@Url.Action("Detail", "Customer", new { Id = id })"> @(firstname) @lastname</a>
+            }
+            else
+            {
+
+        <a onclick="parent.ClosePopupAndReloadPage(@id,'@(firstname+lastname )')"> @(firstname) @lastname  </a>
+            }
+
+        </p>*@
+    <p data-toggle="tooltip" title="Email">
+        <i class="fa fa-envelope"></i> : @(Email == null ? "chưa có" : Email)
+    </p>
+    <span data-toggle="tooltip" title="Số điện thoại">
+        <i class="fa fa-phone-square"></i> : @(Phone == null ? "chưa có" : Phone)
+    </span>
+
+
+}
+@helper GridColumnDateName(DateTime? CreateDate, DateTime? DateOfIssue)
+{
+    <p data-toggle="tooltip" title="Ngày tạo">
+        <i class="fa fa-calendar-plus-o"></i> @CreateDate.Value.ToString("dd/MM/yyyy HH:mm")
+    </p>
+    <span data-toggle="tooltip" title="Ngày cập nhật"><i class="fa fa-calendar-check-o"></i> @(DateOfIssue.HasValue ? DateOfIssue.Value.ToString("dd/MM/yyyy HH:mm") : "chưa có")</span>
+}
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+    <input type="hidden" value="false" name="ExportExcel" />
+    <p>
+        @Html.TextBox("Phone", Request["Phone"], new { @class = "", autocomplete = "off", placeholder = "Số điện thoại..." })
+        @Html.TextBox("txtCode", Request["txtCode"], new { @class = "", autocomplete = "off", placeholder = "Mã khách hàng..." })
+        @Html.TextBox("txtCusName", Request["txtCusName"], new { @class = "", autocomplete = "off", placeholder = "Tên khách hàng..." })
+        @*@Html.TextBox("CardCode", Request["CardCode"], new { @class = "", autocomplete = "off", placeholder = "Mã thẻ khách hàng..." })*@
+    </p>
+    <p>
+        @Html.DropDownList("ProvinceId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Location("0", Request["ProvinceId"], "Thành phố/Tỉnh"), new Dictionary<string, object> { { "class", "form-control" }, { "data-val-required", "Bắt buộc chọn." } })
+        @Html.DropDownList("DistrictId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Location(Request["ProvinceId"], Request["DistrictId"], "Quận/Huyện"), new Dictionary<string, object> { { "class", "form-control" }, { "data-val-required", "Bắt buộc chọn." } })
+        @Html.DropDownList("WardId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Location(Request["DistrictId"], Request["WardId"], "Phường/Xã"), new Dictionary<string, object> { { "class", "form-control" }, { "data-val-required", "Bắt buộc chọn." } })
+    </p>
+
+    @Html.TextBox("numberrowpage", Request["numberrowpage"], new { @class = "", id = "numberrowpage", style = "display: none" })
+    @Html.TextBox("numberrowpage", Request["numberrowpage"], new { @class = "", id = "numberrowpage1", onchange = "myFunction()", autocomplete = "off", style = "width:30px;display: none ", placeholder = "Số lượng sản phẩm" })
+}
+
+
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+
+@if (!isPopup)
+{
+    if (Model != null)
+    {
+        <p>Tổng số: <b>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan(Model.Count())</b></p>
+
+        if (Model.Count() > 0)
+        {
+            <div id="test">
+                @Html.Grid(Model).Columns(columns =>
+           {
+           columns.Add().Titled("#").SetWidth(50).RenderValueAs(o =>
+           {
+           stt++;
+
+           return @<text> @(stt + ((currentPage - 1) * numberOfItem)) </text>;
+
+});
+columns.Add().Titled("Khách hàng").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Phone, u.FullName, u.FirstName, u.LastName, u.TaxCode, u.BankAccount, u.BankName, u.Address, u.DistrictName, u.WardName, u.ProvinceName, u.Code, u.Id, u.Note, u.Image)).SetWidth(150);
+//columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+//columns.Add().Titled(Wording.CustomerName).SetWidth(250).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Phone, u.FirstName, u.LastName, u.TaxCode, u.BankAccount, u.BankName, u.Address, u.DistrictName, u.WardName, u.ProvinceName, u.CompanyName, u.Code, u.Id, u.Note, u.Image));
+columns.Add().Titled("Liên hệ").SetWidth(300).Sortable(false).Encoded(false).Sanitized(false).RenderValueAs(u => GridColumnContact(u.Mobile, u.Email, u.Id, isPopup));
+columns.Add(u => u.Gender).Titled(Wording.Gender).SetWidth(100).Sortable(true).Sanitized(false).RenderValueAs(u => u.Gender == true ? "Nữ" : "Nam").Css("text-center");
+columns.Add(u => u.Birthday).Titled(Wording.Birthday).SetWidth(100).Sortable(true).Sanitized(false).Format("{0:dd/MM/yyyy}").Css("text-center");
+columns.Add().Titled(Wording.Address).SetWidth(280).Sortable(false).Encoded(false).Sanitized(false).RenderValueAs(u => GridColumnNameAddress(u.DistrictName, u.WardName, u.ProvinceName, u.Address));
+columns.Add().Titled("Thời gian").SetWidth(130).Encoded(false).Sanitized(false).RenderValueAs(u => GridColumnDateName(u.CreatedDate, u.ModifiedDate));
+columns.Add().Titled("Hoạt động").Encoded(false).Sanitized(false).RenderValueAs(u => GridColumnAction(u.Id, "Customer", u.Code, u.CompanyName, isPopup)).SetWidth(80);
+}).WithPaging(sopage)
+            </div>
+            <div class="container" style="margin-top: 6px;width: auto;background-color: #eff3f8;height: 60px;/* background-color: aqua; */">
+
+
+                <div class="row">
+
+                    <div style="float:right;margin-right:20px;margin-top:14px">
+                        <label>Trang</label>
+                        <input id="trang" name="trang" type="text" style="width :50px; height: 27px" placeholder="@currentPage/@tongPage" />
+                        <label>Số dòng</label>
+                        <input id='SoTrang1' style="width :30px; height: 27px; border: 1px solid #D5D5D5" placeholder=@numberOfItem />
+                    </div>
+                </div>
+
+
+            </div>
+        }
+    }
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "Customer", "Account"))
+        {
+            <a class="btn btn-primary btn-mini" onclick="OpenPopup('@Url.Action("Create", "Customer", new { IsPopup = true, Phone = Request["Phone"] })', 'Thêm mới khách hàng', 500, 500);">
+                <i class="ace-icon fa fa-plus"></i>
+                @Resources.Wording.CreateNew
+            </a>
+        }
+        <button class="btn btn-white btn-success btn-sm" id="Export">
+            <i class="ace-icon fa fa-file-excel-o"></i>
+            Xuất excel
+        </button>
+    }
+}
+else
+{
+    if (Model != null)
+    {
+        <p>Tổng số: <b>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan(Model.Count())</b></p>
+        if (Model.Count() > 0)
+        {
+            @Html.Grid(Model).Columns(columns =>
+       {
+           //columns.Add().Titled(Wording.Code).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCustomerCode(u.Code, u.Image, path, u.CompanyName, u.Birthday, u.IdCardNumber, u.IdCardDate, u.CardIssuedName)).SetWidth(150);
+           columns.Add().Titled(Wording.Name).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Phone, u.FullName, u.FirstName, u.LastName, u.TaxCode, u.BankAccount, u.BankName, u.Address, u.DistrictName, u.WardName, u.ProvinceName, u.Code, u.Id, u.Note, u.Image, true, jsCallback));
+           columns.Add(u => u.Birthday).Titled(Wording.ModifiedDate).SetWidth(130).Sortable(true).Format("{0:dd/MM/yyyy}");
+           columns.Add().Titled(Wording.ContactId).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnContact(u.Mobile, u.Email, u.Id, isPopup));
+           columns.Add().Titled(Wording.Address).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnNameAddress(u.DistrictName, u.WardName, u.ProvinceName, u.Address));
+       }).WithPaging(sopage)
+        }
+
+
+    }
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "Customer", "Account"))
+        {
+            <a class="btn btn-primary btn-mini" href="@Url.Action("Create", pageSetting.ModuleName, new { IsPopup = true, Phone = Request["Phone"] })">
+                <i class="ace-icon fa fa-plus"></i>
+                @Resources.Wording.CreateNew
+            </a>
+        }
+
+    }
+}
+<script>
+
+    $('#test').find('table.table.table-striped.grid-table').first().attr('id', 'CTable');
+    $('#test').find('table.table.table-striped.grid-table thead').first().attr('id', 'CTh');
+
+</script>
+
+<script src="~/Scripts/jquery.floatThead.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#CTable").floatThead({ top: 30 });
+    });
+</script>
+
+@section Scripts {
+    <script>
+        $(".grid-footer").css({ "float": "right", "width": "auto" });
+    </script>
+    <script type="text/javascript">
+        function myFunction() {
+            var x = document.getElementById("numberrowpage1").value;
+            document.getElementById("numberrowpage").value = x;
+            setCookie("NUMBERROW_INVOICE_CookieName", x, 100);
+
+        }
+    </script>
+    <script type="text/javascript">
+        //Bind keypress event to textbox
+        $('#trang').keypress(function(event){
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13'){
+                var x = document.getElementById('trang').value;
+            var url = window.location.href;
+
+            if (url.includes("?grid-page=" +@currentPage) || url.includes("&grid-page=" +@currentPage)) {
+                var url = url.replace("grid-page=" +@currentPage, "grid-page=" + x);
+            }
+            else {
+                if (!url.includes("grid-page=") && url.includes("?")) {
+                    var url = url + "&grid-page=" + x;
+                }
+                else {
+                    var url = url + "?grid-page=" + x;
+                }
+            }
+            window.location.href = url;
+            }
+
+        });
+         $('#SoTrang1').keypress(function(event){
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13'){
+                var SoTrang1 = $("#SoTrang1").val();
+
+          $("#SoTrang1").val(SoTrang1);
+            $('#numberrowpage1').val(SoTrang1);
+           $('#numberrowpage').val(SoTrang1);
+           $('#numberrowpage1').trigger('change');
+            $('#numberrowpage').trigger('change');
+            location.reload();
+            }
+
+         });
+         $(document).ready(function () {
+
+            var strVal = getCookie("NUMBERROW_INVOICE_CookieName");
+            //alert(strVal);
+            $('#numberrowpage').val(strVal);
+            $('#numberrowpage1').val(strVal);
+
+        });
+        //$('#SoTrang1').keyup(function (e) {
+        //    var SoTrang1 = $("#SoTrang1").val();
+
+        //  $("#SoTrang1").val(SoTrang1);
+        //    $('#numberrowpage1').val(SoTrang1);
+        //   $('#numberrowpage').val(SoTrang1);
+        //   $('#numberrowpage1').trigger('change');
+        //    $('#numberrowpage').trigger('change');
+        //    location.reload();
+        //});
+    </script>
+    <script type="text/javascript">
+
+
+
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('#Export').click(function () {
+
+            $('[name="ExportExcel"]').val("true");
+            $("#Customer").submit();
+            HideLoading();
+        })
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+        })
+
+        $(function () {
+            $("#Phone").focus().select();
+            $('[data-rel=tooltip]').tooltip({ container: 'body' });
+            $("#Phone").click(function () {
+                $("#Phone").select();
+            });
+        });
+
+        var url = '/api/BackOfficeServiceAPI/FetchLocation';
+        var districts = $("#DistrictId"); // cache it
+        var ward = $("#WardId");
+
+        $("#ProvinceId").change(function () {
+            ShowLoading();
+            var id = $(this).val(); // Use $(this) so you don't traverse the DOM again
+            districts.empty(); // remove any existing options
+            ward.empty();
+            debugger;
+            $(document.createElement('option'))
+                .attr('value', '')
+                .text('- Rỗng -')
+                .appendTo(ward).trigger('chosen:updated');
+            $(document.createElement('option'))
+                .attr('value', '')
+                .text('- Rỗng -')
+                .appendTo(districts).trigger('chosen:updated');
+            if (id != "") {
+                $.getJSON(url, { parentId: id }, function (response) {
+
+                    $(response).each(function () {
+                        $(document.createElement('option'))
+                            .attr('value', this.Id)
+                            .text(capitalizeFirstAllWords(this.Name.toLowerCase().replace('huyện', '').replace('quận', '')))
+                            .appendTo(districts).trigger('chosen:updated');
+                        HideLoading();
+                    });
+                });
+            }
+            HideLoading();
+        });
+
+        $("#DistrictId").change(function () {
+            ShowLoading();
+            debugger;
+            var id = $(this).val(); // Use $(this) so you don't traverse the DOM again
+            ward.empty(); // remove any existing options
+            $(document.createElement('option'))
+                .attr('value', '')
+                .text('- Rỗng -')
+                .appendTo(ward).trigger('chosen:updated');
+            if (id != "") {
+                $.getJSON(url, { parentId: id }, function (response) {
+
+                    $(response).each(function () {
+                        $(document.createElement('option'))
+                            .attr('value', this.Id)
+                            .text(capitalizeFirstAllWords(this.Name.toLowerCase()))
+                            .appendTo(ward).trigger('chosen:updated');
+                        HideLoading();
+                    });
+                });
+            }
+            HideLoading();
+        });
+        $('.popover-dismiss').popover({
+            trigger: 'focus'
+        })
+        $(document).ready(function () {
+            $('[data-rel=popover]').popover({ html: true });
+        });
+
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

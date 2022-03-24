@@ -1,0 +1,305 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.Domain.Sale.Entities
+
+@model ProductViewModel
+
+@{
+    ViewBag.Title = "Lịch sử xuất/nhập kho";
+
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Inventory",
+        ActionName = "DetailReportInventory",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    List<WarehouseViewModel> warehouseList = (List<WarehouseViewModel>)ViewBag.warehouseList;
+
+    IEnumerable<InventoryViewModel> listInventory = (IEnumerable<InventoryViewModel>)ViewBag.listInventory;
+    IEnumerable<Sale_BaoCaoXuatKhoViewModelhoapd> nxtDetails = (IEnumerable<Sale_BaoCaoXuatKhoViewModelhoapd>)ViewBag.nxtDetails;
+
+
+}
+<style>
+    /*table, td {
+      border-collapse: collapse;
+      border: 1px solid #000;
+    }*/
+
+
+
+    .table-responsive {
+        max-height: 450px !important;
+        overflow-y: scroll !important;
+    }
+</style>
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+@helper GridColumnType(string type, int NHAP, int XUAT)
+{
+switch (type)
+{
+    case "manual":
+            <span>Nhập kho</span>
+        break;
+    case "invoice":
+            <span>Bán hàng</span>
+        break;
+    case "internal":
+        if (NHAP > 0)
+        {
+                <span>Nhập chuyển kho</span>
+        }
+        else
+        {
+                <span>Xuất chuyển kho</span>
+        }
+        break;
+    case "external":
+            <span>Nhập kho từ mua hàng</span>
+        break;
+    case "service":
+            <span>Xuất trực tiếp</span>
+        break;
+    case "PhysicalInventory":
+        if (NHAP > 0)
+        {
+                <span>Nhập từ kiểm kho</span>
+        }
+        else
+        {
+                <span>Xuất từ kiểm kho</span>
+        }
+        break;
+    case "SalesReturns":
+            <span>Nhập kho từ hàng bán trả lại</span>
+        break;
+    default:
+        if (NHAP > 0)
+        {
+                <span>Nhập kho</span>
+        }
+        else
+        {
+                <span>Xuất kho</span>
+        }
+
+
+        break;
+}
+}
+@helper GridColumnName(string name, int id, int NHAP, int XUAT)
+{
+name = string.IsNullOrEmpty(name) ? "No Title" : name;
+
+if (NHAP > 0)
+{
+        <a href="@Url.Action("Detail", "ProductInbound", new { Id = id })" target="_blank">@name </a>
+}
+else
+{
+        <a href="@Url.Action("Detail", "ProductOutbound", new { Id = id })" target="_blank">@name </a>
+}
+
+    @*<a href="javascript:;" onclick="OpenPopup('@Url.Action("View", "ProductOutbound", new { Id = id, IsPopup = "true" })', 'Xem chi tiết phiếu xuất', 1000, 500)">@name</a>*@
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+<h4 class="green" style="margin-top:0px">@Model.Code - @Model.Name</h4>
+<h4 class="green" style="margin-top:0px">Tổng tồn kho: @Common.NVL_NUM_NT_NEW(Model.MinInventory)  <font size="2" color="blue">(Đang chuyển kho:@Common.NVL_NUM_NT_NEW(Model.QuantityTotalInventory))</font></h4>
+
+<ul class="nav nav-tabs" id="myTab">
+    <li id="li-tab1-@warehouseList.FirstOrDefault().Id" class="active"><a data-target="#tab2-@warehouseList.FirstOrDefault().Id" data-toggle="tab" aria-expanded="true"> @warehouseList.FirstOrDefault().Name <span class="badge" style="background-color: #0f94d4;">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan(listInventory.Where(x => x.WarehouseId == warehouseList.FirstOrDefault().Id).Sum(x => x.Quantity)))</span></a></li>
+    @foreach (var item in warehouseList)
+    {
+        if (item == warehouseList.FirstOrDefault())
+        {
+            continue;
+        }
+        <li id="li-tab1-@item.Id"><a data-target="#tab2-@item.Id" data-toggle="tab" aria-expanded="true"> @item.Name <span class="badge" style="background-color: #0f94d4;">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan(listInventory.Where(x => x.WarehouseId == item.Id).Sum(x => x.Quantity)))</span></a></li>
+    }
+
+
+</ul>
+@{ var index = 1;}
+<div class="tab-content">
+    <div class="tab-pane active" id="tab2-@warehouseList.FirstOrDefault().Id">
+
+        @*<label class="radio"><input type="radio" value="internal" class="group1_choice ace" data-target="#group1_choice_wrap1" checked name="group1_choice" />  <span class="lbl">Xuất kho cho bán hàng</span></label>
+            <label class="radio"><input type="radio" value="service" class="group1_choice ace" data-target="#group1_choice_wrap2" name="group1_choice" /> <span class="lbl">Xuất chuyển kho</span></label>*@
+        <div id="group1_choice_wrap1" class="group1_choice_wrap clearfix">
+            <div class="table-responsive">
+                <table id="cTable" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>@Wording.OrderNo</th>
+                            <th>Chứng Từ</th>
+                            <th>Ngày</th>
+                            <th>Diễn giải</th>
+                            <th>Nhập</th>
+                            <th>Xuất</th>
+                            <th>Tồn</th>
+                        </tr>
+
+                    </thead>
+                    <tbody class="outboundDetails">
+
+                        @foreach (var item2 in nxtDetails.Where(x => x.KHOID == warehouseList.FirstOrDefault().Id))
+                        {
+                            <tr class="trbody">
+                                <td>@index</td>
+                                <td>@GridColumnName(item2.CHUNGTU, item2.CHUNGTUID, item2.NHAP, item2.XUAT)</td>
+                                <td>@item2.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                <td>@GridColumnType(item2.Type, item2.NHAP, item2.XUAT)</td>
+                                <td style="text-align:center">@item2.NHAP</td>
+                                <td style="text-align:center">@item2.XUAT</td>
+                                <td style="text-align:center">@item2.TON</td>
+
+                            </tr>
+                            index++;
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+
+    </div>
+    @foreach (var item in warehouseList)
+    {
+        index = 1;
+        if (item == warehouseList.FirstOrDefault())
+        {
+            continue;
+        }
+        <div class="tab-pane" id="tab2-@item.Id">
+
+            <div id="group1_choice_wrap1" class="group1_choice_wrap clearfix">
+                <div class="table-responsive">
+                    <table id="cTable" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>@Wording.OrderNo</th>
+                                <th>Chứng Từ</th>
+                                <th>Ngày</th>
+                                <th>Diễn giải</th>
+                                <th>Nhập</th>
+                                <th>Xuất</th>
+                                <th>Tồn</th>
+                            </tr>
+                        </thead>
+                        <tbody class="outboundDetails">
+
+                            @foreach (var item2 in nxtDetails.Where(x => x.KHOID == item.Id))
+                            {
+                                <tr>
+                                    <td>@index</td>
+                                    <td>@GridColumnName(item2.CHUNGTU, item2.CHUNGTUID, item2.NHAP, item2.XUAT)</td>
+                                    <td>@item2.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                    <td>@GridColumnType(item2.Type, item2.NHAP, item2.XUAT)</td>
+                                    <td style="text-align:center">@item2.NHAP</td>
+                                    <td style="text-align:center">@item2.XUAT</td>
+                                    <td style="text-align:center">@item2.TON</td>
+                                </tr>
+                                index++;
+                            }
+                        </tbody>
+                        @*<tfoot>
+                                <tr>
+                                    <td colspan="4" align="right">Tổng</td>
+                                    <td align="right" style="font-weight:bold">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan(outboundDetails.Where(x => x.WarehouseSourceId == item.Id).Sum(x => x.Quantity)))</td>
+                                    <td></td>
+                                </tr>
+
+                            </tfoot>*@
+                    </table>
+                </div>
+            </div>
+
+            @*<div id="group1_choice_wrap2" class="group1_choice_wrap clearfix" style="height:0;overflow: hidden;">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>@Wording.OrderNo</th>
+                                    <th>@Wording.CreatedDate</th>
+                                    <th>@Wording.ModifiedDate</th>
+                                    <th>@Wording.ProductOutboundCode</th>
+
+                                    <th>@Wording.Quantity</th>
+                                    <th>@Wording.Destination</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{index = 0; }
+                                @foreach (var item2 in outboundDetails.Where(x => x.Type != "invoice" && x.WarehouseDestinationId == item.Id))
+                                {
+                                    <tr>
+                                        <td>@(++index)</td>
+                                        <td>@item2.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@item2.ModifiedDate.Value.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@item2.ProductOutboundCode</td>
+
+                                        <td align="right">@item2.Quantity</td>
+                                        <td>@item2.WarehouseDestinationName</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="6" align="right">Tổng</td>
+                                    <td align="right" style="font-weight:bold">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan(outboundDetails.Where(x => x.Type != "invoice" && x.WarehouseDestinationId == item.Id).Sum(x => x.Quantity)))</td>
+                                    <td></td>
+                                </tr>
+
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>*@
+
+        </div>
+    }
+
+
+</div>
+
+@section Scripts {
+    @*<script src="~/Scripts/jquery.floatThead.js"></script>*@
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    <script>
+        //$(document).ready(function () {
+        //    $("#cTable").floatThead({ top: 30 });
+        //});
+
+        $(".group_choice").change(function () {
+            ShowLoading();
+            $(".group_choice_wrap").css('height', 'initial');
+            if ($(this).is(":checked")) {
+                $(".group_choice_wrap").hide();
+                $($(this).data("target")).show();
+            }
+            HideLoading();
+        });
+        $(".group1_choice").change(function () {
+            ShowLoading();
+            $(".group1_choice_wrap").css('height', 'initial');
+            if ($(this).is(":checked")) {
+                $(".group1_choice_wrap").hide();
+                $($(this).data("target")).show();
+            }
+            HideLoading();
+        });
+    </script>
+}

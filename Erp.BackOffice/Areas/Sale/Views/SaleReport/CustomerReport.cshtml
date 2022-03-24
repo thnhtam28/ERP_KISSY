@@ -1,0 +1,316 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Helpers
+@using System.Globalization;
+@using PagedList.Mvc;
+
+@model PagedList.IPagedList<CustomerViewModel>
+
+@{
+    ViewBag.Title = "Doanh số theo khách hàng";
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "CustomerReport",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+
+
+
+    };
+
+    List<ProductInvoiceViewModel> ProductInvoice = (List<ProductInvoiceViewModel>)ViewBag.ProductInvoice;
+
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+}
+
+<style>
+    #cTable table tbody {
+        overflow: auto;
+        height: calc(100vh - 360px) !important;
+    }
+
+    #cTable table {
+        width: 100% !important; /* can be dynamic */
+    }
+
+    #cTable th {
+        width: 100px;
+    }
+
+    #cTable td {
+        width: 100px;
+    }
+
+    #cTable > thead > tr > th {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+
+    #cTable > tbody > tr > td {
+        vertical-align: middle;
+        /*text-align: center;*/
+    }
+
+    .detail-row {
+        width: inherit;
+    }
+
+    tr:hover {
+        background: #fef4bb;
+    }
+
+    .table-detail:hover {
+        background: #fef4bb;
+    }
+    select {
+        height: 25px;
+    }
+    .pagination {
+        margin: 9px;
+    }
+</style>
+@helper GridColumnStatusName(string status)
+{
+switch (status)
+{
+    case "pending":
+            <span class="label label-info">@Wording.OrderStatusDisplay_pending</span>
+        break;
+    case "inprogress":
+            <span class="label label-warning">@Wording.OrderStatusDisplay_inprogress</span>
+        break;
+    case "shipping":
+            <span class="label label-warning">@Wording.OrderStatusDisplay_shipping</span>
+        break;
+    case "complete":
+            <span class="label label-success">@Wording.OrderStatusDisplay_complete</span>
+        break;
+    case "delete":
+            <span class="label label-danger">@Wording.OrderStatusDisplay_delete</span>
+        break;
+}
+}
+
+@helper LoadDetails(List<ProductInvoiceViewModel> ProductInvoice)
+{
+    <div class="table-responsive chitiet">
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a data-toggle="tab" class="ng-binding">
+                    <i class="ace-icon fa fa-plus"></i>
+                    Chi tiết (@ProductInvoice.Count)
+                </a>
+            </li>
+
+        </ul>
+        <table id="CTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="text-align:center;width:15%">Hóa đơn</th>
+                    <th style="text-align:center">Trạng thái</th>
+                    <th style="text-align:center;width:30%">Ngày</th>
+
+                    <th style="text-align:center">Tổng tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var item in ProductInvoice)
+                {
+
+                <tr>
+                    <td>
+                        <a target="_blank" href="@Url.Action("Detail","ProductInvoice", new { Id = item.Id})">@item.Code</a>
+
+                    </td>
+                    <td style="text-align:center">@GridColumnStatusName(item.Status)</td>
+                    <td style="text-align:center">@item.CreatedDate</td>
+
+                    <td style="text-align:center">@CommonSatic.ToCurrencyStr(item.TotalAmount, null)</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <div class="form-group">
+        @Html.TextBox("TenMaDT", Request["TenMaDT"], new { autocomplete = "off", placeholder = "Tên, mã hoặc SĐT", @class = "input-group" })
+        <span class="input-daterange input-group">
+            @Html.TextBox("start", Request["start"] != null ? Request["start"] : aDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Từ ngày" })
+            <span class="input-group-addon">
+                <i class="fa fa-exchange"></i>
+            </span>
+            @Html.TextBox("end", Request["end"] != null ? Request["end"] : retDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Đến ngày" })
+        </span>
+
+        @Html.DropDownList("Paymethod", SelectListHelper.GetSelectList_Category("FormPayment", Request["Paymethod"], "Name", "Hình thức thanh toán"))
+    </div>
+}
+
+<div class="width-100 margin-bottom-10">
+    <div class="infobox infobox-blue" style="width:fit-content">
+        <div class="infobox-icon">
+            <i class="ace-icon fa fa-dollar"></i>
+        </div>
+        <div class="infobox-data">
+            <span class="infobox-data-number ng-binding">@CommonSatic.ToCurrencyStr(ProductInvoice.Sum(x => x.TotalAmount), null)</span>
+            <div class="infobox-content ng-binding">
+                Tiền bán hàng
+
+            </div>
+        </div>
+    </div>
+    <!-- ngIf: reportTypeModel.type != 4 --><div class="infobox infobox-blue ng-scope" data-ng-if="reportTypeModel.type != 4">
+        <div class="infobox-icon">
+            <i class="ace-icon fa fa-shopping-cart"></i>
+        </div>
+        <div class="infobox-data">
+            <span class="infobox-data-number ng-binding">@ProductInvoice.Count()</span>
+            <div class="infobox-content ng-binding">Số đơn hàng </div>
+        </div>
+    </div><!-- end ngIf: reportTypeModel.type != 4 -->
+    <!-- ngIf: reportTypeModel.type == 4 -->
+
+</div>
+
+<div class="table-responsive " id="customer_report">
+    <table id="cTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:2%;text-align:center"></th>
+                <th style="width:8%;text-align:center">Mã khách hàng</th>
+                <th style="width:17%;text-align:center">Tên khách hàng</th>
+                <th style="width:14%;text-align:center">SĐT</th>
+                <th style="width:15%;text-align:center">Ngày mua gần nhất</th>
+                <th style="width:10%;text-align:center">Số đơn hàng</th>
+                <th style="width:10%">Tổng tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var listinvoice = ProductInvoice.Where(x => x.CustomerId == item.Id).ToList();
+                <tr onclick="Dropdowntable('#table_@item.Id')">
+                    <td style="text-align:center;width:3%">
+                        <a id="table_@item.Id" href="#" class="green show-details-btn" title="Chi tiết">
+                            <i class="ace-icon fa fa-angle-double-down bigger-120"></i>
+                        </a>
+                    </td>
+                    <td style="text-align:center;"><a onclick="OpenPopup('@Url.Action("Detail", "Customer", new { area = "Account", Id = item.Id, IsPopup = "true" })', 'Trang chi tiết khách hàng', 0, 500)">@item.Code</a></td>
+                    <td style="text-align:center;">@item.FullName</td>
+                    <td style="text-align:center;">@item.Mobile</td>
+                    @if (listinvoice.Count() > 0)
+                    {
+                        <td style="text-align:center;">@listinvoice[0].CreatedDate.Value.ToString("dd/MM/yyyy")</td>
+                    }
+                    else
+                    {
+                        <td style="text-align:center;">Chưa có</td>
+                    }
+                    <td style="text-align:center;">@listinvoice.Count()</td>
+                    <td style="text-align:center;">@CommonSatic.ToCurrencyStr(listinvoice.Sum(x => x.TotalAmount), null)</td>
+                </tr>
+                <tr class="detail-row">
+                    <td colspan="10">
+                        <div class="table-detail clearfix">
+                            @LoadDetails(listinvoice)
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+    <!-- Thêm mã phân trang -->
+    <br />
+    <div class="row" style="width: 70%; display: inline-block;">
+        @*<div class="col-md-6 col-lg-6 col-xs-6 col-sm-6">
+          
+        </div>*@
+        <div class="col-md-6 col-lg-6 col-xs-6 col-sm-6 text-right" style="float: right;">
+            Trang:  <input style="width: 60px; height: 25px;" id="page1" name="page1" type="text" placeholder="@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount" />
+            @*@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount*@
+            <div style="display: inline-block;">
+                @using (Html.BeginForm("CustomerReport", "SaleReport", FormMethod.Get))
+                {
+                    <p>
+                        Số dòng: @Html.DropDownList("size", (List<SelectListItem>)ViewBag.size, new { @onchange = "this.form.submit();" })
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div style="width:29% ; display: inline-block;">
+        @Html.PagedListPager(Model, page => Url.Action("CustomerReport", new { page, size = ViewBag.currentSize, start = Request["start"], end = Request["end"], TenMaDT = Request["TenMaDT"], Paymethod = Request["Paymethod"] }))</div>
+        <!-- Kết thúc -->
+
+    </div>
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <div>
+        <button style="float: left;margin-left: 20px" class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="exportThis()">
+            <i class="ace-icon fa fa-file-excel-o"></i>
+            Xuất excel
+        </button>
+    </div>
+}
+
+<script>
+    function Dropdowntable(id) {
+        $(id).closest('tr').next().toggleClass('open');
+        $(id).find(ace.vars['.icon']).toggleClass('fa-angle-double-down').toggleClass('fa-angle-double-up');
+
+    };
+
+    $("#page1").keyup(function () {
+        debugger
+        //page = $("#gotopage").val();
+        var page = $('#page1').val();
+        var url = window.location.href;
+        if (url.includes("?page=" +@ViewBag.page ) || url.includes("&page=" +@ViewBag.page )) {
+            var url = url.replace("page=" +@ViewBag.page, "page=" + page);
+        }
+        else {
+            if (!url.includes("page=") && url.includes("?")) {
+                var url = url + "&page=" + page;
+            }
+            else {
+                var url = url + "?page=" + page;
+            }
+        }
+        window.location.href = url;
+    });
+
+    function exportThis() {
+        var start = $('#start').val();
+        var end = $('#end').val();
+        var TenMaDT = $('#TenMaDT').val();
+        var Paymethod = $('#Paymethod').val();
+
+        OpenPopup('/SaleReport/ExportCusRevenue/?start=' + start + '&end=' + end + '&TenMaDT=' + TenMaDT + '&Paymethod=' + Paymethod, '', 0, 0);
+        HideLoading();
+        //ClosePopup();
+        
+        setTimeout(function () {
+
+            $('#myModal').modal('hide');
+        }, 5000);
+
+    };
+
+</script>
+@Html.ScriptBottom_ValidationMvc()
+@Html.ScriptBottom_DatePicker("dd/MM/yyyy")

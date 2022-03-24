@@ -1,0 +1,50 @@
+﻿@{
+    string box_header = (string)ViewData["box_header"];
+    string form_header = (string)ViewData["form_header"];
+    string action = (string)ViewData["action"];
+    string controller = (string)ViewData["controller"];
+    FormMethod method = (FormMethod)ViewData["method"];
+    var routeValues = ViewData["routeValues"];
+    IDictionary<string, object> htmlAttributes = new RouteValueDictionary(ViewData["htmlAttributes"]);
+
+    string methodString = string.Empty;
+    switch (method)
+    {
+        case FormMethod.Get:
+            methodString = "get";
+            break;
+        case FormMethod.Post:
+            methodString = "post";
+            break;
+        default:
+            methodString = "get";
+            break;
+    }
+
+    string _htmlAttributes = string.Empty;
+    string _buttonContainer = string.Empty;
+    bool showButton = false;
+
+    foreach (var item in htmlAttributes)
+    {
+        if (item.Key.Contains("button"))
+        {
+            _buttonContainer += item.Value + "\r\n";
+        }
+        else
+            if (item.Key == "showButton")
+            {
+                showButton = (bool)item.Value;
+            }
+            else
+            {
+                _htmlAttributes += " " + item.Key + "=\"" + item.Value + "\"";
+            }
+    }
+
+    string actionUrl = Url.Action(action, controller, routeValues);
+}
+
+<form action="@actionUrl" method="@methodString" @Html.Raw(_htmlAttributes)>
+                <div class="edit-view clearfix">
+                

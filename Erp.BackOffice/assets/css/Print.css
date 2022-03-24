@@ -1,0 +1,32 @@
+﻿@media print {
+    body {
+        
+        transform: scale(0.7);
+        
+        zoom: 200%;
+    }
+
+    h1 {
+        font-family: "Britannic Bold", Broadway, Calibri, sans-serif;
+        
+    }
+
+    p {
+        font-size: 12pt;
+        font-family: Cambria, "Times New Roman", serif;
+    }
+
+    .positioned {
+        position: static;
+    }
+
+    #menu {
+        display: none;
+    }
+    
+}
+@media screen {
+    body {
+        zoom: 200%;
+    }
+}

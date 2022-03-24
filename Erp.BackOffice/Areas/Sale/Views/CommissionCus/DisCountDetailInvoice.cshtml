@@ -1,0 +1,182 @@
+﻿@model  List<CommissionCusViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+    @{
+        ViewBag.Title = ViewBag.ApplyFor == "Customer" ? Wording.PageIndex_CommissionCus : "Tổng giá trị chiết Khấu theo mã";
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+        //string ApplyFor = ViewBag.ApplyFor;
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "CommissionCus",
+            ActionName = "Index",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = false,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        int rowNumber = 0;
+    }
+
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+
+    @helper GridColumnName(string name, int id, bool isPopup)
+    {
+        if (isPopup)
+        {
+            <a onclick="parent.selectBranchItem(@id)">@name</a>
+        }
+        else
+        {
+            name = string.IsNullOrEmpty(name) ? "No Title" : name;
+            <a href="@Url.Action("DisCountDetailInvoice", "CommissionCus" , new { Id= id })">@name</a>
+        }
+    }
+
+    @helper GridColumnCategoryValue(string value, string code)
+    {
+        var attr = Common.GetCategoryByValueCodeOrId("value", value, code);
+        <span>@(attr != null ? attr.Name : "")</span>
+    }
+
+    @helper CheckDeleteColumns(int Id)
+    {
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+            <span class="lbl"></span>
+        </label>
+    }
+
+    @helper BuildCheckAll()
+    {
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+    }
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+
+    }
+
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+
+    @if (!isPopup)
+    {
+            <table id="CTable" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width:25%; text-align: center;">Khuyến Mãi</th>
+                        <th style="width:15%; text-align: center;">Tên Chi Nhánh</th>
+                        <th style="width:15%; text-align: center;">Mức Chiết Khấu</th>
+                        <th style="width:20%; text-align: center;">Tổng Tiền Giảm</th>
+
+                        <th style="width:25%; text-align: center;">Tổng Tiền Hàng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="text-right" data-name="" style="width:25%; text-align: left; font-weight:bold">@((item.nameCommitionCus))</td>
+                            <td class="text-right" data-name="" style="width:15%; text-align: right; font-weight:bold">@((item.BranchName))</td>
+                            <td class="text-right" data-name="" style="width:15%; text-align: right; font-weight:bold">@((item.IrregularDiscount))</td>
+                            <td class="text-right" data-name="" style="width:20%; text-align: right; font-weight:bold">@Common.PhanCachHangNgan2(item.IrregularDiscountAmount)</td>
+                            <td class="text-right" data-name="" style="width:25%; text-align: right; font-weight:bold">@Common.PhanCachHangNgan2(item.SumAmount)</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="text-right">
+                    <tr>
+                        <td colspan="2"></td>
+                        <td  style=" font-weight:bold"> Tổng : </td>
+                        <td class="text-right" data-name="" style="width:20%; text-align: right; font-weight:bold">@CommonSatic.ToCurrencyStr(Model.Sum(x => x.IrregularDiscountAmount), null)</td>
+                        <td class="text-right" data-name="" style="width:25%; text-align: right; font-weight:bold">@CommonSatic.ToCurrencyStr(Model.Sum(x => x.SumAmount), null)</td>
+                    </tr>
+                
+                 
+                </tfoot>
+            </table>
+    }
+    else
+    {
+        @Html.Grid(Model).Columns(columns =>
+        {
+            //columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+            columns.Add().Titled(Html.DisplayNameFor(u => u.FirstOrDefault().Name).ToString()).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Name, u.Id, isPopup));
+        }).WithPaging(10)
+    }
+    @using (Html.BeginButtonContainer(pageSetting))
+    {
+
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Print", "ProductInvoice", "Sale"))
+        {
+            @*<a href="@Url.Action("Print", "ProductInvoice", new { id = Model.Id })" target="_blank" class="btn btn-white btn-success btn-sm">
+                    <i class="ace-icon fa fa-print"></i>
+                    In phiếu
+                </a>*@
+            <button onclick="tableToExcel('CTable', 'BaoCaoKho')" class=" btn btn-primary btn-sm btn-white btn-success">
+                <i class="ace-icon fa fa-download"></i>
+                Xuất Excel
+            </button>
+            @*< a class="btn btn-white btn-success btn-sm" href="@Url.Action("Print", "ProductInvoice", new { id = Model.Id, ExportExcel = true })">
+                    <i class="ace-icon fa fa-file-excel-o"></i>
+                    Xuất excel
+                </a>*@
+        }
+
+
+
+
+    }
+
+    @section Scripts {
+        <script type="text/javascript">
+
+            var tableToExcel = (function () {
+                var uri = 'data:application/vnd.ms-excel;base64,'
+                    , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+                    , base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                    , format = function (s, c) { return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; }) }
+                return function (table, name) {
+                    if (!table.nodeType) table = document.getElementById(table)
+                    var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML }
+                    window.location.href = uri + base64(format(template, ctx))
+                }
+            })()
+        </script>
+    }

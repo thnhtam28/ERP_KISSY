@@ -1,0 +1,556 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model ProductInboundViewModel
+
+@{
+    ViewBag.isGiaNhap = Erp.BackOffice.Helpers.Common.GetSetting("hiden_gianhap");
+    ViewBag.Title = Wording.PageView_ProductInBound;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "ProductInBound",
+        ActionName = "Detail",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    IEnumerable<SelectListItem> warehouseList = (IEnumerable<SelectListItem>)ViewBag.warehouseList;
+    var admin = Erp.BackOffice.Helpers.Common.CurrentUser.UserTypeName;
+    //var branchid = Erp.BackOffice.Helpers.Common.CurrentUser.BranchId;
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+<style>
+
+     #TongSoLuong,ProductItemCount {
+            /*width: 3%;
+            height: 1.8%;
+            text-align: center;
+            border-radius: 100px;
+            color: #ffc107;
+            background: none !important;
+            font-weight: bold;
+
+            font-size: 14px;
+            padding: unset;
+            margin: unset;
+            top: 9%;*/
+            width: 5%;
+            height: 3.8%;
+            text-align: right;
+            border-radius: 100px;
+            color: #ffc107;
+            background: none !important;
+            font-weight: bold;
+            font-size: 23px;
+            padding: unset;
+            margin: unset;
+            margin-left:10px;
+            top: 15%;
+            z-index: 5;
+            
+        }
+
+        #TongSoLuong,ProductItemCount {
+            background: none;
+            border: none;
+        }
+
+        #TongSoLuong,ProductItemCount{
+            /*left: 5.7%;*/
+            left: 20.7%;
+        }
+    .lighter.block.green {
+        display: none !important;
+    }
+
+    .not-active {
+        cursor: not-allowed;
+        text-decoration: none;
+        color: black;
+    }
+
+    .mini-popup {
+        position: relative;
+        display: inline;
+    }
+
+    #popup_huy {
+        position: absolute;
+        bottom: 45px;
+        left: 0px;
+        width: 410px;
+        height: 160px;
+        max-width: inherit;
+        top: inherit;
+    }
+
+    .popover {
+        max-width: 650px !important;
+    }
+</style>
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@helper GridColumnStatusName(string status)
+{
+switch (status)
+{
+    case "pendding":
+            <span class="label label-warning">Chưa xử lý</span>
+        break;
+    case "success":
+            <span class="label label-success">Đã xử lý</span>
+        break;
+
+}
+}
+@Html.ValidationSummary(true)
+@Html.HiddenFor(model => model.Id)
+@Html.HiddenFor(model => model.CreatedUserId)
+@Html.HiddenFor(model => model.CreatedDate)
+@Html.HiddenFor(model => model.IsDeleted)
+
+<div class="row">
+    <div class="col-sm-7">
+        <h4 class="green" style="margin-top:0px">
+            <span>Phiếu nhập: @Model.Code (@(Model.CreatedDate.HasValue ? Model.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm") : ""))</span>
+            <span class="pull-right red"><b>@Model.TotalAmount.ToCurrencyStr(null)</b></span>
+        </h4>
+        @*@if (TempData["Message"] != null)
+            {
+
+                <div class="alert alert-block alert-danger">
+                    <button class="close" data-dismiss="alert" type="button">
+                        <i class="ace-icon fa fa-times"></i>
+                    </button>
+                    <i class="ace-icon fa fa-warning red"></i>
+                    @TempData["Message"]
+                </div>
+            }*@
+        @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+        {
+            <div class="alert alert-block alert-success">
+                <button class="close" data-dismiss="alert" type="button">
+                    <i class="ace-icon fa fa-times"></i>
+                </button>
+                <i class="ace-icon fa fa-check green"></i>
+                @ViewBag.SuccessMessage
+            </div>
+        }
+
+        @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+        {
+            <div class="alert alert-block alert-danger">
+                <button class="close" data-dismiss="alert" type="button">
+                    <i class="ace-icon fa fa-times"></i>
+                </button>
+                <i class="ace-icon fa fa-warning red"></i>
+                @Html.Raw(ViewBag.FailedMessage)
+            </div>
+        }
+        @*@if (!string.IsNullOrEmpty(Model.Note))
+            {
+                <div class="alert alert-warning">@Model.Note</div>
+            }*@
+
+        @if (Model.IsDeleted == true)
+        {
+            <div class="alert alert-danger">
+                <p><i class="ace-icon fa fa-warning red"></i> @Model.ModifiedUserName đã hủy bỏ chứng từ lúc @Model.ModifiedDate.Value.ToString("HH:mm dd/MM/yyyy").</p>
+                <p>Lý do hủy: @Model.Note</p>
+            </div>
+        }
+        <div id="listOrderDetail" class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>STT(@(Common.PhanCachHangNgan(Model.DetailList.Count())))</th>
+                        <th>Tên sản phẩm</th>
+                        @*<th>Lô</th>
+                            <th>Hạn SD</th>*@
+                        <th id="TongSoLuong" style="text-align:center">SL(@(Common.PhanCachHangNgan(Model.DetailList.Sum(item => item.Quantity))))</th>
+                        @*<th style="text-align:right">Đơn giá</th>*@
+                        <th style="text-align:right">Giá bán</th>
+                        @*<th style="text-align:center;width:5%">SL tem in</th>*@
+                    </tr>
+                </thead>
+                <tbody id="detailList" class="detailList">
+                    @for (int i = 0; i < Model.DetailList.Count(); i++)
+                    {
+                        <tr>
+                            <td>
+                                @(i + 1)
+                                @Html.Hidden("DetailList[" + i + "].ProductId", Model.DetailList[i].ProductCode)
+                                @Html.Hidden("DetailList[" + i + "].ProductId", Model.DetailList[i].ProductName)
+                            </td>
+                            <td>
+                                @Model.DetailList[i].ProductCode - @Model.DetailList[i].ProductName
+                                @if (Model.DetailList[i].ProductDamagedId != null && Model.DetailList[i].ProductDamagedId.Value > 0)
+                            {
+                            <a onclick="ShowPopover(@Model.DetailList[i].ProductDamagedId)"
+                               class="" id="a-popover-@Model.DetailList[i].ProductDamagedId">
+                                @if (Model.DetailList[i].Status == "pendding")
+                                    {
+                                    <i class="ace-icon fa fa-exclamation-triangle bigger-120" style="color:#F89406"></i>
+
+                                    }
+                                    else
+                                    {
+                                    <i class="ace-icon fa fa-info-circle bigger-120" style="color:#82AF6F"></i>
+                                    }
+                            </a>
+                                    <!--content html-->
+                            <div id="divContentHTML_@Model.DetailList[i].ProductDamagedId" style="display:none">
+                                <p>Trạng thái: @GridColumnStatusName(Model.DetailList[i].Status)</p>
+                                <p style="">Số lượng chênh lệch: @Model.DetailList[i].NumberAmount</p>
+                                <p style="">Lý do: @Model.DetailList[i].Reason</p>
+                                <p>
+                                    @if (Model.DetailList[i].Status == "pendding")
+                                            {
+                                                if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Approval", "ProductInbound", "Sale"))
+                                                {
+                                            <a class="btn btn-mini btn-success" href="@Url.Action("Approval", "ProductInbound", new { Id = Model.DetailList[i].ProductDamagedId,ProductInboundId=Model.Id })">
+                                                <i class="fa fa-check"></i>
+                                                Chấp nhận
+                                            </a>
+                                                }
+                                            }
+                                </p>
+                            </div>
+                            }
+                            </td>
+                            @*<td>
+                                    @Model.DetailList[i].LoCode
+                                </td>
+                                <td>
+                                    @(Model.DetailList[i].ExpiryDate == null ? "" : Model.DetailList[i].ExpiryDate.Value.ToString("dd/MM/yyyy"))
+                                </td>*@
+                            <td style="text-align:center">
+                                @Common.PhanCachHangNgan(Model.DetailList[i].Quantity)
+                                <input type="hidden" value="@Model.DetailList[i].Quantity" />
+                            </td>
+                            @*<td style="text-align:right">
+                                @Model.DetailList[i].Price.ToCurrencyStr("Price")
+                                @Html.Hidden("DetailList[" + i + "].ProductId", CommonSatic.ToCurrencyStr(Model.DetailList[i].Price, null))
+                            </td>*@
+                            <td style="text-align:right">@(Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(Math.Round(Model.DetailList[i].Price.Value * 1, 0), null))</td>
+                            @*<td style="width:5%"><input type="text" value="@Model.DetailList[i].Quantity" /></td>*@
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2"></td>
+                        <td id="TongSoLuong" align="right" style="font-weight:bold">@(Common.PhanCachHangNgan(Model.DetailList.Sum(item => item.Quantity)))</td>
+                        @*<td></td>*@
+                        <td id="TongThanhTien" align="right" style="font-weight:bold">@CommonSatic.ToCurrencyStr(Model.DetailList.Sum(item => Math.Round(item.Price.Value * item.Quantity.Value, 0)), null)</td>
+                        
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <div class="wrap" style="text-align:center; margin:0;width:80%">
+                <div class="ListBarCode" style="text-align:center; display:none">
+                    <div id="seleted-rows" class="grid-container" style="text-align:center">
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-sm-5">
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title">Thông tin chi tiết</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main clearfix">
+                    <div class="detail-view col-xs-12">
+                        @if (Model.CreatedStaffId != null)
+                        {
+                            <div class="row control-group">
+                                <div class="col-xs-4 control-label"><label for="CreatedStaffId">Nhân viên lập phiếu</label></div><div class="col-xs-8 control-value" style=""><a href="/Staffs/Detail/?Id=@Model.CreatedStaffId" target="_blank">@Model.CreatedStaffName</a></div>
+                            </div>
+                        }
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CodeOrderRed, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.DateOrder, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.WarehouseDestinationName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Note, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        @if (Model.PurchaseOrderId != null)
+                        {
+                            <div class="row control-group">
+                                <div class="col-xs-4 control-label"><label for="PurchaseOrderCode">Mã đơn mua hàng</label></div><div class="col-xs-8 control-value" style=""><a href="/PurchaseOrder/Detail/?TransactionCode=@Model.PurchaseOrderCode" target="_blank">@Model.PurchaseOrderCode</a></div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p></p>
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title">Chứng từ</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    @{Html.RenderAction("Relationship", "Transaction", new { area = "Account", TransactionCode = Model.Code });}
+                </div>
+            </div>
+        </div>
+        <p></p>
+    </div>
+</div>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    if (!Model.IsArchive)
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Edit", "ProductInBound", "Sale"))
+        {
+            if (Model.IsDeleted == true)
+            {
+                <a class="btn btn-mini btn-primary not-active" href="#">
+                    <i class="ace-icon fa fa-edit"></i>
+                    Chỉnh sửa
+                </a>
+            }
+            else
+            {
+                <a class="btn btn-mini btn-primary" href="@Url.Action("Edit", pageSetting.ModuleName, new { Id = Model.Id })">
+                    <i class="ace-icon fa fa-edit"></i>
+                    Chỉnh sửa
+                </a>
+            }
+
+        }
+    }
+    @*if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("UpdateLocationItem", "ProductInBound", "Sale"))
+        {
+            <a class="btn btn-primary btn-white btn-sm" href="@Url.Action("UpdateLocationItem", pageSetting.ModuleName, new { Id = Model.Id })">
+                Chỉnh sửa số lô / hạn sử dụng
+            </a>
+        }*@
+if (Model.IsDeleted == true)
+{
+    <a href="#" class="btn btn-primary btn-white btn-sm not-active"><i class="fa fa-print"></i> In phiếu</a>
+    <a href="#" class="btn btn-secondary btn-mini btn-sm not-active"><i class="fa fa-print"></i> In mã vạch</a>
+}
+else
+{
+    <a href="@Url.Action("Print", new { Id = Model.Id })" target="_blank" class="btn btn-primary btn-white btn-sm"><i class="fa fa-print"></i> In phiếu</a>
+    @*<a href="@Url.Action("PrintBarcode", new { Id = Model.Id })" target="_blank" class="btn btn-secondary btn-mini btn-sm" id="PrintBarcode"><i class="fa fa-print"></i> In mã vạch</a>*@
+    <a class="btn btn-secondary btn-mini btn-sm" id="PrintBarcode" target="_blank" href="@Url.Action("PrintBarCode","Product", new { Id = Model.Id, source = "in" })"><i class="fa fa-print"></i> In mã vạch</a>
+
+}
+
+if (Model.AllowEdit)
+{
+    if (!Model.IsArchive)
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Archive", "ProductInBound", "Sale"))
+        {
+            using (Html.BeginForm("Archive", pageSetting.ModuleName, FormMethod.Post, new { @class = "inline" }))
+            {
+                @Html.HiddenFor(m => m.Id)
+                    <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+                    if (Model.IsDeleted == true)
+                    {
+                        <a class="btn btn-mini btn-success not-active" type="submit" name="Submit" value="Save">
+                            <i class="ace-icon fa fa-save"></i>
+                            Ghi sổ
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-mini btn-success" type="submit" name="Submit" value="Save">
+                            <i class="ace-icon fa fa-save"></i>
+                            Ghi sổ
+                        </button>
+                    }
+
+                }
+            }
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "ProductInBound", "Sale"))
+            {
+                <div class="mini-popup">
+                    @if (Model.IsDeleted == true)
+                    {
+                        <a class="btn btn-white btn-sm no-border not-active" data-toggle="collapse" data-target="#popup_huy" style="color: red !important;">
+                            <i class="ace-icon fa fa-trash"></i>
+                            Hủy phiếu nhập
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-white btn-sm no-border" data-toggle="collapse" data-target="#popup_huy" style="color: red !important;">
+                            <i class="ace-icon fa fa-trash"></i>
+                            Hủy phiếu nhập
+                        </a>
+                        <div id="popup_huy" class="popover fade top">
+                            <div class="arrow" style="left: 50%;"></div>
+                            <h3 class="popover-title"><i class="ace-icon fa fa-bolt red"></i> Hủy đơn hàng</h3>
+                            <div class="popover-content">
+                                @using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Delete", "ProductInBound", null, FormMethod.Post, new { id = "ProductInvoice_Delete", @class = "form-horizontal clearfix" }))
+                                {
+                                    @Html.HiddenFor(m => m.Id)
+                                    @Html.CustomTextAreaFor(model => model.Note, null, WidthType.span12)
+
+                                    <p class="top-10">
+                                        <button id="btnDelete" class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save" onclick="return submitDelete();">
+                                            Đồng ý
+                                        </button>
+                                        <a class="btn btn-white btn-sm no-border" data-toggle="collapse" data-target="#popup_huy">Đóng</a>
+                                    </p>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            }
+        }
+        else
+        {
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("UnArchive", "ProductInBound", "Sale"))
+            {
+                using (Html.BeginForm("UnArchive", pageSetting.ModuleName, FormMethod.Post, new { @class = "inline" }))
+                {
+                    @Html.HiddenFor(m => m.Id)
+                    <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+                    <button class="btn btn-white btn-danger btn-sm no-border" type="submit" name="Submit" value="Save" onclick="return confirm('Bạn chắc chắn muốn thực hiện thao tác này?')">
+                        Bỏ ghi sổ
+                    </button>
+                }
+            }
+        }
+    }
+}
+
+@section Scripts {
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+}
+
+<script src="~/assets/js/jQuery.print.min.js"></script>
+<script src="~/assets/js/JsBarcode.all.min.js"></script>
+<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
+
+<script src="https://unpkg.com/html2canvas@1.0.0-rc.5/dist/html2canvas.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.1/html2pdf.bundle.min.js"></script>
+
+
+<script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+<script>
+    function ShowPopover(Id) {
+        //popover option
+        $("#a-popover-" + Id).popover({
+            title: 'Thông tin chênh lệch của sản phẩm',
+            content: $('#divContentHTML_' + Id).html(),
+            placement: 'right',
+            html: true
+        });
+
+    }
+    function submitDelete() {
+        var note = $("#Note").val();
+        if (note == '') {
+            alertPopup('Bạn chưa nhập lý do hủy. Không thể hủy phiếu nhập này!', 'Xin hãy kiểm tra lại.', 'error');
+            return false;
+        }
+        else {
+            alertPopup('Hủy thành công!', '', 'success');
+            return true;
+        }
+    }
+
+    $('#').click(function () {
+
+
+        $(".table TBODY TR").each(function () {
+            debugger
+
+            var row = $(this);
+            var code = row.closest('tr').find("td:eq(0) input:nth-child(1)").val();
+            var soluong = row.closest('tr').find("td:eq(5) input").val();
+            var gia = row.closest('tr').find("td:eq(3) input").val();
+            var name = row.closest('tr').find("td:eq(0) input:nth-child(2)").val();
+            for (i = 1; i <= soluong ; i++) {
+                $("#seleted-rows").append('<div class="rowbarcode" style="float:left;width:30%;text-align:center;margin:1;padding:0;margin-bottom: 13px"><div class="grid-item" style= "width:fit-content;text-align:center;margin:0;line-height:10px"><svg jsbarcode-fontoptions="bold"  jsbarcode-textmargin="0" id="code' + code + '"></svg>'
+                        + '<div style="text-align:center">' + '<font size="2" style="font-weight: bold;">' + gia + '</font></div>' + '<div style="text-align:center;">' + '<font size="0.4">' + name + '</font></div></div>');
+
+            };
+            JsBarcode("#code" + code, code, {
+                fontSize: 8,
+                width: 0.8,
+                height: 15,
+                textMargin: 0.02,
+                //font: "fantasy"
+            });
+
+
+        });
+        //$("#seleted-rows").print();
+        //$('.grid-item').remove();
+        var element = document.getElementById('seleted-rows');
+        var opt = {
+            margin: 0.05,
+            padding: 0,
+            filename: 'BarCodes.pdf',
+
+            image: { type: 'jpeg', quality: 1000 },
+            html2canvas: { scale: 5 },
+            //pagebreak: '.before',
+            jsPDF: { unit: 'in', format: [0.9, 4.2], orientation: 'landscape', compressPDF: true }
+        };
+
+        // New Promise-based usage:
+        html2pdf().from(element).set(opt).save();
+        setTimeout(function () { $('.rowbarcode').remove(); }, 5000);
+    });
+
+    //$('#PrintBarcode').click(function () {
+    //    var list = new Array();
+    //    $(".table TBODY TR").each(function () {
+    //        debugger;
+    //        var row = $(this);
+    //        var code = row.closest('tr').find("td:eq(0) input:nth-child(1)").val();
+    //        var soluong = row.closest('tr').find("td:eq(2) input").val();
+    //        var product = {};
+    //        product.ProductCode = code;
+    //        product.Quantity = soluong;
+    //        list.push(product);
+    //    });
+    //    $.ajax({
+    //        type: "POST",
+    //        url: "/Product/PrintBarCode2",
+    //        data: JSON.stringify(list),
+    //        contentType: "application/json; charset=utf-8",
+    //        dataType: "json",
+    //        success: function (r) {
+    //            location.reload();
+    //            HideLoading();
+    //        }
+    //    });
+
+    });
+
+</script>

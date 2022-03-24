@@ -1,0 +1,96 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+
+@model Erp.BackOffice.Sale.Models.CommisionCustomerViewModel
+
+
+@{
+    //int orderNo = 0;
+    //decimal CommissionValue = 0;
+    //bool? IsMoney = false;
+    //Model.IsMoney = false;
+    int filtersRow = 0;
+    
+}
+
+
+
+
+
+
+<tr data-id="@(Model.OrderNo)">
+    <td>@(Model.OrderNo + 1)
+        @Html.Hidden("DetailList[" + (Model.OrderNo) + "].Id", Model.Id)
+        @Html.Hidden("DetailList[" + (Model.OrderNo) + "].ProductId", Model.ProductId)
+        @Html.Hidden("DetailList[" + (Model.OrderNo) + "].Price", Model.Price)
+        @Html.Hidden("DetailList[" + (Model.OrderNo) + "].Type", 1)
+        @Html.Hidden("DetailList[" + (Model.OrderNo) + "].ProductCode", Model.ProductCode)
+    </td>
+    <td>@Model.ProductCode-@Model.ProductName</td>
+    <td>Sản phẩm</td>
+    <td class="text-right">@CommonSatic.ToCurrencyStr(Model.Price, null)</td>
+    <td>
+       
+        @Html.TextBox("DetailList[" + (Model.OrderNo) + "].CommissionValue", Model.CommissionValue, new { style = "width:100px; text-align:right; " + (Model.CommissionValue > 0 ? "border:1px solid green; font-weight:bold; color:green" : ""), @class = "input-price numberinput2", autocomplete = "off" })
+        @Html.TextBox("DetailList[" + (Model.OrderNo) + "].CommissionValueText", (Model.IsMoney != null && Model.IsMoney == true ? "VNĐ" : "%"), new { style = "width:40px; text-align:center", @readonly = "readonly" })
+    </td>
+    <td>
+       <input class="totalComission" value="" style="width:120px;" />
+    </td>
+    <td>
+        <label>
+            <input class="detail_item_check ace" type="checkbox" name="DetailList[@(Model.OrderNo)].IsMoney" data-index="@(Model.OrderNo)" id="DetailList_@(Model.OrderNo)__IsMoney" value="@(Model.IsMoney != null && Model.IsMoney == true ? "true" : "false")" @(Model.IsMoney != null && Model.IsMoney == true ? "checked=\"checked\"" : "") />
+            <span class="lbl"></span>
+        </label>
+    </td>
+    <td class="text-center">
+        <a class="btn-delete-item">
+            <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+        </a>
+    </td>
+</tr>
+<script type="text/javascript">
+    $(function () {
+        LoadNumberInput();
+        $(".detail_item_check").change(function () {
+            var index = $(this).data("index");
+            if ($(this).prop("checked")) {
+                $("#DetailList_" + index + "__IsMoney").val(true);
+                $("#DetailList_" + index + "__CommissionValueText").val("VNĐ");
+            }
+            else {
+                $("#DetailList_" + index + "__IsMoney").val(false);
+                $("#DetailList_" + index + "__CommissionValueText").val("%");
+            }
+        });
+    });
+    function CheckIsval() {
+        if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+            alert("Phải chọn ít nhất 1 item.");
+            return false;
+        }
+        else {
+            if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+
+    $('[name="Delete"]').click(function () {
+        if (confirm('Bạn có chắc muốn xóa item ?')) {
+            $(this).closest('tr').children('td').each(function (i, e) {
+                $(this).find("input.class-delete-all").prop("checked", true);
+                return true;
+            })
+        }
+        else {
+            return false;
+        }
+
+    })
+
+</script>

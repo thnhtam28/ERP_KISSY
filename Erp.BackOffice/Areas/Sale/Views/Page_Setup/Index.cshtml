@@ -1,0 +1,24 @@
+﻿@{
+    ViewBag.Title = "";
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Page_Setup",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+<p>test</p>
+

@@ -1,0 +1,954 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.Domain.Sale.Entities
+
+@model ProductViewModel
+
+@{
+    ViewBag.Title = Wording.PageEdit_Product;
+
+
+
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Product",
+        ActionName = "Edit",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    List<Supplier> supplier_List = (List<Supplier>)ViewBag.supplierList;
+    IEnumerable<SelectListItem> ManufacturerList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("manufacturerList", null, "value");
+    IEnumerable<SelectListItem> CategoryList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("product", null, "value");
+    IEnumerable<SelectListItem> productUnitList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("productUnit", null, "value");
+    IEnumerable<SelectListItem> productGroupList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("ProductGroup", null, "value");
+    IEnumerable<SelectListItem> OriginList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("Origin", null, Wording.Empty);
+    IEnumerable<SelectListItem> productASList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_NhomSP("ProductASList", null);
+    IEnumerable<SelectListItem> productASGroup = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_LoaiSP("productASGroup", null);
+    IEnumerable<vwProductsamegroup> listProduct = (IEnumerable<vwProductsamegroup>)ViewBag.listProduct;
+    IEnumerable<vwProductsamesize> listProduct2 = (IEnumerable<vwProductsamesize>)ViewBag.listProduct2;
+    IEnumerable<vwProductSKU> listProduct3 = (IEnumerable<vwProductSKU>)ViewBag.listProduct3;
+
+}
+<style>
+    #ColorSP, #SizeSP {
+        width: 100%;
+    }
+
+    #btn-SPLQ {
+        margin: 10px 0;
+    }
+
+    #btn-QT {
+        margin: 10px 0;
+    }
+
+    .grid-pager {
+        margin-bottom: 5px;
+    }
+
+    #popup_archive2 {
+        position: center;
+        bottom: 30%;
+        left: 20%;
+        height: 500px;
+        max-width: 450px !important;
+        /*top: 20%;*/
+        right: 30%;
+    }
+
+
+
+    .scrollit {
+        height: 60%; /* Just for the demo          */
+        overflow-y: auto; /* Trigger vertical scroll    */
+        overflow-x: hidden; /* Hide the horizontal scroll */
+    }
+</style>
+
+@helper GridColumnCommandBANCUNG(int id)
+{
+if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "Product", "Sale"))
+{
+        <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+            <button name="DeleteBANCUNG" value=@id onclick="deleteSPBANCUNG(@id)" id="DeleteBANCUNG" type="button" class="btn btn-minier btn-danger">
+                <i class="ace-icon fa fa-trash"></i>
+            </button>
+        </div>
+}
+}
+
+@helper GridColumnCommandSKU(int id)
+{
+if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "Product", "Sale"))
+{
+        <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+            <button name="DeleteSPSKU" value=@id onclick="deleteSPSKU(@id)" id="DeleteSPSKU" type="button" class="btn btn-minier btn-danger">
+                <i class="ace-icon fa fa-trash"></i>
+            </button>
+        </div>
+}
+}
+
+@helper GridColumnCommandTUONGTU(int id)
+{
+if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "Product", "Sale"))
+{
+        <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+            <button name="DeleteTUONGTU" value=@id onclick="deleteSPTUONGTU(@id)" id="DeleteTUONGTU" type="button" class="btn btn-minier btn-danger">
+                <i class="ace-icon fa fa-trash"></i>
+            </button>
+        </div>
+}
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+
+
+<div class="text-danger">@ViewBag.errors</div>
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Edit", "Product", null, FormMethod.Post, new { id = "EditProduct", @class = "form-horizontal clearfix", enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+    <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.CreatedUserId)
+    @Html.HiddenFor(model => model.CreatedDate)
+    @Html.HiddenFor(model => model.IsDeleted)
+    @Html.HiddenFor(model => model.Image_Name)
+    @Html.HiddenFor(model => model.Image_Name)
+    @Html.HiddenFor(model => model.Type)
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#home" aria-expanded="true"><i class="fa fa-info-circle"></i> Tổng quan</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#image" aria-expanded="false"><i class="fa fa-image"></i> Ảnh minh họa</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#imagepos" aria-expanded="false"><i class="fa fa-image"></i> Ảnh POS</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#profile_brief" aria-expanded="false"><i class="fa fa-comment-o"></i> Mô tả ngắn</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#profile" aria-expanded="false"><i class="fa fa-comment-o"></i> Mô tả</a>
+                                </li>
+                                <li>
+                                    <a data-toggle="tab" href="#HDSD" aria-expanded="false"> Hướng dẫn sử dụng</a>
+                                </li>
+                                <li id="tab_li_SPTT">
+                                    <a data-toggle="tab" href="#SPTT">Sản phẩm liên quan</a>
+                                </li>
+
+                                @*<li id="tab_li_SPBC">
+                                        <a data-toggle="tab" href="#SPBC" aria-expanded="false"> Có thể bạn quan tâm</a>
+                                    </li>*@
+                                <li id="tab_li_SPSKU">
+                                    <a data-toggle="tab" href="#SPSKU" aria-expanded="false"> sản phẩm SKU</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#home2" aria-expanded="false"><i class=""></i> Thông tin thêm</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="home" class="Container tab-pane active" style="width:100%">
+                                    <div class="col-sm-6">
+                                        @Html.CustomTextboxFor(model => model.Name, null, null, WidthType.span12)
+                                        @Html.CustomTextboxFor(model => model.Code, null, null, WidthType.span12)
+                                        @*@Html.CustomTextboxFor(model => model.Origin, null, null, WidthType.span12)*@
+                                        @Html.CustomDropDownListFor(model => model.Manufacturer, ManufacturerList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen)
+                                        @Html.CustomDropDownListFor(model => model.NHOMSANPHAM_ID, productASList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen)
+                                        @*@Html.CustomDropDownListFor(model => model.LOAISANPHAM_ID, productASGroup, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen)*@
+                                        @*@Html.CustomDropDownListFor(model => model.LOAISANPHAM_ID_LST, SelectListHelper.GetSelectList_LoaiSP(Model.LOAISANPHAM_ID, Wording.Category), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen, true)*@
+                                        @*@Html.CustomDropDownListFor(model => model.Color_product, SelectListHelper.GetSelectList_ColorSP(Model.Color_product, "Color_product"), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen, true)*@
+                                        @Html.CustomDropDownListFor(model => model.Color_product, SelectListHelper.GetSelectList_ColorSP(Model.Color_product, "Color_product"), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen)
+                                        @Html.CustomDropDownListFor(model => model.Size_product, SelectListHelper.GetSelectList_ColorSP(Model.Size_product, "Size_product"), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen)
+                                        @*@Html.CustomDropDownListFor(model => model.Size_product, SelectListHelper.GetSelectList_SizeSP(Model.Size_product, "Size_product"), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen, true)*@
+                                        @Html.CustomDropDownListFor(model => model.Unit, productUnitList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen)
+
+
+
+                                        <div id="" class="control-group form-group">
+                                            <label class="control-label col-lg-5 col-md-4 col-sm-4">Giá bán</label>
+                                            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                                                <div class="clearfix">
+                                                    <input class="col-sm-12 text-right" id="PriceOutbound" name="PriceOutbound" type="text" value="@Model.PriceOutbound">
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div id="" class="control-group form-group">
+                                            <label class="control-label col-lg-5 col-md-4 col-sm-4">Giá nhập</label>
+                                            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                                                <div class="clearfix">
+                                                    <input class="col-sm-12 text-right" id="PriceInbound" name="PriceInbound" type="text" value="@Model.PriceInbound">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @Html.CustomTextboxFor(model => model.MinInventory, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "col-sm-12 text-right" } })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        @Html.CustomTextboxFor(model => model.LIST_TAGS, null, null, WidthType.span12)
+
+
+
+                                        @Html.CustomSwitchesFor(model => model.IS_NOIBAT, SwitchesStyle.CheckboxStyle, true)
+                                        @Html.CustomSwitchesFor(model => model.IS_NEW, SwitchesStyle.CheckboxStyle, false)
+                                        @*@Html.CustomTextboxFor(model => model.STT_ISNEW, null, null, WidthType.span12)*@
+                                        @Html.CustomSwitchesFor(model => model.IS_HOT, SwitchesStyle.CheckboxStyle, false)
+
+                                        @Html.CustomSwitchesFor(model => model.is_price_unknown, SwitchesStyle.CheckboxStyle, true)
+                                        @Html.CustomSwitchesFor(model => model.is_display, SwitchesStyle.CheckboxStyle, true)
+
+                                    </div>
+                                </div>
+                                <div id="home2" class="tab-pane">
+
+                                    @Html.CustomSwitchesFor(model => model.IS_ALOW_BAN_AM, SwitchesStyle.CheckboxStyle, true)
+                                    @Html.CustomSwitchesFor(model => model.IS_NGUNG_KD, SwitchesStyle.CheckboxStyle, true)
+                                    @Html.CustomSwitchesFor(model => model.IS_COMBO, SwitchesStyle.CheckboxStyle, true)
+
+                                    <div id="" class="control-group form-group">
+                                        <div><label>Thông tin SEO</label></div>
+                                        <label class="control-label col-lg-5 col-md-4 col-sm-4">Tiêu đề</label>
+                                        <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                                            <input class="" id="META_TITLE" name="META_TITLE" type="text" value="@Model.META_TITLE">
+                                        </div>
+                                        <label class="control-label col-lg-5 col-md-4 col-sm-4">Mô tả ngắn</label>
+                                        <div class="control-value col-lg-7 col-md-8 col-sm-8">
+
+                                            <input class="" id="META_DESCRIPTION" name="META_DESCRIPTION" type="text" value="@Model.META_DESCRIPTION">
+
+                                        </div>
+                                        <label class="control-label col-lg-5 col-md-4 col-sm-4">Url slug</label>
+                                        <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                                            <input class="" id="URL_SLUG" name="URL_SLUG" type="text" value="@Model.URL_SLUG">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div id="image" class="tab-pane">
+                                    <div class="wrap-btn-upload">
+                                        <a class="btn btn-primary btn-sm btn-white"><i class="fa fa-upload"></i><span>Tải hình mới</span></a>
+                                        <input type="file" id="file-image" name="file-image" multiple class="file-image" onchange="previewFileImage2(event, '#display-image' )" />
+                                    </div>
+
+                                    <div class="text-center" id="display-image">
+
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                @if (Model.listimg_product != null && ((Model.listimg_product.Count() - 1) >= 0))
+                                                {
+                                                    <span id="s1"><img name="s1" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.listimg_product[0], "product-image-folder", "product"))" id="" style="max-height:250px;max-width:200px;" /> <a style="background-color:red;" onclick="deleteimgid('s1',1)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img1" name="img1" value="" />
+                                                }
+                                                else
+                                                {
+                                                    <span id="s1"><img name="s1" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /> <a style="background-color:aqua;" onclick="deleteimgid('s1',1)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img1" name="img1" value="" />
+                                                }
+                                            </div>
+                                            <div class="col-sm-3">
+                                                @if (Model.listimg_product != null && (Model.listimg_product.Count() - 2) >= 0)
+                                                {
+                                                    <span id="s2"><img name="s2" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.listimg_product[1], "product-image-folder", "product"))" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:red;" onclick="deleteimgid('s2',2)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img2" name="img2" value="" />
+                                                }
+                                                else
+                                                {
+                                                    <span id="s2"><img name="s2" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s2',2)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img2" name="img2" value="" />
+                                                }
+
+                                            </div>
+                                            <div class="col-sm-3">
+                                                @if (Model.listimg_product != null && (Model.listimg_product.Count() - 3) >= 0)
+                                                {
+                                                    <span id="s3"><img name="s3" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.listimg_product[2], "product-image-folder", "product"))" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:red;" onclick="deleteimgid('s3',3)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img3" name="img3" value="" />
+                                                }
+                                                else
+                                                {
+                                                    <span id="s3"><img name="s3" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s3',3)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img3" name="img3" value="" />
+                                                }
+
+                                            </div>
+                                            <div class="col-sm-3">
+                                                @if (Model.listimg_product != null && (Model.listimg_product.Count() - 4) >= 0)
+                                                {
+                                                    <span id="s4"><img name="s4" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.listimg_product[3], "product-image-folder", "product"))" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:red;" onclick="deleteimgid('s4',4)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img4" name="img4" value="" />
+                                                }
+                                                else
+                                                {
+                                                    <span id="s4"><img name="s4" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s4',4)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img4" name="img4" value="" />
+                                                }
+
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                @if (Model.listimg_product != null && (Model.listimg_product.Count() - 5) >= 0)
+                                                {
+                                                    <span id="s5"><img name="s5" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.listimg_product[4], "product-image-folder", "product"))" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:red;" onclick="deleteimgid('s5',5)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img5" name="img5" value="" />
+                                                }
+                                                else
+                                                {
+                                                    <span id="s5"><img name="s5" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s5',5)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img5" name="img5" value="" />
+                                                }
+
+                                            </div>
+                                            <div class="col-sm-3">
+                                                @if (Model.listimg_product != null && (Model.listimg_product.Count() - 6) >= 0)
+                                                {
+                                                    <span id="s6"><img name="s6" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.listimg_product[5], "product-image-folder", "product"))" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:red;" onclick="deleteimgid('s6',6)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img6" name="img6" value="" />
+                                                }
+                                                else
+                                                {
+                                                    <span id="s6"><img name="s6" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s6',6)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img6" name="img6" value="" />
+                                                }
+
+                                            </div>
+                                            <div class="col-sm-3">
+                                                @if (Model.listimg_product != null && (Model.listimg_product.Count() - 7) >= 0)
+                                                {
+                                                    <span id="s7"><img name="s7" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.listimg_product[6], "product-image-folder", "product"))" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:red;" onclick="deleteimgid('s7',7)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img7" name="img7" value="" />
+                                                }
+                                                else
+                                                {
+                                                    <span id="s7"><img name="s7" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s7',7)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img7" name="img7" value="" />
+                                                }
+
+                                            </div>
+                                            <div class="col-sm-3">
+                                                @if (Model.listimg_product != null && (Model.listimg_product.Count() - 8) >= 0)
+                                                {
+                                                    <span id="s8"><img name="s8" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.listimg_product[7], "product-image-folder", "product"))" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:red;" onclick="deleteimgid('s8',8)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img8" name="img8" value="" />
+                                                }
+                                                else
+                                                {
+                                                    <span id="s8"><img name="s8" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s8',8)"><span> X</span></a></span>
+                                                    <input type="hidden" id="img8" name="img8" value="" />
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div id="imagepos" class="tab-pane">
+                                    <div class="wrap-btn-upload">
+                                        <a class="btn btn-primary btn-sm btn-white"><i class="fa fa-upload"></i><span>Tải hình mới</span></a>
+                                        <input type="file" id="file-imagepos" name="file-imagepos" class="file-imagepos" onchange="previewFileImage(event, '#display-imagepos img')" />
+                                    </div>
+                                    <div class="text-center" id="display-imagepos">
+                                        <img src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.Image_Pos, "product-image-folder", "product"))" title="@Model.Name" id="" style="max-height:250px" />
+                                    </div>
+                                </div>
+                                <div id="profile_brief" class="tab-pane">
+                                    <textarea class="ckeditor" cols="20" id="Description_brief" name="Description_brief" placeholder="" rows="2">@Model.Description_brief</textarea>
+
+                                </div>
+
+
+
+                                <div id="profile" class="tab-pane">
+                                    <textarea class="ckeditor" cols="20" id="Description" name="Description" placeholder="" rows="2">@Model.Description</textarea>
+
+                                </div>
+                                <div id="HDSD" class="tab-pane">
+                                    <textarea class="ckeditor" cols="20" id="HDSD" name="HDSD" placeholder="" rows="2">@Model.HDSD</textarea>
+                                </div>
+
+                                <div class="tab-pane  clearfix" id="SPTT">
+                                    <div class="table-responsive">
+                                        <div id="btn-SPLQ">
+                                            <a class="btn btn-success btn-sm btn-white" onclick="OpenPopup('/Product/IndexSearch?IsPopup=true&pruductid=@Model.Id', 'Tìm kiếm dữ liệu', 800, 600)"><i></i><span>Thêm sản phẩm</span></a>
+                                        </div>
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:130px">STT</th>
+                                                    <th style="width:130px">Mã sản phẩm</th>
+                                                    <th style="width:110px">Tên sản phẩm</th>
+                                                    <th style="width:180px">Giá bán</th>
+                                                    <th style="width:100px">Nhóm sản phẩm</th>
+                                                    <th style="width:100px">Loại sản phẩm</th>
+                                                    <th style="width:20px">Xóa</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="detailList" id="detailList">
+                                                @if (listProduct != null)
+                                                {
+                                                    foreach (var i in listProduct)
+                                                    {
+                                                        <tr>
+                                                            <td>@i.stt</td>
+                                                            <td>@i.Code</td>
+                                                            <td>@i.Name</td>
+                                                            <td class="text-right">@Common.PhanCachHangNgan(i.PriceOutBound)</td>
+                                                            <td>@i.TEN_NHOMSANPHAM</td>
+                                                            <td>@i.TEN_LOAISANPHAM</td>
+                                                            <td>@GridColumnCommandTUONGTU(i.Id)</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="tab-pane  clearfix" id="SPBC">
+                                    <div class="table-responsive">
+                                        <div id="btn-QT">
+                                            <a class="btn btn-success btn-sm btn-white" onclick="OpenPopup('/Product/IndexSearch2?IsPopup=true&pruductid=@Model.Id', 'Tìm kiếm dữ liệu', 800, 600)"><i></i><span>Thêm sản phẩm</span></a>
+                                        </div>
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:130px">STT</th>
+                                                    <th style="width:130px">Mã sản phẩm</th>
+                                                    <th style="width:110px">Tên sản phẩm</th>
+                                                    <th style="width:180px">Giá bán</th>
+                                                    <th style="width:100px">Nhóm sản phẩm</th>
+                                                    <th style="width:100px">Loại sản phẩm</th>
+                                                    <th style="width:20px">Xóa</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="detailList">
+                                                @if (listProduct2 != null)
+                                                {
+                                                    foreach (var i in listProduct2)
+                                                    {
+                                                        <tr>
+                                                            <td>@i.stt</td>
+                                                            <td>@i.Code</td>
+                                                            <td>@i.Name</td>
+                                                            <td class="text-right">@Common.PhanCachHangNgan(i.PriceOutBound)</td>
+                                                            <td>@i.TEN_NHOMSANPHAM</td>
+                                                            <td>@i.TEN_LOAISANPHAM</td>
+                                                            <td>@GridColumnCommandBANCUNG(i.Id)</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                                <div class="tab-pane  clearfix" id="SPSKU">
+                                    <div class="table-responsive">
+                                        <div id="btn-QT">
+                                            <a class="btn btn-success btn-sm btn-white btnCreateSKU" data-toggle="collapse" data-target="#popup_archive2" id="chitiet" style="border-radius:5px;" aria-expanded="false"><i></i><span> Tạo Nhanh Sản Phẩm</span></a>
+                                        </div>
+                                        @*<a class="btn btn-white btn-success btn-sm collapsed" data-toggle="collapse" data-target="#popup_archive2" id="chitiet" style="border-radius:5px;" aria-expanded="false">
+                                                <i class="ace-icon fa fa-file-excel-o"></i>
+                                                Tạo Nhanh Sản Phẩm
+                                            </a>*@
+                                        <div class="mini-popup">
+                                            <div id="popup_archive2" class="popover fade top">
+                                                <h3 class="popover-title"><i class="ace-icon fa fa-arrow-circle-right"></i> Tạo nhanh sản phẩm SKU</h3>
+                                                <div class="popover-content">
+                                                    <div class="row-1">
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-6">
+                                                                    @Html.DropDownList("ColorSP", SelectListHelper.GetSelectList_ColorSP(Model.Color_product, "Color_product"))
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    @Html.DropDownList("SizeSP", SelectListHelper.GetSelectList_SizeSP(Model.Size_product, "Size_product"))
+                                                                </div>
+                                                                <div class="col-sm-12" style="padding-top:10px">
+                                                                    <input type="text" id="Code" name="Code" value="@Model.Code" readonly="readonly" name="@Model.Id" style="border-radius:5px;" />
+                                                                    <a class="btn btn-success btn-mini" id="btnSKU" style="padding:4px 15px ; border-radius:5px ">Tạo</a>
+
+                                                                </div>
+                                                            </div>
+
+
+
+
+                                                            <br />
+                                                            <br />
+                                                            <div class="scrollit">
+                                                                <table id="tlbSKU" class="table table-bordered" style="border-radius:5px;">
+                                                                    <thead>
+                                                                        <tr>
+
+                                                                            <th style="width:5%">Xóa</th>
+                                                                            @*<th style="width:20%">Mã Sản Phẩm</th>*@
+                                                                            <th style="width:10%">Màu</th>
+                                                                            <th style="width:15%">Size</th>
+
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+
+                                                                        @*<tr><td><a name='record'><i class='fa fa-times-circle'></i></a></td><td>@Model.NameColor</td><td>@Model.NameSize</td></tr>*@
+
+                                                                    </tbody>
+                                                                </table>
+                                                                @*<a class="btn btn-success btn-mini" style="padding:4px 15px ; border-radius:5px;width:30%">Lưu</a>*@
+                                                            </div>
+
+                                                            @*<button class="btn btn-success btn-sm" id="addSKU" value="Lưu" type="button" style="border-radius:5px;width:30%" />*@
+                                                            <p class="top-10">
+                                                                <a class="btn btn-primary btn-mini" id="WERT" style="padding:4px 15px ; border-radius:5px;width:30% ">Tạo Mã </a>
+                                                                <a class="btn btn-white btn-sm no-border" data-toggle="collapse" id="closepopup" data-target="#popup_archive2" style="border-radius:5px;">Đóng</a>
+                                                            </p>
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:50px">STT</th>
+                                                    <th style="width:25%" class="text-center">Mã sản phẩm</th>
+                                                    <th style="width:25%" class="text-center">Mã sản phẩm SKU</th>
+                                                    <th style="width:10%">Màu</th>
+                                                    <th style="width:10%">Size</th>
+                                                    <th style="width:5%">Hiển thị</th>
+                                                    <th style="width:20px">Xóa</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="detailList">
+                                                @{ var soTT = 1; }
+                                                @if (listProduct3 != null)
+                                                {
+
+                                                    foreach (var i in listProduct3)
+                                                    {
+                                                        <tr>
+                                                            <td>@soTT</td>
+                                                            <td class="text-center"><a href="@Url.Action("Edit", "Product", new { Id = i.Product_id,IsPopup="true"})">@i.CodeSP</a></td>
+                                                            <td class="text-center">@i.CodeSKU</td>
+                                                            <td>@i.color</td>
+                                                            <td>@i.Size</td>
+                                                            <td>
+                                                                <input name="is_Display" type="checkbox" disabled="disabled" value="@Html.Raw(i.Is_display)" @(i.Is_display != null && i.Is_display == true ? "checked=\"checked\"" : "")>
+
+
+                                                            </td>
+                                                            <td>@GridColumnCommandSKU(i.Id)</td>
+                                                        </tr>
+                                                        soTT++;
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                                                    using (Html.BeginButtonContainer(pageSetting))
+                                                    {
+                                                        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save">
+                                                            <i class="ace-icon fa fa-save"></i>
+                                                            @Wording.Save
+                                                        </a>
+                                                        }
+
+                                                    }
+
+@section Scripts {
+    <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/notify.min.js"></script>
+    <script>
+        $("#page_header").find("a").attr("href", "javascript:history.go(-1)");
+    </script>
+    <script>
+
+        $('.modal-header').removeClass('Close-popup');
+        function deleteSPBANCUNG(id) {
+            $.ajax({
+                type: "POST",
+                url: "/Product/Xoasanphambancung",
+                data: { id: id.toString() },
+                success: function (r) {
+                    location.reload();
+                    HideLoading();
+                }
+            });
+        }
+        function GetAllSPTUONGTU() {
+
+            $.ajax({
+                url: '/Product/GetList1Json',
+                type: "GET",
+                dataType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    console.log(data);
+                    for (var x = 0; x < data.length; x++) {
+                        content = data[x].Id;
+                        content += "<br>";
+                        content += data[x].Name;
+                        content += "<br>";
+                        $(content).appendTo("#detailList");
+                        // updateListing(data[x]);
+                    }
+                }
+            });
+        }
+        function deleteSPTUONGTU(id) {
+            $.ajax({
+                type: "POST",
+                url: "/Product/Xoasanphamtuongtu",
+                data: { id: id.toString() },
+                success: function (r) {
+                    window.location.reload();
+                    //location.reload();
+                    HideLoading();
+                }
+            });
+        }
+        function deleteSPSKU(id) {
+            var r = confirm("Bạn có chắc muốn xóa sản phẩm SKU này ?");
+            if (r == true) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Product/XoasanphamSKU",
+                    data: { id: id.toString() },
+                    success: function (r) {
+                        window.location.reload();
+                        //location.reload();
+                        HideLoading();
+                    }
+                });
+            }
+
+        }
+
+
+        $(document).ready(function () {
+            LoadNumberInput();
+            //$('#PriceInbound').numberFormat();
+            //$('#PriceOutbound').numberFormat();
+            $('#MinInventory').numberFormat();
+            //$("#IsMoneyDiscount").on('change', function () {
+            //    if ($("#IsMoneyDiscount").is(':checked')) {
+            //        $("#IsMoneyDiscount").val("true");
+            //        $("#lb_IsCheck").text("VNĐ");
+            //    }
+            //    else {
+            //        $("#IsMoneyDiscount").val("false");
+            //        $("#lb_IsCheck").text("%");
+            //    }
+            //});
+            $('#CategoryCode').change(function () {
+                var $this = $(this);
+                $('.list-attr-by-category').html('');
+                $.get('/ObjectAttribute/GetListByModuleCategory', { category: $this.val(), objectId: @Model.Id, column:'col-sm-6' }, function (res) {
+                    if(res.replace(/\s+/,'') != ''){
+                        $('.list-attr-by-category').html(res);
+                        initDataTypeInput($('.list-attr-by-category input'));
+                        $('.box-attr').show();
+                    }
+                });
+            });
+
+            // resetLableRequired('#EditProduct');
+            //parseValidatorForm('#ProductInBound');
+            $('#Save').click(function () {
+                ShowLoading();
+                ClearFormatBeforeSubmit($("#EditProduct"));
+                $("#EditProduct").submit();
+                // HideLoading();
+                //return false;
+            });
+
+            //init
+            $('#CategoryCode').trigger('change');
+
+
+        });
+        function deleteimgid(id, img) {
+            document.images[id].src = '/assets/css/images/noimage.gif';
+            if (img == 1) {
+                $("#img1").val(1);
+
+            } else if (img == 2) {
+                $("#img2").val(1);
+            } else if (img == 3) {
+                $("#img3").val(1);
+            } else if (img == 4) {
+                $("#img4").val(1);
+            } else if (img == 5) {
+                $("#img5").val(1);
+            } else if (img == 6) {
+                $("#img6").val(1);
+            } else if (img == 7) {
+                $("#img7").val(1);
+            } else if (img == 8) {
+                $("#img8").val(1);
+            }
+
+            $('img').val(1);
+        }
+        function initCkeditor() {
+            $('.ckeditor').ckeditor({
+                "extraPlugins": 'imagebrowser',
+                "imageBrowser_listUrl": "@Url.Action("ListJson","Images")",
+                // Define the toolbar groups as it is a more accessible solution.
+                toolbarGroups: [
+                    { "name": "document", "groups": ["mode", "document", "doctools"] },
+                    { "name": "editing", "groups": ["find", "selection", "spellchecker"] },
+                    { "name": "forms" },
+                    { "name": "tools" },
+                    { "name": "basicstyles", "groups": ["basicstyles", "cleanup"] },
+                    { "name": "clipboard", "groups": ["clipboar", "undo"] },
+                    { "name": "links", "groups": ["links"] },
+                    { "name": "paragraph", "groups": ["list", "blocks"] },
+                    { "name": "insert", "groups": ["insert"] },
+                    { "name": "styles", "groups": ["styles"] },
+                    //{ "name": "about", "groups": ["about"] },
+                    { "name": "styles" },
+                    { "name": "colors" },
+                    { "name": "align", "groups": ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+
+                ],
+                // Remove the redundant buttons from toolbar groups defined above.
+                removeButtons: 'Underline,Strike,Subscript,Superscript,Anchor,Styles,Specialchar'
+            });
+        }
+        var $tr_template = $('#detailList tr:first-child');
+        //truyền từ action create của controller qua khi thực hiện submit và return về lại view create, để nhận biết là được gọi theo dạng popup
+        var closePopup = '@ViewBag.closePopup';
+        $(document).ready(function () {
+            //nếu là được gọi theo dạng popup từ form khác thì chạy đoạn code bên dưới
+            if (closePopup != '') {
+                var option = '<option value="@Model.Id" >@Model.Name</option>';
+                //tên funtion có thể khác theo từng công việc riêng (đây chỉ là mẫu khi thêm mới sẽ gọi lại)
+                window.parent.ClosePopupAndAppendSelect(option);
+            }
+
+        });
+
+        $("#Name").keyup(function () {
+            var Text = $(this).val();
+            Text = to_slug(Text);
+
+            $("#URL_SLUG").val(Text);
+        });
+
+        function to_slug(str) {
+            // Chuyển hết sang chữ thường
+            str = str.toLowerCase();
+
+            // xóa dấu
+            str = str.replace(/(à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ)/g, 'a');
+            str = str.replace(/(è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ)/g, 'e');
+            str = str.replace(/(ì|í|ị|ỉ|ĩ)/g, 'i');
+            str = str.replace(/(ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ)/g, 'o');
+            str = str.replace(/(ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ)/g, 'u');
+            str = str.replace(/(ỳ|ý|ỵ|ỷ|ỹ)/g, 'y');
+            str = str.replace(/(đ)/g, 'd');
+
+            // Xóa ký tự đặc biệt
+            str = str.replace(/([^0-9a-z-\s])/g, '');
+
+            // Xóa khoảng trắng thay bằng ký tự -
+            str = str.replace(/(\s+)/g, '-');
+
+            // xóa phần dự - ở đầu
+            str = str.replace(/^-+/g, '');
+
+            // xóa phần dư - ở cuối
+            str = str.replace(/-+$/g, '');
+
+            // return
+            return str;
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+
+            $("#closepopup").click(function () {
+                var tbody = $("#tlbSKU tbody tr");
+                tbody.reset();
+            });
+            //$(".btnCreateSKU").click(function () {
+            //    var tbody = $("#tlbSKU tbody tr");
+            //    tbody.empty();
+            //});
+            // $("#chitiet").click(function () {
+            //    $("#tlbSKU tbody").remove();
+            //});
+        })
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#btnSKU").on("click ", function () {
+                debugger
+                var color = $("#ColorSP option:selected").text();
+                var size = $("#SizeSP option:selected").text();
+                var Id = @Model.Id;
+                @*var Idsize = $("#SizeSP option:selected").val();
+                var Idcolor = $("#ColorSP option:selected").val();
+                var NameGroup = $("#NHOMSANPHAM_ID_chosen .chosen-single span").text();
+                var Group = NameGroup.replace('--', '');
+                var MaCode = (@Erp.BackOffice.Helpers.Common.GetOrderNo("Product", Model.Code)).toString();
+                var Code = MaCode.toString();*@
+                var markup = "<tr><td><a class='remove' name='record'><i class='fa fa-times-circle'/></i></a></td><td>" + color + "</td><td>" + size + "</td></tr>";
+                var tbody = $("#tlbSKU tbody tr");
+                var trung = 0;
+                $.ajax({
+                    type: "POST",
+                    url: "/Product/CheckSKU",
+                    data: JSON.stringify({ColorSKU:color,SizeSKU:size,IdParent :Id }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (r) {
+                        if (r == 0) {
+                            $("#btnSKU").notify("Màu và Size đã tồn tại!",
+                                {
+                                    elementPosition: 'bottom right',
+                                    globalPosition: 'top right',
+                                    autoHideDelay: 1000,
+                                    showAnimation: 'slideDown',
+                                    showDuration: 400,
+                                    hideAnimation: 'slideUp',
+                                    hideDuration: 200,
+                                }
+                            );
+                            //alert("Màu và Size đã tồn tại trong sản phẩm SKU !");
+                        } else if (r == 1) {
+                            if (tbody.length == 0) {
+                                $("#tlbSKU tbody").append(markup);
+
+                            } else {
+                                $(tbody).each(function () {
+                                    debugger
+
+                                    var ColorSKU = $(this).closest('tr').find("td:eq(1)").html();
+                                    var SizeSKU = $(this).closest('tr').find("td:eq(2)").html();
+                                    if (color.trim() == ColorSKU.trim() && size.trim() == SizeSKU.trim()) {
+                                        alert("Tạo màu và size bị trùng bên dưới!");
+                                        return trung = 1;
+                                    }
+
+
+
+                                });
+                                if (trung != 1) {
+                                    $("#tlbSKU tbody").append(markup);
+
+                                }
+
+                            }
+
+                        }else if (r == 3) {
+                            location.reload();
+                            HideLoading();
+
+                        }
+
+                    }
+                });
+
+
+
+
+
+
+            });
+
+            $("#WERT").on("click", function () {
+                var r = confirm("Bạn có chắc muốn Thêm các sản phẩm SKU này ?");
+                if (r == true) {
+                    var productSKUs = new Array();
+                    //$("#tlbSKU tbody tr:first-child").remove();
+                    $("#tlbSKU TBODY TR").each(function () {
+                        debugger
+
+                        var row = $(this);
+
+                        var productSKU = {};
+                        productSKU.ColorSKU = row.find("TD").eq(1).html();
+                        productSKU.SizeSKU = row.find("TD").eq(2).html();
+                        productSKU.Id = @Model.Id;
+
+                        //$(this).closest('tr').find("input").each(function () {
+                        //    customer.Giamoi = this.value;
+                        //});
+
+                        productSKUs.push(productSKU);
+                    })
+                    $.ajax({
+                        type: "POST",
+                        url: "/Product/CreateSKU",
+                        data: JSON.stringify(productSKUs),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (r) {
+                            if (r == 0) {
+                                alert("Màu và Size đã tồn tại trong sản phẩm SKU !");
+                            } else {
+                                location.reload();
+                                HideLoading();
+                            }
+
+                        }
+                    });
+                }
+
+
+            });
+            // Find and remove selected table rows
+            $('table').on('click','tr a.remove',function(e){
+                e.preventDefault();
+                $(this).closest('tr').remove();
+            });
+        });
+    </script>
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+}

@@ -1,0 +1,697 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using System.Globalization;
+@using PagedList.Mvc;
+
+@model PagedList.IPagedList<ProductInvoiceDetailViewModel>
+@{
+    ViewBag.Title = "Báo cáo doanh số theo tháng";
+    if (Request["IsPopup"] == "true")
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        if (Request["IsPopup"] == "null")
+        {
+            Layout = null;
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+    }
+    bool IsDisplaySearchPanel = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? false : true;
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "DoanhThuNgay",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = IsDisplaySearchPanel,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    int index = 1;
+    Calendar calendar = CultureInfo.InvariantCulture.Calendar;
+    var weekdefault = calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    string week = Request["week"] != null ? Request["week"] : weekdefault.ToString();
+    var a = 0;
+    var b = 0;
+    List<ProductInvoiceDetailViewModel> model = (List<ProductInvoiceDetailViewModel>)ViewBag.model;
+    PagedList.IPagedList<ProductInvoiceViewModel> invoice = (PagedList.IPagedList<ProductInvoiceViewModel>)ViewBag.InvoiceList;
+    List<ProductInvoiceViewModel> Invoice2 = (List<ProductInvoiceViewModel>)ViewBag.Invoice2;
+}
+<style>
+    
+    tr:hover {
+        background: #fef4bb !important;
+    }
+    select {
+        height: 25px;
+    }
+    .pagination {
+        margin:8px;
+    }
+</style>
+
+<script type="text/javascript">
+    var exportThis = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"  xmlns="http://www.w3.org/TR/REC-html40"><head> <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets> <x:ExcelWorksheet><x:Name>{worksheet}</x:Name> <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions> </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook> </xml><![endif]--></head><body> <table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+            }
+        return function () {
+            var ctx = { worksheet: '@ViewBag.Title' || 'Worksheet', table: document.getElementById("cTable").innerHTML }
+            window.location.href = uri + base64(format(template, ctx))
+        }
+    })()
+
+    var exportThisWithParameter = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"  xmlns="http://www.w3.org/TR/REC-html40"><head> <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets> <x:ExcelWorksheet><x:Name>{worksheet}</x:Name> <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions> </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook> </xml><![endif]--></head><body> <table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+            }
+        return function (tableID, excelName) {
+            tableID = document.getElementById(tableID)
+            var ctx = { worksheet: excelName || 'Worksheet', table: tableID.innerHTML }
+            window.location.href = uri + base64(format(template, ctx))
+        }
+    })()
+</script>
+
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    @*@Html.Partial("_PartialSearchDrugStore", ViewData["branchId"])*@
+    <p>
+        Xem dữ liệu theo
+        <label>
+            <input id="single3" name="single" type="radio" class="ace" value="week">
+            <span class="lbl"> Tuần</span>
+        </label>
+        <label>
+            <input id="single1" name="single" type="radio" class="ace" value="month" checked="checked">
+            <span class="lbl"> Tháng</span>
+        </label>
+
+        <label>
+            <input id="single2" name="single" type="radio" class="ace" value="quarter">
+            <span class="lbl"> Quý</span>
+        </label>
+
+        <select id="month" name="month">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(Month == i.ToString() ? "Selected" : "") value="@i">Tháng @i</option>
+            }
+        </select>
+        <select id="quarter" name="quarter" style="display:none">
+            <option value="1">Quý I</option>
+            <option value="2">Quý II</option>
+            <option value="3">Quý III</option>
+            <option value="4">Quý IV</option>
+        </select>
+        <select id="week" name="week" style="display:none">
+            @for (int i = 1; i <= 52; i++)
+            {
+                //int year=Convert.ToInt32(Year);
+                //var first_day = Erp.BackOffice.Helpers.Common.FirstDateOfWeekISO8601(year, i);
+                //DateTime end_day = first_day.AddDays(6);
+                <option @(week == i.ToString() ? "Selected" : "") value="@i">Tuần @i</option>
+            }
+        </select>
+        <select id="year" name="year">
+            @for (int i = 2016; i <= DateTime.Now.Year; i++)
+            {
+                <option @(Year == i.ToString() ? "Selected" : "") value="@i">Năm @i</option>
+            }
+        </select>
+
+        @Html.DropDownList("Sizeproduct", SelectListHelper.GetSelectList_Category("Size_product", Request["Sizeproduct"], "Name", "Kích cỡ"))
+        @Html.DropDownList("Colorproduct", SelectListHelper.GetSelectList_Category("Color_product", Request["Colorproduct"], "Name", "Màu sắc"))
+
+        <label style="margin-top:5px">Theo đơn hàng: <input class="ace " id="HTTT" name="HTTT" type="checkbox" checked="@Request["HTTT"]" value="@Request["HTTT"]"><span class="lbl"></span></label>
+        @Html.DropDownList("Paymethod", SelectListHelper.GetSelectList_Category("FormPayment", Request["Paymethod"], "Name", "Hình thức thanh toán"))
+    </p>
+}
+
+<div class="table-responsive" id="BCDoanhthu" style="margin-bottom:40px">
+    <h4>Doanh số theo chi tiết đơn hàng</h4>
+    <div class="width-100 margin-bottom-10">
+        <div class="infobox infobox-blue" style="width:fit-content">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-dollar"></i>
+            </div>
+            <div class="infobox-data">
+                <span class="infobox-data-number ng-binding">@(CommonSatic.ToCurrencyStr(model.Sum(x => x.Amount), null))</span>
+                <div class="infobox-content ng-binding">
+                    Doanh số
+
+                </div>
+            </div>
+        </div>
+        <div class="infobox infobox-blue" style="width:fit-content">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-dollar"></i>
+            </div>
+            <div class="infobox-data">
+                <span class="infobox-data-number ng-binding doanhthu">@(CommonSatic.ToCurrencyStr(model.Sum(x => x.Amount) - Invoice2.Sum(x => x.TienTra), null))</span>
+                <div class="infobox-content ng-binding">
+                    Doanh thu
+
+                </div>
+            </div>
+        </div>
+        <div class="infobox infobox-orange ng-scope" data-ng-if="reportTypeModel.type != 4">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-dollar"></i>
+            </div>
+            <div class="infobox-data">
+                <span class="infobox-data-number ng-binding">@(CommonSatic.ToCurrencyStr(model.Sum(x => x.IrregularDiscountAmount), null))</span>
+                <div class="infobox-content ng-binding">Giảm giá</div>
+            </div>
+        </div>
+        <!-- ngIf: reportTypeModel.type != 4 -->
+        <div class="infobox infobox-orange ng-scope" data-ng-if="reportTypeModel.type != 4">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-dollar"></i>
+            </div>
+            <div class="infobox-data">
+                <span class="infobox-data-number ng-binding tratien">@(CommonSatic.ToCurrencyStr(Invoice2.Sum(x => x.TienTra), null))</span>
+                <div class="infobox-content ng-binding">Tiền trả</div>
+            </div>
+        </div>
+
+        <div class="infobox infobox-blue" style="width:fit-content">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-shopping-cart"></i>
+            </div>
+            <div class="infobox-data">
+                <span class="infobox-data-number ng-binding">@(Common.PhanCachHangNgan(model.Sum(x => x.Quantity)))</span>
+                <div class="infobox-content ng-binding">
+                    Số lượng
+
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+    <table id="cTable" class="table table-bordered table-striped">
+        <thead>
+            @*<tr class="">
+                    <th class="" colspan="11" style="text-align:center"><h4>BÁO CÁO DOANH SỐ TỪ @startDate ĐẾN @endDate</h4></th>
+                </tr>*@
+            <tr>
+                <th style="width:3%;text-align:center"></th>
+                @*<th style="width:3%;text-align:center">Chi tiết</th>*@
+                <th style="width:10%;text-align:center">Ngày mua</th>
+                @*<th style="min-width:100px;text-align:center">Nhà thuốc</th>*@
+                <th style="width:13%;text-align:center">Đơn hàng</th>
+                <th style="width: 13%;text-align:center">Khách hàng</th>
+                <th style="width:8%;text-align:center">SĐT</th>
+                @*<th style="width:100px;text-align:center">Nhân viên</th>*@
+                <th style="width:13%;text-align:center">Sản phẩm</th>
+                <th style="width:3%;text-align:center">SL</th>
+                <th style="width:8%;text-align:center">Đơn giá</th>
+                @*<th style="width:8%;text-align:center">Chiết khấu cố định</th>*@
+                <th style="width:8%;text-align:center">Giảm giá</th>
+                <th style="width:13%;text-align:center">Doanh số</th>
+                <th style="width:13%;text-align:center">Tiền trả</th>
+                <th style="width:13%;text-align:center">Doanh thu</th>
+            </tr>
+        </thead>
+        <tbody id="listRP">
+            @foreach (var item in Model)
+            {
+                <tr class="@(index%2==0?"alert-warning":"") ">
+                    <td>
+                        <span></span>
+                        <a class="green show-details-btn" title="Show Details" data-id="@item.ProductInvoiceId">
+                            <i class="ace-icon fa fa-angle-double-down bigger-120"></i>
+                        </a>
+                    </td>
+                    @*<td>
+                            <a class="green show-details-btn" title="Show Details" data-id="@item.ProductInvoiceId">
+                                <i class="ace-icon fa fa-angle-double-down bigger-120"></i>
+                            </a>
+                        </td>*@
+                    <td>@(item.CreatedDateTemp01)</td>
+
+                    <td>
+                        <a onclick="OpenPopup('@Url.Action("Detail", "ProductInvoice", new { area = "Sale", Id = item.ProductInvoiceId, IsPopup = "true" })', 'Trang chi tiết bán hàng', 0, 500)">
+                            @(item.ProductInvoiceCode)
+                        </a>
+                    </td>
+                    <td>
+                        <a onclick="OpenPopup('@Url.Action("Detail", "Customer", new { area = "Account", Id = item.CustomerId, IsPopup = "true" })', 'Trang chi tiết khách hàng', 0, 500)">
+                            @(item.CustomerName)
+                        </a>
+                    </td>
+                    <td>@(item.CustomerPhone)</td>
+                    @*<td>
+                            <a onclick="OpenPopup('@Url.Action("Detail", "Staffs", new { area = "Staff", Id = item.StaffId, IsPopup = "true" })', 'Trang chi tiết nhân viên', 0, 500)">
+                                @(item.StaffName)
+                            </a>
+                        </td>*@
+                    <td>@(item.ProductName) (@item.Size,@item.color)</td>
+                    <td style="text-align:right">@(Common.PhanCachHangNgan(item.Quantity))</td>
+                    <td style="text-align:right">@(CommonSatic.ToCurrencyStr(item.Price, null))</td>
+                    @*<td style="text-align:right">@(CommonSatic.ToCurrencyStr(item.FixedDiscountAmount, null))</td>*@
+                    <td style="text-align:right">@(CommonSatic.ToCurrencyStr(item.IrregularDiscountAmount, null))</td>
+                    <td style="text-align:right">@(CommonSatic.ToCurrencyStr(item.Amount, null))</td>
+                    @if (item.IsReturn)
+                    {
+                        if (item.QuantitySaleReturn == 0)
+                        {
+                            <td style="text-align:right">@(CommonSatic.ToCurrencyStr(item.Amount, null))</td>
+                            <td style="text-align:right">@(CommonSatic.ToCurrencyStr(0, null))</td>
+                        }
+                        else
+                        {
+                            <td style="text-align:right">@(CommonSatic.ToCurrencyStr(item.Price * (item.Quantity - item.QuantitySaleReturn) - item.IrregularDiscountAmount, null))</td>
+                            <td style="text-align:right">@(CommonSatic.ToCurrencyStr(item.Amount - (item.Price * (item.Quantity - item.QuantitySaleReturn) - item.IrregularDiscountAmount), null))</td>
+                        }
+                    }
+                    else
+                    {
+                        <td style="text-align:right">@(CommonSatic.ToCurrencyStr(0, null))</td>
+                        <td style="text-align:right">@(CommonSatic.ToCurrencyStr(item.Amount, null))</td>
+                    }
+                </tr>
+            }
+        </tbody>
+        @*<thead style="position:fixed;bottom: 80px;right: 0.7%; width: 45.3%">
+
+            <tr>
+
+                <th style="width: 26.3%;text-align:right"><b>Tổng</b></th>
+                <th style="text-align:right;resize:initial"><b>@(Common.PhanCachHangNgan(Model.Sum(x => x.Quantity)))</b></th>
+                <th style="text-align:right;width: 15.5%"></th>
+                <th style="text-align:right;width: 15.2%"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.FixedDiscountAmount), null))</b></th>
+                <th style="text-align:right;width: 15.2%"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.IrregularDiscountAmount), null))</b></th>
+                <th style="text-align:right;width: 24.7%"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Amount), null))</b></th>
+                <th style="text-align:right;width: 15.2%"><b class="tratien">@(CommonSatic.ToCurrencyStr(a, null))</b></th>
+                <th style="text-align:right;width: 15.2%"><b class="doanhthu">@(CommonSatic.ToCurrencyStr(b, null))</b></th>
+            </tr>
+        </thead>*@
+    </table>
+    <!-- Thêm mã phân trang -->
+    <br />
+    <div class="row" style="width: 55%; display: inline-block;">
+        <div class="col-md-6 col-lg-6 col-xs-6 col-sm-6">
+           
+        </div>
+        <div class="col-md-6 col-lg-6 col-xs-6 col-sm-6 text-right" style="float:right">
+            @*Trang: @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount*@
+            Trang:  <input style="width: 60px; height: 25px;" class="page" id="page1" name="page1" type="text" placeholder="@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount" />
+            <div style="display:inline-block">
+                @using (Html.BeginForm("DoanhThuNgay", "SaleReport", FormMethod.Get))
+                {
+                    <p>
+                        Số dòng: @Html.DropDownList("size", (List<SelectListItem>)ViewBag.size, new { @onchange = "this.form.submit();" })
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div style="width:40% ; display: inline-block;">@Html.PagedListPager(Model, page => Url.Action("DoanhThuNgay", new { page, size = ViewBag.currentSize, single = Request["single"], quarter = Request["quarter"], Sizeproduct = Request["Sizeproduct"], month = Request["month"], Colorproduct = Request["Colorproduct"] }))</div>
+    <!-- Kết thúc -->
+
+</div>
+
+<div class="table-responsive" id="BCDoanhSO">
+    <h4>Doanh số theo đơn hàng</h4>
+    <div class="width-100 margin-bottom-10">
+       
+        <div class="infobox infobox-blue" style="width:fit-content">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-dollar"></i>
+            </div>
+            <div class="infobox-data">
+                <span class="infobox-data-number ng-binding ">@(CommonSatic.ToCurrencyStr(Invoice2.Sum(x => x.TotalAmount), null))</span>
+                <div class="infobox-content ng-binding">
+                    Tổng tiền 
+
+                </div>
+            </div>
+        </div>
+       
+        <!-- ngIf: reportTypeModel.type != 4 -->
+        <div class="infobox infobox-orange ng-scope" data-ng-if="reportTypeModel.type != 4">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-dollar"></i>
+            </div>
+            <div class="infobox-data">
+                <span class="infobox-data-number ng-binding tratien">@(CommonSatic.ToCurrencyStr(Invoice2.Sum(x => x.TienTra), null))</span>
+                <div class="infobox-content ng-binding">Tiền trả</div>
+            </div>
+        </div>
+
+        <div class="infobox infobox-blue" style="width:fit-content">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-shopping-cart"></i>
+            </div>
+            <div class="infobox-data">
+                <span class="infobox-data-number ng-binding">@(Common.PhanCachHangNgan(Invoice2.Count()))</span>
+                <div class="infobox-content ng-binding">
+                    Số đơn hàng
+
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+    <table id="aTable" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th style="width:15%;text-align:center">Ngày mua</th>
+                <th style="width:10%;text-align:center">Đơn hàng</th>
+                <th style="width:13%;text-align:center">Khách hàng</th>
+                <th style="width:8%;text-align:center">SĐT</th>
+                <th style="width:8%;text-align:center">Số lượng</th>
+                <th style="width:8%;text-align:center">Thành tiền</th>
+                <th style="width:8%;text-align:center">Giảm giá</th>
+                <th style="width:8%;text-align:center">Tổng tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in invoice)
+            {
+                var sol = model.Where(x => x.ProductInvoiceId == item.Id).Sum(x => x.Quantity);
+                var thanhtien = model.Where(x => x.ProductInvoiceId == item.Id).Sum(x => x.Quantity * x.Price);
+                <tr>
+                    <td>@item.CreatedDate</td>
+                    <td>@item.Code</td>
+                    <td>@item.CustomerName</td>
+                    <td>@item.Mobile</td>
+                    <td style="text-align:center;">@sol</td>
+                    <td style="text-align:center;">@CommonSatic.ToCurrencyStr(thanhtien, null)</td>
+                    <td style="text-align:center;">@CommonSatic.ToCurrencyStr(thanhtien - item.TotalAmount, null)</td>
+                    <td style="text-align:center;">@CommonSatic.ToCurrencyStr(item.TotalAmount, null)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <!-- Thêm mã phân trang -->
+    <br />
+    <div class="row" style="width: 70%; display: inline-block;">
+        <div class="col-md-6 col-lg-6 col-xs-6 col-sm-6">
+            @*@using (Html.BeginForm("DoanhThuNgay", "SaleReport", FormMethod.Get))
+            {
+                <p>
+                    Kích thước trang: @Html.DropDownList("size1", (List<SelectListItem>)ViewBag.size)
+                </p>
+            }*@
+            
+        </div>
+        <div class="col-md-6 col-lg-6 col-xs-6 col-sm-6 text-right">
+            @*Trang: @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount*@
+            Trang:  <input style="width: 60px; height: 25px;" class="page" id="page2" name="page2" type="text" placeholder="@(invoice.PageCount < invoice.PageNumber ? 0 : invoice.PageNumber) / @invoice.PageCount" />
+            <div style="display: inline-block;">
+                <p>
+                    Số dòng: @Html.DropDownList("size1", (List<SelectListItem>)ViewBag.size)
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div style="width:29% ; display: inline-block;">
+        @Html.PagedListPager(invoice, page => Url.Action("DoanhThuNgay", new { page, size = ViewBag.currentSize, single = Request["single"], quarter = Request["quarter"], HTTT = Request["HTTT"], month = Request["month"], year = Request["year"] }))</div>
+    <!-- Kết thúc -->
+
+
+
+</div>
+
+<script src="~/Scripts/jquery.floatThead.js"></script>
+
+<script>
+    var format = function (num) {
+        var str = num.toString().replace("$", ""), parts = false, output = [], i = 1, formatted = null;
+        if (str.indexOf(".") > 0) {
+            parts = str.split(".");
+            str = parts[0];
+        }
+        str = str.split("").reverse();
+        for (var j = 0, len = str.length; j < len; j++) {
+            if (str[j] != ",") {
+                output.push(str[j]);
+                if (i % 3 == 0 && j < (len - 1)) {
+                    output.push(".");
+                }
+                i++;
+            }
+        }
+        formatted = output.reverse().join("");
+        return (formatted + ((parts) ? "." + parts[1].substr(0, 2) : ""));
+    };
+
+    $(document).ready(function () {
+
+        $("#cTable").floatThead({ top: 30 });
+        $("#aTable").floatThead({ top: 30 });
+        var sumtra = 0;
+        var thu = 0
+        //$("#cTable TBODY TR").each(function () {
+
+        //    var row = $(this);
+        //    var tientra = removeComma(row.find("TD").eq(10).html());
+        //    var doanhthu = removeComma(row.find("TD").eq(11).html());
+        //    sumtra = sumtra + parseFloat(tientra);
+        //    thu = thu + parseFloat(doanhthu);
+        //});
+        //var a = format(sumtra).toString();
+        //var b = format(thu).toString();
+
+        //console.log(a);
+        //$('.tratien').html(a);
+        //$('.doanhthu').html(b);
+
+        debugger
+        if ($('#HTTT').is(':checked')) {
+            $("#BCDoanhSO").show();
+            $("#BCDoanhthu").hide();
+            $('#Paymethod').show();
+            $("#Sizeproduct").hide();
+            $("#Colorproduct").hide();
+            //console.log(tong);
+        } else {
+            $("#BCDoanhSO").hide();
+            $("#BCDoanhthu").show();
+            $('#Paymethod').hide();
+            $("#Sizeproduct").show();
+            $("#Colorproduct").show();
+        }
+    });
+
+   
+
+</script>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="exportThis()">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+}
+
+@section Scripts {
+    <script>
+        $("#HTTT").change(function () {
+            if ($('#HTTT').val($(this).is(':checked'))) {
+                $("#BCDoanhSO").hide();
+                $("#BCDoanhthu").hide();
+                $('#Paymethod').show();
+                $("#Sizeproduct").hide();
+                $("#Colorproduct").hide();
+
+            }
+            if (!$(this).is(':checked')) {
+                $("#BCDoanhSO").hide();
+                $("#BCDoanhthu").hide();
+                $('#Paymethod').hide();
+                $("#Sizeproduct").show();
+                $("#Colorproduct").show();
+            }
+        });
+
+        $(function () {
+            $("#quarter").val(currentQuarter);
+
+            var single = "month";
+
+            $("#single1").change(function () {
+                if ($(this).val() == 'month') {
+                    $("#month").show();
+                    $("#week").hide();
+                    $("#quarter").hide();
+                    single = "month";
+                }
+            });
+
+            $("#single2").change(function () {
+                if ($(this).val() == 'quarter') {
+                    $("#month").hide();
+                    $("#week").hide();
+                    $("#quarter").show();
+                    single = "quarter";
+                }
+            });
+            $("#single3").change(function () {
+                if ($(this).val() == 'week') {
+                    $("#month").hide();
+                    $("#quarter").hide();
+                    $("#week").show();
+                    single = "week";
+                }
+            });
+        });
+    </script>
+    <script>
+        //format currency
+        var format = function (num) {
+            var str = num.toString().replace("$", ""), parts = false, output = [], i = 1, formatted = null;
+            if (str.indexOf(".") > 0) {
+                parts = str.split(".");
+                str = parts[0];
+            }
+            str = str.split("").reverse();
+            for (var j = 0, len = str.length; j < len; j++) {
+                if (str[j] != ".") {
+                    output.push(str[j]);
+                    if (i % 3 == 0 && j < (len - 1)) {
+                        output.push(".");
+                    }
+                    i++;
+                }
+            }
+            formatted = output.reverse().join("");
+            return (formatted + ((parts) ? "." + parts[1].substr(0, 2) : ""));
+        };
+
+        // end format currency
+        $(".show-details-btn").on("click", function (e) {
+            var Id = $(this).data("id");
+            $(this).closest('tr').addClass('grid-row-selected').siblings().removeClass('grid-row-selected');
+            $("#Details-" + Id).remove().slideDown("slow");
+
+
+            var clicks = $(this).data('clicks');
+            if (clicks) {
+                $("#Details-" + Id).remove();
+            } else {
+
+                console.log(Id);
+                e.preventDefault();
+                //get load detail productInvoice
+                $.ajax({
+                    url: '/SaleReport/GetListJsonInvoiceDetailById/' + Id,
+                    dataType: "json",
+                    type: "GET",
+                    contentType: 'application/json; charset=utf-8',
+                    async: true,
+                    success: function (data) {
+
+                        console.log(data);
+                        var trHTML = '';
+                        trHTML += '<tr id="Details-' + Id + '" class="open" >';
+                        trHTML += '<td colspan="11">';
+                        trHTML += '<div class="table-detail clearfix">'
+                        trHTML += '<div class="row">';
+                        trHTML += ' <table id="tableDetail" class="table table-striped grid-table">';
+                        trHTML += ' <thead>';
+                        trHTML += ' <tr><th class="grid-header">Mã sản phẩm</th> <th class="grid-header">Tên Sản Phẩm</th><th class="grid-header">Màu sắc</th><th class="grid-header">Kích cỡ</th><th class="grid-header">SL</th><th class="grid-header">Đơn Giá</th><th class="grid-header">% CK</th><th class="grid-header">Thành tiền</th></tr> ';
+                        trHTML += ' <tbody id="listDetail">';
+                        $.each(data, function (i, item) {
+                            var price = parseFloat(item.Price);
+                            trHTML += '<tr class="grid-row"><td class="grid-cell">' + item.ProductCode + '</td><td class="grid-cell">' + item.ProductName + '</td></td><td class="grid-cell">' + item.color + '</td></td><td class="grid-cell">' + item.Size + '</td></td><td class="grid-cell">' + item.Quantity + '</td><td lass="grid-cell">' + format(price) + '</td><td lass="grid-cell">' + format(item.IrregularDiscountAmount) + '</td><td lass="grid-cell">' + format(item.Quantity * item.Price - item.IrregularDiscountAmount) + '</td></tr>';
+
+                        });
+                        trHTML += '</tbody>';
+                        trHTML += '</table>';
+                        trHTML += '</div>';
+                        trHTML += '</div>';
+                        trHTML += '</td>';
+                        trHTML += '</tr>';
+                        //$('#tableDetail tbody').append(trHTML);
+
+                        $('.grid-row-selected').closest('.grid-row-selected').fadeIn(1000).after(trHTML);
+
+                    },
+                    error: function (xhr) {
+                        alert('error');
+                    }
+                });
+            }
+            $(this).data("clicks", !clicks);
+        });
+
+        $(".page").keyup(function () {
+            debugger
+            var page = 0;
+            //page = $("#gotopage").val();
+            if ($('#HTTT').is(':checked')) {
+                page = $('#page2').val();
+            }
+            else{
+                page = $('#page1').val();
+            }
+
+            var url = window.location.href;
+            if (url.includes("?page=" +@ViewBag.page ) || url.includes("&page=" +@ViewBag.page )) {
+                var url = url.replace("page=" +@ViewBag.page, "page=" + page);
+            }
+            else {
+                if (!url.includes("page=") && url.includes("?")) {
+                    var url = url + "&page=" + page;
+                }
+                else {
+                    var url = url + "?page=" + page;
+                }
+            }
+            window.location.href = url;
+        });
+
+
+        @*$("#size1").click(function(){
+            debugger
+            var size = $(this).children("option:selected").val();
+            var url = window.location.href;
+            if (url.includes("?size=" +@ViewBag.currentSize ) || url.includes("&size=" +@ViewBag.currentSize )) {
+                var url = url.replace("size=" +@ViewBag.currentSize, "size=" + size);
+            }
+            else {
+                if (!url.includes("size=") && url.includes("?")) {
+                    var url = url + "&size=" + size;
+                }
+                else {
+                    var url = url + "?size=" + size;
+                }
+            }
+            window.location.href = url;
+
+        });*@
+
+        
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

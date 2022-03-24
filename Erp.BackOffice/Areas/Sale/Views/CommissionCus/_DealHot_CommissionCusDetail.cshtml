@@ -1,0 +1,80 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Staff.Models
+@model CommissionCusViewModel
+
+@{
+    var CommissionCus_Id = ViewData["CommissionCus_Id"];
+    var orderNo = 0;
+}
+
+<div class="row">
+    <div class="col-sm-7 ">
+        <table class="table table-bordered" style="margin-bottom:80px">
+            <thead>
+                <tr>
+                    <th width="30">STT</th>
+                    <th>Tên mặt hàng</th>
+                    <th width="120">Giá bán (VNĐ)</th>
+                    <th width="100">Giá trị</th>
+                </tr>
+            </thead>
+            <tbody class="detailList">
+                @foreach (var item in Model.ProductList)
+                {
+                    orderNo++;
+                    var commission = Model.DetailList.Where(x => x.ProductId == item.Id).ToList();
+                    decimal CommissionValue = 0;
+                    bool? IsMoney = false;
+                    if (commission.Count() > 0)
+                    {
+                        var comss = commission.FirstOrDefault();
+                        CommissionValue = comss.CommissionValue;
+                        IsMoney = comss.IsMoney;
+                    }
+                    <tr>
+                        <td>@orderNo</td>
+                        <td>@item.Name</td>
+                        <td class="text-right">@Common.PhanCachHangNgan(item.PriceOutbound)</td>
+                        <td class="text-right">
+                            @CommissionValue @(IsMoney != null && IsMoney == true ? "VNĐ" : "%")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-sm-5">
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title">Thông tin chiết khấu</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="detail-view">
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Name, true, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Type, true, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        @if (Model.Type != "FixedDiscount")
+                        {
+                            <div class="row control-group">
+                                @Html.DetailViewItemFor2(model => model.StartDate, true, null, "col-xs-4", "col-xs-8")
+                            </div>
+                            <div class="row control-group">
+                                @Html.DetailViewItemFor2(model => model.EndDate, true, null, "col-xs-4", "col-xs-8")
+                            </div>
+                        }
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Note, true, null, "col-xs-4", "col-xs-8")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

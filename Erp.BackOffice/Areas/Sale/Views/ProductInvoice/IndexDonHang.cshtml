@@ -1,0 +1,140 @@
+﻿@model IEnumerable<YHL_KIENHANG_GUI_CTIETViewModel>
+
+@using AutoMapper.Internal
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = "Danh Sách Đơn Hàng Gửi Chi Tiết";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "ProductInvoice",
+        ActionName = "IndexDonHang",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false,
+        AdvancedSearch = false,
+        SearchOjectAttr = ViewBag.ListOjectAttrSearch
+    };
+}
+@{
+    if (ViewBag.ErrorMesseage != null)
+    {
+        <script type="text/javascript">
+            $(document).ready(function () {
+                alert("@ViewBag.ErrorMesseage");
+            });
+        </script>
+    }
+}
+
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <p>
+
+        @Html.TextBox("MA_DH", Request["MA_DH"], new { @class = "", autocomplete = "off", placeholder = "Mã Đơn Hàng" })
+        
+    </p>
+}
+
+@using (Html.BeginForm("IndexDonHang", "ProductInvoice", FormMethod.Post))
+{
+    <div class="table-responsive">
+        @Html.Grid(Model).Columns(columns =>
+   {
+       columns.Add(u => u.STT_DEN).Titled("STT").SetWidth(20);
+       columns.Add(u => u.SO_HIEU).Titled("Số Hiệu").SetWidth(50);
+       columns.Add(u => u.MA_DON_HANG).Titled("Mã Đơn Hàng").SetWidth(50);
+       columns.Add(u => u.NGAY_KG).Titled("Ngày Ký Gửi").SetWidth(30);
+       columns.Add(u => u.NGUOI_GUI).Titled("Người Gửi").SetWidth(30);
+       columns.Add(u => u.NGUOI_NHAN).Titled("Người Nhận").SetWidth(30);
+       columns.Add(u => u.DC_NHAN).Titled("Địa Chỉ").SetWidth(100);
+       columns.Add(u => u.DT_NHAN).Titled("SDT").SetWidth(100);
+       columns.Add(u => u.TEN_BC_NHAN).Titled("Bưu Cục Nhận").SetWidth(100);
+       columns.Add(u => u.KHOI_LUONG).Titled("Khối Lượng").SetWidth(20);
+       columns.Add(u => u.KHOI_LUONG_QD).Titled("Khối Lượng QD").SetWidth(20);
+       columns.Add(u => u.NOI_DUNG).Titled("Nội Dung").SetWidth(100);
+       columns.Add(u => u.DV_DB).Titled("DV_DB").SetWidth(30);
+       columns.Add(u => u.vung_xa).Titled("Vùng Xa").SetWidth(10);
+       columns.Add(u => u.CUOC_DV).Titled("Cước DV").SetWidth(30);
+       columns.Add(u => u.Cuoc_COD).Titled("Cước COD").SetWidth(30);
+       columns.Add(u => u.CUOC_DVCT).Titled("Cước DVCT").SetWidth(30);
+       columns.Add(u => u.TIEN_VAT).Titled("VAT").SetWidth(20);
+       columns.Add(u => u.TONG_CUOC).Titled("Tổng Cước").SetWidth(50);
+   }).WithPaging(30)
+    </div>
+    @*using (Html.BeginButtonContainer(pageSetting))
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("CreateNT", "ProductInvoice", "Sale"))
+        {
+            <a class="btn btn-mini btn-primary" href="@Url.Action("Create", pageSetting.ModuleName)">
+                <i class="ace-icon fa fa-plus"></i>
+                @Wording.CreateNew
+            </a>
+        }
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "ProductInvoice", "Sale"))
+        {
+            <button class="btn btn-white btn-sm btn-danger" type="submit" name="DeleteAll" value="DeleteAll" onclick="return CheckIsval();">
+                <i class="ace-icon fa fa-trash"></i>
+                @Wording.Delete
+            </button>
+        }
+    }*@
+}
+
+@section Scripts {
+
+
+
+    <script type="text/javascript">
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+    </script>
+}
+

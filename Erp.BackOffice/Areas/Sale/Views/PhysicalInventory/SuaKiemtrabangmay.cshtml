@@ -1,0 +1,289 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model PhysicalInventoryViewModel
+<style>
+    tr.scrollCode {
+        background-color: yellow;
+    }
+    body{
+        overflow:hidden;
+    }
+</style>
+@{
+    ViewBag.Title = "Chỉnh sửa kiểm tra bằng máy";
+
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "PhysicalInventory",
+        ActionName = "SuaKiemtrabangmay",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+
+    int n = 0;
+    var groupList = Model.DetailList.GroupBy(x => new { x.CategoryCode }, (key, group) => new
+    {
+        CategoryCode = key.CategoryCode,
+        ProductList = group.ToList()
+    });
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+
+<body>
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+
+    <div class="row">
+        @*<div class="col-sm-12">
+
+            <p style="width:300px">
+                @Html.TextBox("txtCode", Request["txtCode"], new { @class = "form-control", autocomplete = "off", placeholder = "Nhập mã..." })
+
+            </p>
+
+        </div>*@
+
+        <div class="col-sm-8" style="max-height:600px; overflow-y:auto">
+            <div>
+                <table id="tblCustomers" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width:130px;display:none">ID</th>
+                            <th style="width:130px;display:none">ID1</th>
+                            <th style="width:5%">STT</th>
+                            <th style="width:30%">Mã sản phẩm</th>
+                            <th style="width:20%">Tên sản phẩm</th>
+                           
+                            <th style="width:10%">SL hệ thống</th>
+                            <th style="width:10%">SL đã kiểm</th>
+                            <th style="width:10%">SL đang kiểm</th>
+                            <th style="width:10%">SL chênh lệch</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailList">
+                        <tr>
+                            <td colspan="5" style="font-weight:bold;font-size:18px;">TOTAL</td>
+                            <td style="text-align:center;font-size:18px;"></td>
+                            <td></td>
+                        </tr>
+                        @foreach (var g in groupList)
+                        {
+
+                            @*<tr style="background:#eee">
+                                    <td colspan="7"><b>@g.CategoryCode</b></td>
+
+                                </tr>*@
+                            foreach (var item in g.ProductList)
+                            {
+                                n++;
+                                <tr>
+                                    <td style="display:none;">@item.Id</td>
+                                    <td style="display:none;">@item.PhysicalInventoryId</td>
+                                    <td>@n</td>
+                                    <td>@item.ProductCode</td>
+                                    <td>@item.ProductName</td>                                   
+                                    <td>@Common.PhanCachHangNgan(item.QuantityInInventory)</td>
+                                    <td><input readonly="readonly" name="QuantityRemaining" style="width:70px;" value="@Common.PhanCachHangNgan(item.QuantityRemaining)" /></td>
+                                    <td><input class="productA" name="QuantityForcheck" style="width:70px;" value="0" /></td>
+                                    <td>@Common.PhanCachHangNgan(item.QuantityDiff)</td>
+                                </tr>
+                            }
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="tabbable">
+                <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tabInvoice">
+                    <li class="active"><a data-toggle="tab" href="#tab1">Thông tin chi tiết</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="detail-view">
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Code, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CreatedDate, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.WarehouseName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            <div class="col-xs-4 control-label"><label for="ProductInboundCode">Mã phiếu nhập</label></div><div class="col-xs-8 control-value"><a target="_blank" href="/ProductInbound/Detail/?TransactionCode=@Model.ProductInboundCode">@Model.ProductInboundCode</a></div>
+                        </div>
+                        <div class="row control-group">
+                            <div class="col-xs-4 control-label"><label for="ProductOutboundCode">Mã phiếu xuất</label></div><div class="col-xs-8 control-value"><a target="_blank" href="/ProductOutbound/Detail/?TransactionCode=@Model.ProductOutboundCode">@Model.ProductOutboundCode</a></div>
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Note, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="button1">
+        <button class="btn btn-mini btn-primary" id="btnSave" value="Cập nhật"><i class="ace-icon fa fa-save"></i>Cập nhật</button>
+    </div>
+
+    @*@using (Html.BeginButtonContainer(pageSetting))
+        {
+        <a href="@Url.Action(" Print", new { Id=Model.Id })" target="_blank" class="btn btn-primary btn-white btn-sm"><i class="fa fa-print"></i> In phiếu</a>
+        if (Model.IsExchange == false)
+        {
+        using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Exchange", "PhysicalInventory", null, FormMethod.Post, new { id = "Exchange", @class = "inline" }))
+        {
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(m => m.Id)
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Exchange", "PhysicalInventory", "Sale"))
+        {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Exchange" onclick="return confirm('Bạn muốn tiếp tục thao tác xử lý chênh lệch tồn kho?');">
+            <i class="ace-icon fa fa-check"></i>
+            Xử lý chênh lệch
+        </button>
+        }
+        }
+        }
+        else
+        {
+        using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Exchange", "PhysicalInventory", null, FormMethod.Post, new { id = "CheckData", @class = "inline" }))
+        {
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(m => m.Id)
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Exchange", "PhysicalInventory", "Sale"))
+        {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="CheckData">
+            <i class="ace-icon fa fa-check"></i>
+            Kiểm tra dữ liệu
+        </button>
+        }
+        }
+        }
+        <a href="@Url.Action(" Kiemtrabangmay", new { Id=Model.Id })" target="_blank" class="btn btn-primary btn-mini  btn-sm"><i class="fa fa-warning"></i> Kiểm tra bằng máy</a>
+        }*@
+
+
+    <script type="text/javascript">
+
+
+
+        $('#txtCode').keypress(function (e) {
+            if (e.which == 13) {
+                var txtcodekh = $(this).val();
+                $("#tblCustomers TBODY TR").each(function () {
+                    var w = $(window);
+                    var row = $(this);
+
+                    var customer = {};
+                    var Macustomer = row.find("TD").eq(3).html();
+
+                    if (txtcodekh.localeCompare(Macustomer) == 0) {
+                        //alert(txtcodekh);
+                        var body = $("html, body");
+                        body.stop().animate({ scrollTop: row.offset().top - (w.height() / 2) }, 500, 'swing', function () {
+                            row.addClass('scrollCode');
+                        });
+
+                        row.find('input[name="QuantityForcheck"]').val(parseInt(row.find('input[name="QuantityForcheck"]').val()) + 1);
+                    } else {
+                        $(this).removeClass("scrollCode");
+                    }
+
+                });
+
+                $(this).val("");
+            }
+        });
+
+
+
+        $("body").on("click", "#btnSave", function () {
+            //Loop through the Table rows and build a JSON array.
+            ShowLoading();
+            var customers = new Array();
+            var IDIVENTORY = 0;
+            $("#tblCustomers TBODY TR").each(function () {
+                var row = $(this);
+                var customer = {};
+                customer.Id = row.find("TD").eq(0).html();
+                customer.Giacu = row.find("TD").eq(1).html();
+                $(this).closest('tr').find("input").each(function () {
+                    customer.Giamoi = this.value;
+                });
+
+                customers.push(customer);
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "/PhysicalInventory/SuaKiemtrabangmay",
+                data: JSON.stringify(customers),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (r) {
+                    location.reload();
+                    HideLoading();
+                },
+                error: function (r) {
+
+                    location.reload();
+                    HideLoading();
+                },
+
+            });
+
+        });
+
+
+
+    </script>
+    <script>
+        //Sum value keyup đang kiểm
+        $(document).on("keyup", "input:text", function () {
+            calculateSum();
+        });
+
+        function calculateSum() {
+            var total = 0;
+            $('.productA').each(function () {
+                if (!isNaN(parseInt($(this).val())))
+                    total += parseInt($(this).val());
+            });
+            $('#detailList tr:first td:eq(1)').html(total);
+
+        }
+    </script>
+</body>
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+
+
+}

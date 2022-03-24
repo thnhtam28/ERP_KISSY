@@ -1,0 +1,376 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Staff.Models
+@model CommissionCusViewModel
+
+@{
+    ViewBag.Title = Wording.PageIndex_CommisionDetail;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CommissionCus",
+        ActionName = "Detail",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    //IEnumerable<SelectListItem> CategoryList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("product", null, "value");
+    IEnumerable<SelectListItem> typeList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("TypeCommission", null, null);
+    IEnumerable<SelectListItem> BranchList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_BranchAllNew(null, Wording.Empty);
+    List<BranchViewModel> departmentList = (List<BranchViewModel>)ViewBag.departmentList;
+    int orderNo = 0;
+    List<bool> ObjectApplyFor = ViewBag.ObjectApplyFor;
+    bool ApplyForAllBranch = ViewBag.ApplyForAllBranch;
+    bool IsHH = Model.Type == "HH" ? true : false;
+    Model.Type = Model.Type == "HH" ? "Hàng hóa" : "Hóa đơn";
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+<style>
+    .row {
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .box {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+        margin-top: 0px !important;
+    }
+
+    .title-Css {
+        font-size: 20px !important;
+        height: 20px;
+        font-family: Roboto,Helvetica Neue,sans-serif;
+        padding: 9px !important;
+        position: absolute;
+        color: #0277bd !important;
+    }
+
+    .widget1-Css {
+        border-radius: 2px 2px 0px 0px;
+        background-color: white;
+        height: 40px;
+    }
+
+    .widget-Css {
+        padding-bottom: 80px;
+        border: none;
+    }
+
+    .header-Css {
+        font-size: 20px !important;
+        height: 30px;
+        padding: 5px;
+        /*box-shadow: 0 3px 10px 0px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12) !important;*/
+        font-family: Roboto,Helvetica Neue,sans-serif;
+    }
+
+    .Close-toggle {
+        width: 30px;
+        height: 30px;
+    }
+
+        .Close-toggle:hover {
+            background-color: #67a6ca !important;
+            width: 30px;
+            height: 30px;
+            border-radius: 100px !important;
+        }
+</style>
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "CommissionCus", @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+    <div class="row">
+        <div class="col-sm-7 ">
+            @if (IsHH)
+            {
+                <table class="table table-bordered" style="margin-bottom:80px">
+                    <thead>
+                        <tr>
+                            <th width="30">STT</th>
+                            <th>Tên mặt hàng</th>
+                            <th>Chiết khấu cho</th>
+                            <th width="120">Giá bán (VNĐ)</th>
+                            <th width="100">Giá trị</th>
+                        </tr>
+                    </thead>
+                    <tbody class="detailList">
+                        @foreach (var item in Model.DetailList)
+                        {
+                            orderNo++;
+                            <tr>
+                                <td>@orderNo</td>
+                                <td>@item.ProductName</td>
+                                <td>@item.ObjectName</td>
+                                <td class="text-right">@Common.PhanCachHangNgan(item.Price)</td>
+                                <td class="text-right">
+                                    @item.CommissionValue @(item.IsMoney != null && item.IsMoney == true ? "VNĐ" : "%")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <table class="table table-bordered" style="margin-bottom:80px">
+                    <thead>
+                        <tr>
+                            <th width="30">STT</th>
+                            <th>Điều kiện</th>
+                            <th>Chiết khấu cho</th>
+                            <th width="100">Giá trị</th>
+                        </tr>
+                    </thead>
+                    <tbody class="detailList">
+                        @foreach (var item in Model.DetailList)
+                        {
+                            orderNo++;
+                            <tr>
+                                <td>@orderNo</td>
+                                <td>@Common.PhanCachHangNgan(item.Minvalue)</td>
+                                <td>@item.ObjectName</td>
+                                <td class="text-right">
+                                    @item.CommissionValue @(item.IsMoney != null && item.IsMoney == true ? "VNĐ" : "%")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+        <div class="col-sm-5">
+            <div class="widget-box">
+                <div class="widget-header widget1-Css">
+                    <h5 class="widget-title title-Css">Thông tin chung khuyễn mãi</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="detail-view">
+                            <div class="row control-group">
+                                @Html.DetailViewItemFor2(model => model.Name, true, null, "col-xs-4", "col-xs-8")
+                            </div>
+                            <div class="row control-group">
+                                @Html.DetailViewItemFor2(model => model.Type, true, null, "col-xs-4", "col-xs-8")
+                            </div>
+
+                            <div class="row control-group">
+                                <label class="control-label col-lg-5 col-md-4 col-sm-4" for="">Đối tượng áp dụng:</label>
+                                <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important;">
+                                    <table style="position:relative; width: 320px;">
+                                        <tr>
+                                            <td style="width: 1%;">
+                                                <label class="typeCheck">
+                                                    @if (ObjectApplyFor[2])
+                                                    {
+                                                        <input id="checkbox1" type="checkbox" value="3" class="group_choice ace" name="group_choice" checked disabled />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input id="checkbox1" type="checkbox" value="3" class="group_choice ace" name="group_choice" disabled />
+                                                    }
+                                                    <span class="lbl"></span>
+                                                </label>
+                                            </td>
+                                            <td style="position:relative; width: 2%;">
+                                                <select id="Select_Type3" name="Select_Type3" style="width:120px; height:-5%" disabled>
+                                                    @if (ApplyForAllBranch)
+                                                    {
+                                                        <option value="0" selected> Tất cả cửa hàng</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="1" selected> Cửa hàng</option>
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td style="width: 10%;position:relative">
+                                                @if (ObjectApplyFor[1])
+                                                {
+                                                    <label class="typeCheck"><input id="checkbox2" type="checkbox" value="2" class="group_choice ace" name="group_choice" checked disabled />  <span class="lbl">Nhóm Vip</span></label>
+                                                }
+                                                else
+                                                {
+                                                    <label class="typeCheck"><input id="checkbox2" type="checkbox" value="2" class="group_choice ace" name="group_choice" disabled />  <span class="lbl">Vip</span></label>
+                                                }
+                                            </td>
+                                            <td style="padding-right: 81px; width: 25%; position:relative">
+                                                @if (ObjectApplyFor[0])
+                                                {
+                                                    <label class="typeCheck"><input id="checkbox3" type="checkbox" value="1" class="group_choice ace" name="group_choice" checked disabled />  <span class="lbl">KH</span></label>
+                                                }
+                                                else
+                                                {
+                                                    <label class="typeCheck"><input id="checkbox3" type="checkbox" value="1" class="group_choice ace" name="group_choice" disabled />  <span class="lbl">KH</span></label>
+                                                }
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row control-group">
+                                <div class="col-xs-8 control-label"><label for="StartDate">Ngày bắt đầu</label></div><div class="col-xs-10 control-value" style="width: 225px!important;">@Model.StartDate</div>
+                            </div>
+                            <div class="row control-group">
+                                <div class="col-xs-8 control-label"><label for="EndDate">Ngày kết thúc</label></div><div class="col-xs-10 control-value" style="width: 225px!important;">@Model.EndDate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget-box widget-color-blue widget-Css" style="opacity: 1;">
+                <div class="widget-header header-Css">
+                    <h5 class="widget-title bigger lighter" style="color:white; position: absolute; margin: 5px 0px 0px 10px;font-size: 15px;">
+                        <i class="ace-icon fa fa-list"></i> Đối tượng áp dụng
+                    </h5>
+
+                    <div class="widget-toolbar Close-toggle">
+                        <a id="close-collapse" data-action="collapse" style="color: white;">
+                            <i class="ace-icon fa fa-chevron-up" style="padding-top:8px; padding-left: 4px;color:white;"></i>
+                        </a>
+                    </div>
+                </div>
+                @*-------------------------------------------------------------------------------------------------------*@
+                <div class="tabbable">
+
+                    <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tabCustomer">
+                        @if (ObjectApplyFor[2])
+                        {
+                            <li class="active" id="tab1_head">
+                                <a id="tab1_head" data-toggle="tab" href="#tab1">Cửa hàng</a>
+                            </li>
+                        }
+                        @if (ObjectApplyFor[1])
+                        {
+                            <li>
+                                <a id="tab2_head" data-toggle="tab" href="#tab2">Nhóm Vip</a>
+                            </li>
+                        }
+                        @if (ObjectApplyFor[0])
+                        {
+                            <li>
+                                <a id="tab3_head" data-toggle="tab" href="#tab3">KH cụ thể</a>
+                            </li>
+                        }
+                    </ul>
+
+                    <div class="tab-content">
+                        @if (ObjectApplyFor[2])
+                        {
+                            <div class="tab-pane clearfix active" id="tab1">
+                                <div class="widget-body">
+                                    <div class="widget-main clearfix">
+                                        <div class="box box-height-max" style="margin-top:10px">
+                                            <h4><span>Cửa hàng được áp dụng:</span></h4>
+                                            <div class="product-chosen">
+                                                @foreach (var BranchItem in Model.ApplyDetail)
+                                                {
+                                                    if (BranchItem.Type == 3)
+                                                    {
+                                                        <label class="product-item" data-category="" style="border-radius: 5px;">
+                                                            <input type="checkbox" name="DisplayFor" class="" value="@BranchItem.BranchId" />
+                                                            <span class="">@BranchItem.BranchName</span>
+                                                        </label>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @*tab 2-----------------------------------------------------------------------------------------------*@
+
+                        @if (ObjectApplyFor[1])
+                        {
+                            <div class="tab-pane clearfix" id="tab2">
+                                <div class="widget-body">
+                                    <div class="box box-height-max" style="margin-top:10px">
+                                        <h4><span>Nhóm vip được áp dụng:</span></h4>
+                                        <div class="vip-chosen">
+                                            @foreach (var NhomVipItem in Model.ApplyDetail)
+                                            {
+                                                if (NhomVipItem.Type == 2)
+                                                {
+                                                    <label class="vip-item" data-category="">
+                                                        <input type="checkbox" name="DisplayFor" class="" value="@NhomVipItem.BranchId" />
+                                                        <span class="">@NhomVipItem.LogVipName</span>
+                                                    </label>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @*--------------------------------------------------------------------------------------------------------------*@
+                        @if (ObjectApplyFor[0])
+                        {
+                            <div class="tab-pane clearfix" id="tab3">
+                                <div class="widget-body">
+                                    <div class="box box-height-max" style="margin-top:10px">
+                                        <h4><span>Khách hàng được chọn:</span></h4>
+                                        <div class="customer-chosen">
+                                            @foreach (var CustomerItem in Model.ApplyDetail)
+                                            {
+                                                if (CustomerItem.Type == 1)
+                                                {
+                                                    <label class="customer-item" data-category="">
+                                                        <input type="checkbox" name="DisplayFor" class="" value="@CustomerItem.BranchId" />
+                                                        <span class="">@CustomerItem.CustomerName</span>
+                                                    </label>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                @*-------------------------------------------------------------------------------------------------------*@
+            </div>
+        </div>
+    </div>
+}
+<script>
+
+    $('#close-collapse').click(function () {
+        $("#tab1,#tab2,#tab3").toggleClass("close");
+    });
+</script>

@@ -1,0 +1,168 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+
+@model TemplatePrintViewModel
+
+@{
+    ViewBag.Title = "";
+
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+
+    <link href="~/assets/css/printTestNT.css" rel="stylesheet" />
+    <style type="text/css">
+       
+
+        body {
+            font-size: 12pt;
+        }
+
+        p {
+            margin: 0px;
+            margin-bottom: 5px;
+            font-size: 12pt;
+        }
+
+        table, th, td {
+            background: none;
+            border: none;
+        }
+
+            table.invoice-detail, th.invoice-detail, td.invoice-detail {
+                background: none;
+                border: none;
+            }
+
+        td {
+            padding-bottom: 3px;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        th {
+            font-size: 12pt;
+            font-weight: bold;
+        }
+
+        .invoice-detail {
+            border: none;
+            width: 210px;
+            margin-top: 10px;
+            border-spacing: 0px;
+        }
+
+            .invoice-detail th {
+                border-right: none;
+                padding: 5px;
+            }
+
+            .invoice-detail tr th:last-child {
+            }
+
+            .invoice-detail td {
+                padding: 5px 5px;
+                height: 15px;
+                font-size: 12pt;
+            }
+
+            .invoice-detail tr td:last-child {
+            }
+
+            .invoice-detail tbody tr:last-child td {
+            }
+
+            .invoice-detail tfoot td {
+                font-size: 12px;
+            }
+
+            .invoice-detail tfoot tr:first-child td {
+            }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .logo {
+            width: 100px;
+            float: left;
+            margin: 0 20px;
+            height: 100px;
+            line-height: 100px;
+        }
+
+            .logo img {
+                width: 100%;
+                vertical-align: middle;
+            }
+
+        .orderNo {
+            width: 20px;
+        }
+
+
+        .chiet_khau {
+            width: 40px;
+        }
+    </style>
+</head>
+<body>
+    @*<button id="repos"><i class="fa fa-reply-all" aria-hidden="true"></i></button>*@
+    @Html.Raw(Model.Content)
+    <script src="~/assets/js/JsBarcode.all.min.js"></script>
+    <script>
+        JsBarcode(".barcode").init();
+        window.print();
+        @*location.href = '@Url.Action("Index")';*@
+        //var btn = document.getElementById("repos");
+        var remove = document.getElementById("Search_Product8");
+
+        var mainNT = document.getElementById("bodymainNT");
+        //btn.onclick = function () {
+        //    $("#buttonmenu").css('display', 'block');
+        //    $("#footerPOS").css('display', 'block');
+        //    mainNT.style.display = "block";
+        //    remove.style.display = "none";
+        //    if (tab3 == 0 && tab1 == 1 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+        //        $("#CustomerId").val(0);
+        //        $("#DiscountTab1").val(0);
+        //        ExitPopupPay();
+        //    } else if (tab3 == 0 && tab1 == 0 && tab2 == 1 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+        //        $("#CustomerId2").val(0);
+        //        $("#DiscountTab2").val(0);
+        //        ExitPopupPay();
+        //    } else if (tab3 == 1 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+        //        $("#CustomerId3").val(0);
+        //        $("#DiscountTab3").val(0);
+        //        ExitPopupPay();
+        //    } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 1 && tab5 == 0 && tab6 == 0) {
+        //        $("#CustomerId4").val(0);
+        //        $("#DiscountTab4").val(0);
+        //        ExitPopupPay();
+        //    } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 1 && tab6 == 0) {
+        //        $("#CustomerId5").val(0);
+        //        $("#DiscountTab5").val(0);
+        //        ExitPopupPay();
+        //    } else {
+        //        $("#CustomerId6").val(0);
+        //        $("#DiscountTab6").val(0);
+        //        ExitPopupPay();
+        //    }
+        //    totalKm = 0;
+        //}
+    </script>
+
+</body>
+</html>

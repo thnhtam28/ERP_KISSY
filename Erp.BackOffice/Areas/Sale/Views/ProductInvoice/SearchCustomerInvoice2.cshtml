@@ -1,0 +1,173 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+@model List<CustomerViewModel>
+    @{
+        Layout = null;
+
+    }
+    @section HeadOfPage {
+        @Html.ScriptTop_ChosenStyle()
+        <style type="text/css">
+            .imgproduct :hover {
+                border-color: antiquewhite
+            }
+        </style>
+    }
+    @*cái này search cus*@
+    <div class="product-search-box">
+        <select id="CustomerSelectList" name="CustomerSelectList" style="width:75%">
+            @foreach (var item in Model)
+            {
+                <option value="@item.Id" data-selected="0" data-value="@item.Id|@("<b>"+item.FullName==null?"null":item.FullName +"</b>") | @(item.Mobile==null?"null":item.Mobile)" data-customer-id="@item.Id" data-customerame="@(item.FullName==null?"null":item.FullName)" data-taxcode="@(item.TaxCode==null?"null":item.TaxCode)" data-bankaccount="@(item.BankAccount==null?"null":item.BankAccount)" data-bankname="@(item.BankName==null?"null":item.BankName)" data-address="@(item.Address==null?"null":item.Address)" data-note="@(item.Note==null?"null":item.Note)">@(item.FullName == null ? "null" : item.FullName)</option>
+            }
+        </select>
+    </div>
+
+
+
+    <link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+    <script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#CustomerSelectList').radComboBox({
+                colTitle: 'ID,Tên Khách Hàng',
+                colValue: 1,
+                colHide: '1',
+                colSize: '0px,200px',
+                colClass: ',,',
+                //width: 200,
+                height: 350,
+                boxSearch: true,
+                customId: 2,
+                colSearch: 1,
+                rcbname:"txtkhachhang"
+            });
+            //Hiển thị giá và tính thành tiền khi chọn sản phẩm
+
+
+            $('#CustomerSelectList').on('change', function () {
+               
+                var $this = $(this);
+                var selected = $this.find("option:selected");
+               
+               
+                if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+
+                    var Istab = 1;
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+
+                    var Istab = 2;
+                } else {
+
+                    var Istab = 3;
+                }
+                var CustomerId = selected.data("customer-id");
+              
+                var CustomerName = selected.data("customerame");
+                var CustomerPhone = selected.text();
+                var TaxCode = selected.data("taxcode");
+                var BankAccount = selected.data("bankaccount");
+                var BankName = selected.data("bankname");
+                var Address = selected.data("address");
+                var Note = selected.data("note");
+                var formdata = {
+                    CustomerId: CustomerId,
+                    CustomerName: CustomerName,
+                    CustomerPhone: CustomerPhone,
+                    TaxCode: TaxCode,
+                    BankAccount: BankAccount,
+                    BankName: BankName,
+                    Address: Address,
+                    Note: Note,
+                    Istab: Istab
+                };
+                
+                //Thêm dòng mới
+                ClickEventHandlerSearchCus(true, "/ProductInvoice/LoadCustomerInvoice", ".detailList2", formdata, function () {
+                    if (tab3 == 0 && tab1 == 1 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                        $("#DiscountTab1").val(0);
+                        tinh_tong_tien1();
+                        totalKm = 0;
+                    } else if (tab3 == 0 && tab1 == 0 && tab2 == 1 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                         $("#DiscountTab2").val(0);
+                        tinh_tong_tien2();
+                        totalKm = 0;
+                    } else if (tab3 == 1 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                       $("#DiscountTab3").val(0);
+                        tinh_tong_tien3();
+                        totalKm = 0;
+                    } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 1 && tab5 == 0 && tab6 == 0) {
+                        $("#DiscountTab4").val(0);
+                        tinh_tong_tien4();
+                        totalKm = 0;
+                    } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 1 && tab6 == 0) {
+                         $("#DiscountTab5").val(0);
+                        tinh_tong_tien5();
+                        totalKm = 0;
+                    } else {
+                         $("#DiscountTab6").val(0);
+                        tinh_tong_tien6();
+                        totalKm = 0;
+                    }
+                   
+                
+
+            });
+                
+            });
+
+
+
+
+            $('#product_barcode').keypress(function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    $('#product_barcode').trigger('change');
+                }
+            });
+
+            $(window).keydown(function (e) {
+                if (e.which == 114) {
+                    e.preventDefault();
+                    $("#product_barcode").focus();
+                }
+            });
+
+            //khi nhập barcode
+            $('#product_barcode').change(function () {
+                var $this = $(this);
+                if ($this.val() != '') {
+
+                    var barcode = $this.val();
+                    //đặt lại giá trị rỗng
+                    $this.val('').focus();
+
+                    var valueSearch = searchProductByBarCodeContain(barcode);
+                    if (valueSearch == undefined) {
+                        alert('Không tìm thấy sản phẩm với mã code trên!');
+                        return;
+                    }
+
+                    $('#productSelectList2').val(valueSearch).trigger("change");
+
+                    //kết thúc các lệnh của sự kiện
+                }
+            });
+            function getOrderNO() {
+                if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+                    var OrderNo = $('.detailList1 tr').length;
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+                    var OrderNo = $('.detailList2 tr').length;
+                } else {
+                    var OrderNo = $('.detailList3 tr').length;
+                }
+                return OrderNo;
+            }
+
+            //document.getElementById("idboxsearch2").placeholder = "Nhập số điện thoại khách hàng..";
+
+        });
+
+    </script>

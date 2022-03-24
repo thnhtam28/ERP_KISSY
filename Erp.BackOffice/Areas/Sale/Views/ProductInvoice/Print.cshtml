@@ -1,0 +1,119 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+
+@model TemplatePrintViewModel
+
+@{
+    ViewBag.Title = "";
+
+    Layout = null;
+}
+    
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+
+    <link href="~/assets/css/printTest.css" rel="stylesheet" />
+    <style type="text/css">
+
+        body {
+            font-size: 12px;
+        }
+
+        p {
+            margin: 0px;
+            margin-bottom: 5px;
+        }
+
+        th {
+            font-size: 14px;
+        }
+
+        td {
+            padding-bottom: 3px;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .pp {
+            text-indent: 5px;
+        }
+
+        .invoice-detail {
+            font-weight: 200;
+            border: none;
+            width: 210px;
+            margin-top: 10px;
+            margin-left: 0;
+            border-spacing: 0px;
+            font-size: 13px;
+            max-width: 210px;
+        }
+
+            .invoice-detail th {
+                border-right: none;
+                padding: 4px;
+            }
+
+            .invoice-detail tr th:last-child {
+            }
+
+            .invoice-detail td {
+                padding: 3px 3px;
+                height: 13px;
+            }
+
+            .invoice-detail tr td:last-child {
+            }
+
+            .invoice-detail tbody tr:last-child td {
+            }
+
+            .invoice-detail tfoot td {
+                font-weight: bold;
+            }
+
+            .invoice-detail tfoot tr:first-child td {
+            }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+
+
+
+        .orderNo {
+            width: 20px;
+        }
+
+
+        .chiet_khau {
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+    @Html.Raw(Model.Content)
+    <script src="~/assets/js/JsBarcode.all.min.js"></script>
+    <script>
+        JsBarcode(".barcode").init();
+        window.print();
+       
+        //parent.ClosePopup(false);
+
+
+        @*location.href = '@Url.Action("Index")';*@
+    </script>
+</body>
+</html>

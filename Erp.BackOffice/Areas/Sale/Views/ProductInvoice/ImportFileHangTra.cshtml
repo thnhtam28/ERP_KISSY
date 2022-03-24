@@ -1,0 +1,210 @@
+﻿@model IEnumerable<ImportHangTraViewModel>
+
+    @using AutoMapper.Internal
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+    @{
+        ViewBag.Title = "";
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "ProductInvoice",
+            ActionName = "IndexDonHangTra",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false,
+            AdvancedSearch = false,
+            SearchOjectAttr = ViewBag.ListOjectAttrSearch
+
+        };
+    }
+    @section  HeadOfPage {
+        @Html.ScriptTop_ChosenStyle()
+        <style type="text/css">
+            #popup_archive {
+                position: absolute;
+                bottom: inherit;
+                left: 50px;
+                width: 300px;
+                height: 150px;
+                max-width: inherit;
+                top: 0px;
+            }
+        </style>
+    }
+
+    @{
+        if (ViewBag.ErrorMesseage != null)
+        {
+            <script type="text/javascript">
+            $(document).ready(function () {
+                alert("@ViewBag.ErrorMesseage");
+            });
+            </script>
+        }
+    }
+    @if (true)
+    {
+        using (Html.BeginForm("ImportFileHangTra",
+            "ProductInvoice",
+            FormMethod.Post,
+            new { enctype = "multipart/form-data" }))
+        {
+            <label for="file">Chọn File Excel</label>
+            <input type="file" class="btn btn-white btn-sm btn-danger" name="file" id="file" />
+            <input class="btn btn-mini btn-black" type="submit" value="Xem Trước" name="submitBtn" />
+        }
+
+    }<br />
+    @if (ViewBag.FileName != null)
+    {
+        <div class="mini-popup">
+
+            <a class="btn btn-mini btn-success" data-toggle="collapse" data-target="#popup_archive">
+                <i class="ace-icon fa fa-save"></i>
+                Lưu Vào CSDL
+            </a>
+
+            <div id="popup_archive" class="popover fade top">
+                <div class="arrow" style="left: 50%;"></div>
+                <h3 class="popover-title"><i class="ace-icon fa fa-save"></i> Nhập Ghi Chú</h3>
+                <div class="popover-content">
+                    @using (Html.BeginForm_AceStyle((string)ViewBag.Title, "SaveFileExcel2", "ProductInvoice", null, FormMethod.Post, new { id = "", @class = "form-horizontal" }))
+                    {
+                        @Html.ValidationSummary(true)
+
+
+                        @Html.TextBox("ghichu", Request["ghichu"], new { @class = "", autocomplete = "off", placeholder = "Ghi Chú" })
+
+
+                        <p class="top-10">
+                            <input type="hidden" name="currentFile" value="@ViewBag.FileName" />
+                            <input class="btn btn-mini btn-black" type="submit" value="Đồng ý" name="Save" />
+                            <a class="btn btn-white btn-sm no-border" data-toggle="collapse" data-target="#popup_archive">Đóng</a>
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @*using (Html.BeginForm("SaveFileExcel",
+                "ProductInvoice",
+                FormMethod.Post))
+            {
+                <input type="hidden" name="currentFile" value="@ViewBag.FileName" />
+                <input class="btn btn-mini btn-black" type="submit" value="Lưu Lại" name="Save" />
+            }*@
+
+    }
+    @helper BuildCheckAll()
+    {
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+    }
+    @helper CheckDeleteColumns(int Id)
+    {
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+            <span class="lbl"></span>
+        </label>
+    }
+    @using (Html.BeginForm("ImportFileHangTra", "ProductInvoice", FormMethod.Post))
+    {
+        <div class="table-responsive">
+            <div id="test">
+                @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(u => u.STT).Titled("STT").SetWidth(20);
+               columns.Add(u => u.SO_HIEU).Titled("Số Hiệu").SetWidth(100);
+               columns.Add(u => u.MA_DON_HANG).Titled("Mã Đơn Hàng").SetWidth(100);
+               columns.Add(u => u.NGAY_GUI).Titled("Ngày gửi").SetWidth(100);
+               columns.Add(u => u.NGUOI_NHAN).Titled("Người Nhận").SetWidth(100);
+               columns.Add(u => u.DC_NHAN).Titled("Địa Chỉ").SetWidth(100);
+               columns.Add(u => u.DT_NHAN).Titled("SDT").SetWidth(100);
+               columns.Add(u => u.TRI_GIA).Titled("Trị Giá").SetWidth(100);
+               columns.Add(u => u.CUOC).Titled("Cước").SetWidth(100);
+               columns.Add(u => u.VUN).Titled("VUN").SetWidth(100);
+               columns.Add(u => u.CONG_THUC).Titled("Công Thức").SetWidth(100);
+               columns.Add(u => u.CUOC_EMS_HOAN).Titled("Hoàn Cước EMS").SetWidth(100);
+               columns.Add(u => u.CUOC_COD_HOAN).Titled("Chi Hoàn Cước COD").SetWidth(100);
+               columns.Add(u => u.PHAI_THU).Titled("Phải Thu Người Gửi").SetWidth(100);
+               columns.Add(u => u.LYDO_HOAN).Titled("Lý Do Chuyển Hoàn").SetWidth(100);
+               columns.Add(u => u.NGUOI_NHAN_CUOC_HOAN).Titled("Người Nhận Cước Hoàn").SetWidth(100);
+               columns.Add(u => u.KHOI_LUONG).Titled("Khối Lượng").SetWidth(20);
+
+                }).WithPaging(30)
+            </div>
+        </div>
+        @*using (Html.BeginButtonContainer(pageSetting))
+            {
+                if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("CreateNT", "ProductInvoice", "Sale"))
+                {
+                    <a class="btn btn-mini btn-primary" href="@Url.Action("Create", pageSetting.ModuleName)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        @Wording.CreateNew
+                    </a>
+                }
+                if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "ProductInvoice", "Sale"))
+                {
+                    <button class="btn btn-white btn-sm btn-danger" type="submit" name="DeleteAll" value="DeleteAll" onclick="return CheckIsval();">
+                        <i class="ace-icon fa fa-trash"></i>
+                        @Wording.Delete
+                    </button>
+                }
+            }*@
+    }
+    <script>
+
+        $('#test').find('table.table.table-striped.grid-table').first().attr('id', 'CTable');
+
+
+    </script>
+    
+    <script src="~/Scripts/jquery.freezeheader.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#CTable").freezeHeader({ 'offset': '30px' });
+        })
+    </script>
+    @section Scripts {
+
+
+
+        <script type="text/javascript">
+            function CheckIsval() {
+                if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                    alert("Phải chọn ít nhất 1 item.");
+                    return false;
+                }
+                else {
+                    if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+
+            $('[name="Delete"]').click(function () {
+                if (confirm('Bạn có chắc muốn xóa item ?')) {
+                    $(this).closest('tr').children('td').each(function (i, e) {
+                        $(this).find("input.class-delete-all").prop("checked", true);
+                        return true;
+                    })
+                }
+                else {
+                    return false;
+                }
+
+            })
+
+        </script>
+    }
+

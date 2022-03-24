@@ -1,0 +1,495 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model ProductViewModel
+
+@{
+    ViewBag.Title = Wording.PageCreate_Product;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Product",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+
+    IEnumerable<SelectListItem> ManufacturerList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("manufacturerList", null, "value");
+    IEnumerable<SelectListItem> CategoryList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("product", null, "value");
+    IEnumerable<SelectListItem> productUnitList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("productUnit", null, "value");
+    IEnumerable<SelectListItem> productGroupList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("ProductGroup", null, "value");
+    IEnumerable<SelectListItem> OriginList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("Origin", null, Wording.Empty);
+    IEnumerable<SelectListItem> productASList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_NhomSP("ProductASList", null);
+    IEnumerable<SelectListItem> productASGroup = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_LoaiSP("productASGroup", null);
+
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Create", "Product", null, FormMethod.Post, new { id = "CreateProduct", @class = "form-horizontal clearfix", enctype = "multipart/form-data" }))
+{
+    //@Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+    <input type="hidden" name="Type" value="product" />
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#home" aria-expanded="true"><i class="fa fa-info-circle"></i> Tổng quan</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#image" aria-expanded="false"><i class="fa fa-image"></i> Ảnh minh họa</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#imagepos" aria-expanded="false"><i class="fa fa-image"></i> Ảnh POS</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#profile_brief" aria-expanded="false"><i class="fa fa-comment-o"></i> Mô tả ngắn</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#profile" aria-expanded="false"><i class="fa fa-comment-o"></i> Mô tả</a>
+                                </li>
+                                <li>
+                                    <a data-toggle="tab" href="#HDSD" aria-expanded="false"> Hướng dẫn sử dụng</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#home2" aria-expanded="false"><i class=""></i> Thông tin thêm</a>
+                                </li>
+
+                                @*<li id="tab_li_SPTT">
+                                        <a data-toggle="tab" href="#SPTT">Sản phẩm liên quan</a>
+                                    </li>
+
+                                    <li id="tab_li_SPBC">
+                                        <a data-toggle="tab" href="#SPBC" aria-expanded="false"> Có thể bạn quan tâm</a>
+                                    </li>*@
+
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="home" class="Container tab-pane active" style="width:100%">
+                                    <div class="col-sm-6">
+
+                                        @*@Html.CustomTextboxFor(model => model.Name, null, null, WidthType.span6)*@
+                                        <div id="" class="control-group form-group">
+                                            <label class="control-label col-lg-5 col-md-4 col-sm-4">Tên hàng hóa/dịch vụ</label>
+                                            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                                                <div class="clearfix">
+                                                    <input class="col-sm-12 text-left" id="Name" data-type="" name="Name" type="text" value="@Model.Name">
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span class="col-sm-3" style="margin-top: 8px; color: red">(Bắt Buộc nhập)</span>
+                                            </div>
+                                        </div>
+                                        @*@Html.CustomTextboxFor(model => model.Code, null, null, WidthType.span6)*@
+                                        <div id="" class="control-group form-group">
+                                            <label class="control-label col-lg-5 col-md-4 col-sm-4">Mã hàng hóa/dịch vụ</label>
+                                            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                                                <div class="clearfix">
+                                                    <input class="col-sm-12 text-left" id="Code" data-type="" name="Code" type="text" value="@Model.Code">
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span class="col-sm-5" style="margin-top: 8px; color: red">(Nếu không nhập Code sẽ tự sinh)</span>
+                                            </div>
+                                        </div>
+                                        @Html.CustomDropDownListFor(model => model.Manufacturer, ManufacturerList, WidthType.span6, true, null, DropdownListStyle.DropdownListStyleChosen)
+                                        @Html.CustomDropDownListFor(model => model.NHOMSANPHAM_ID, productASList, WidthType.span6, true, null, DropdownListStyle.DropdownListStyleChosen)
+                                        @*@Html.CustomDropDownListFor(model => model.LOAISANPHAM_ID_LST, SelectListHelper.GetSelectList_LoaiSP(Model.LOAISANPHAM_ID, "Danh mục"), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen, true)*@
+                                        @*@Html.CustomDropDownListFor(model => model.LOAISANPHAM_ID, productASGroup, WidthType.span6, true, null, DropdownListStyle.DropdownListStyleChosen)*@
+                                        @*@Html.CustomDropDownListFor(model => model.LOAISANPHAM_ID_LST, SelectListHelper.GetSelectList_LoaiSP(Model.LOAISANPHAM_ID, Wording.Category), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen, true)*@
+                                        @Html.CustomDropDownListFor(model => model.Color_product, SelectListHelper.GetSelectList_ColorSP(Model.Color_product, "Color_product"), WidthType.span6, true, null, DropdownListStyle.DropdownListStyleChosen)
+                                        @*@Html.CustomDropDownListFor(model => model.Color_product, SelectListHelper.GetSelectList_ColorSP(Model.Color_product, "Color_product"), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen, true)*@
+                                        @Html.CustomDropDownListFor(model => model.Size_product, SelectListHelper.GetSelectList_ColorSP(Model.Size_product, "Size_product"), WidthType.span6, true, null, DropdownListStyle.DropdownListStyleChosen)
+                                        @*@Html.CustomDropDownListFor(model => model.Size_product, SelectListHelper.GetSelectList_SizeSP(Model.Size_product, "Size_product"), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen, true)*@
+                                        @Html.CustomDropDownListFor(model => model.Unit, productUnitList, WidthType.span6, true, null, DropdownListStyle.DropdownListStyleChosen)
+                                        <div id="" class="control-group form-group">
+                                            <label class="control-label col-lg-5 col-md-4 col-sm-4">Giá bán</label>
+                                            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                                                <div class="clearfix">
+
+                                                    <input class=" col-sm-6 text-right" id="PriceOutbound" data-type="currency" name="PriceOutbound" type="number" value="@Model.PriceOutbound">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="" class="control-group form-group">
+                                            <label class="control-label col-lg-5 col-md-4 col-sm-4">Giá nhập</label>
+                                            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                                                <div class="clearfix">
+                                                    <input class="col-sm-12 text-right" id="PriceInbound" data-type="currency" name="PriceInbound" type="number" value="@Model.PriceInbound">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @Html.CustomTextboxFor(model => model.MinInventory, null, null, WidthType.span6, true, new Dictionary<string, object> { { "class", "col-sm-6 text-right" } })
+                                    </div>
+                                    <div class=" col-sm-6">
+                                        @Html.CustomTextboxFor(model => model.LIST_TAGS, null, null, WidthType.span6)
+
+
+                                        @Html.CustomSwitchesFor(model => model.IS_NOIBAT, SwitchesStyle.CheckboxStyle, true)
+
+                                        @Html.CustomSwitchesFor(model => model.is_price_unknown, SwitchesStyle.CheckboxStyle, true)
+                                        @Html.CustomSwitchesFor(model => model.is_display, SwitchesStyle.CheckboxStyle, true)
+                                    </div>
+
+                                </div>
+
+                                <div id="home2" class="tab-pane">
+
+
+                                    @Html.CustomSwitchesFor(model => model.IS_ALOW_BAN_AM, SwitchesStyle.CheckboxStyle, true)
+                                    @Html.CustomSwitchesFor(model => model.IS_NGUNG_KD, SwitchesStyle.CheckboxStyle, true)
+                                    @Html.CustomSwitchesFor(model => model.IS_COMBO, SwitchesStyle.CheckboxStyle, true)
+
+
+                                    <div id="" class="control-group form-group">
+                                        <div><label>Thông tin SEO</label></div>
+                                        <label class="control-label col-lg-5 col-md-4 col-sm-4">Tiêu đề</label>
+                                        <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                                            <input class="" id="META_TITLE" name="META_TITLE" type="text" value="@Model.META_TITLE">
+                                        </div>
+                                        <label class="control-label col-lg-5 col-md-4 col-sm-4">Mô tả ngắn</label>
+                                        <div class="control-value col-lg-7 col-md-8 col-sm-8">
+
+                                            <input class="" id="META_DESCRIPTION" name="META_DESCRIPTION" type="text" value="@Model.META_DESCRIPTION">
+
+                                        </div>
+                                        <label class="control-label col-lg-5 col-md-4 col-sm-4">Url slug</label>
+                                        <div class="control-value col-lg-7 col-md-8 col-sm-8">
+
+                                            <input class="" id="URL_SLUG" name="URL_SLUG" type="text" value="@Model.URL_SLUG">
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div id="image" class="tab-pane">
+                                    <div class="wrap-btn-upload">
+                                        <a class="btn btn-primary btn-sm btn-white"><i class="fa fa-upload"></i><span>Tải hình mới</span></a>
+                                        <input type="file" id="file-image" name="file-image" multiple class="file-image" onchange="previewFileImage2(event, '#display-image' )" />
+
+                                    </div>
+
+                                    <div class="text-center" id="display-image">
+
+                                        <div class="row">
+                                            <div class="col-sm-3">
+
+                                                <span id="s1"><img name="s1" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /> <a style="background-color:aqua;" onclick="deleteimgid('s1',1)"><span> X</span></a></span>
+                                                <input type="hidden" id="img1" name="img1" value="" />
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <span id="s2"><img name="s2" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s2',2)"><span> X</span></a></span>
+                                                <input type="hidden" id="img2" name="img2" value="" />
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <span id="s3"><img name="s3" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s3',3)"><span> X</span></a></span>
+                                                <input type="hidden" id="img3" name="img3" value="" />
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <span id="s4"><img name="s4" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s4',4)"><span> X</span></a></span>
+                                                <input type="hidden" id="img4" name="img4" value="" />
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <span id="s5"><img name="s5" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s5',5)"><span> X</span></a></span>
+                                                <input type="hidden" id="img5" name="img5" value="" />
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <span id="s6"><img name="s6" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s6',6)"><span> X</span></a></span>
+                                                <input type="hidden" id="img6" name="img6" value="" />
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <span id="s7"><img name="s7" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s7',7)"><span> X</span></a></span>
+                                                <input type="hidden" id="img7" name="img7" value="" />
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <span id="s8"><img name="s8" src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:200px;" /><a style="background-color:aqua;" onclick="deleteimgid('s8',8)"><span> X</span></a></span>
+                                                <input type="hidden" id="img8" name="img8" value="" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+
+
+                                </div>
+                                <div id="imagepos" class="tab-pane">
+                                    <div class="wrap-btn-upload">
+                                        <a class="btn btn-primary btn-sm btn-white"><i class="fa fa-upload"></i><span>Tải hình mới</span></a>
+                                        <input type="file" id="file-imagepos" name="file-imagepos" class="file-imagepos" onchange="previewFileImage(event, '#display-imagepos img')" />
+                                    </div>
+                                    <div class="text-center" id="display-imagepos">
+                                        <img src="/assets/css/images/noimage.gif" title="@Model.Name" id="" style="max-height:250px" />
+                                    </div>
+
+                                </div>
+                                <div id="profile_brief" class="tab-pane">
+                                    <textarea class="ckeditor" cols="20" id="Description_brief" name="Description_brief" placeholder="" rows="2">@Model.Description_brief</textarea>
+                                </div>
+                                <div id="profile" class="tab-pane">
+                                    <textarea class="ckeditor" cols="20" id="Description" name="Description" placeholder="" rows="2">@Model.Description</textarea>
+                                </div>
+                                <div id="HDSD" class="tab-pane">
+                                    <textarea class="ckeditor" cols="20" id="HDSD" name="HDSD" placeholder="" rows="2">@Model.HDSD</textarea>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        @*<a class="btn btn-mini btn-primary" id="Save" name="command" value="Save">
+                <i class="ace-icon fa fa-save"></i>
+                @Wording.Save
+            </a>*@
+        <button class="btn btn-mini btn-primary" type="submit" name="command" value="Luu">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+        <button class="btn btn-mini btn-primary" type="submit" name="command" value="Luu2">
+            <i class="ace-icon fa fa-save"></i>
+            Lưu và tiếp tục
+        </button>
+        @*<input class="btn btn-mini btn-primary" type="submit" name="command" value="Lưu và tiếp tục" />*@
+    }
+
+
+
+
+
+}
+
+@section Scripts {
+    <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+    <script>
+        $(document).ready(function () {
+            LoadNumberInput();
+            $("#IsMoneyDiscount").on('change', function () {
+                if ($("#IsMoneyDiscount").is(':checked')) {
+                    $("#IsMoneyDiscount").val("true");
+                    $("#lb_IsCheck").text("VNĐ");
+                }
+                else {
+                    $("#IsMoneyDiscount").val("false");
+                    $("#lb_IsCheck").text("%");
+                }
+            });
+            //   $('#PriceInbound').priceFormat();
+            $('#MinInventory, #QuantityService').numberFormat();
+
+            $('#CategoryCode').change(function () {
+                var $this = $(this);
+                $('.list-attr-by-category').html('');
+                $.get('/ObjectAttribute/GetListByModuleCategory', { category: $this.val() }, function (res) {
+                    if (res.replace(/\s+/, '') != '') {
+                        $('.list-attr-by-category').html(res);
+                        initDataTypeInput($('.list-attr-by-category input'));
+                        $('.box-attr').show();
+                    }
+                });
+            });
+
+            resetLableRequired('#CreateProduct');
+            //parseValidatorForm('#ProductInBound');
+            $('#Save').click(function () {
+                ShowLoading();
+                ClearFormatBeforeSubmit($("#CreateProduct"));
+                $("#CreateProduct").submit();
+                // HideLoading();
+            });
+
+            $('#Save1').click(function () {
+                ShowLoading();
+                ClearFormatBeforeSubmit($("#CreateProduct"));
+                $("#CreateProduct").submit();
+                // HideLoading();
+            });
+            $("#Code").change(function () {
+                $.get('/Product/CheckCodeExsist/', { id: @Model.Id, code: $(this).val() }, function (rs) {
+                    if (rs != '') {
+                        alert(rs);
+                    }
+                });
+            });
+
+        });
+        function deleteimgid(id,img) {
+            document.images[id].src = '/assets/css/images/noimage.gif';
+            if (img == 1) {
+                $("#img1").val(1);
+
+            } else if (img == 2) {
+                $("#img2").val(1);
+            } else if (img == 3) {
+                $("#img3").val(1);
+            } else if (img == 4) {
+                $("#img4").val(1);
+            } else if (img == 5) {
+                $("#img5").val(1);
+            } else if (img == 6) {
+                $("#img6").val(1);
+            } else if (img == 7) {
+                $("#img7").val(1);
+            } else if (img == 8) {
+                $("#img8").val(1);
+            }
+
+            $('img').val(1);
+        }
+        function initCkeditor() {
+            $('.ckeditor').ckeditor({
+                "extraPlugins": 'imagebrowser',
+                "imageBrowser_listUrl": "@Url.Action("ListJson","Images")",
+                // Define the toolbar groups as it is a more accessible solution.
+                toolbarGroups: [
+                    { "name": "document", "groups": ["mode", "document", "doctools"] },
+                    { "name": "editing", "groups": ["find", "selection", "spellchecker"] },
+                    { "name": "forms" },
+                    { "name": "tools" },
+                    { "name": "basicstyles", "groups": ["basicstyles", "cleanup"] },
+                    { "name": "clipboard", "groups": ["clipboar", "undo"] },
+                    { "name": "links", "groups": ["links"] },
+                    { "name": "paragraph", "groups": ["list", "blocks"] },
+                    { "name": "insert", "groups": ["insert"] },
+                    { "name": "styles", "groups": ["styles"] },
+                    //{ "name": "about", "groups": ["about"] },
+                    { "name": "styles" },
+                    { "name": "colors" },
+                    { "name": "align", "groups": ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+
+                ],
+                // Remove the redundant buttons from toolbar groups defined above.
+                removeButtons: 'Underline,Strike,Subscript,Superscript,Anchor,Styles,Specialchar'
+            });
+        }
+
+        var $tr_template = $('#detailList tr:first-child');
+        //truyền từ action create của controller qua khi thực hiện submit và return về lại view create, để nhận biết là được gọi theo dạng popup
+        var closePopup = '@ViewBag.closePopup';
+        $(document).ready(function () {
+            //nếu là được gọi theo dạng popup từ form khác thì chạy đoạn code bên dưới
+            if (closePopup != '') {
+                var option = '<option value="@Model.Id" >@Model.Name</option>';
+                //tên funtion có thể khác theo từng công việc riêng (đây chỉ là mẫu khi thêm mới sẽ gọi lại)
+                window.parent.ClosePopupAndAppendSelect(option);
+            }
+
+        });
+
+        $("#Name").keyup(function () {
+            var Text = $(this).val();
+            Text = to_slug(Text);
+
+            $("#URL_SLUG").val(Text);
+        });
+
+        function to_slug(str) {
+            // Chuyển hết sang chữ thường
+            str = str.toLowerCase();
+
+            // xóa dấu
+            str = str.replace(/(à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ)/g, 'a');
+            str = str.replace(/(è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ)/g, 'e');
+            str = str.replace(/(ì|í|ị|ỉ|ĩ)/g, 'i');
+            str = str.replace(/(ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ)/g, 'o');
+            str = str.replace(/(ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ)/g, 'u');
+            str = str.replace(/(ỳ|ý|ỵ|ỷ|ỹ)/g, 'y');
+            str = str.replace(/(đ)/g, 'd');
+
+            // Xóa ký tự đặc biệt
+            str = str.replace(/([^0-9a-z-\s])/g, '');
+
+            // Xóa khoảng trắng thay bằng ký tự -
+            str = str.replace(/(\s+)/g, '-');
+
+            // xóa phần dự - ở đầu
+            str = str.replace(/^-+/g, '');
+
+            // xóa phần dư - ở cuối
+            str = str.replace(/-+$/g, '');
+
+            // return
+            return str;
+        }
+    </script>
+    @*<script>
+            $(document).ready(function () {
+                $('body').delegate('#PriceInbound', 'keyup', function (event) {
+                    var total = $(this).val();
+                    if (event.which >= 37 && event.which <= 40) {
+                        event.preventDefault();
+                    }
+
+                    $(this).val(function (index, value) {
+                        return value
+                            .replace(/\D/g, "")
+                            //.replace(/([0-9])([0-9])$/, '$1.$2')
+                            .replace(/\B(?=(\d{3})+(?!\d)\.?)/g, ".")
+                            ;
+                    });
+                })
+
+                $('body').delegate('#PriceOutbound', 'keyup', function (event) {
+                    var total = $(this).val();
+                    if (event.which >= 37 && event.which <= 40) {
+                        event.preventDefault();
+                    }
+
+                    $(this).val(function (index, value) {
+                        return value
+                            .replace(/\D/g, "")
+                            //.replace(/([0-9])([0-9])$/, '$1.$2')
+                            .replace(/\B(?=(\d{3})+(?!\d)\.?)/g, ".")
+                            ;
+                    });
+                })
+
+            })
+        </script>*@
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+}

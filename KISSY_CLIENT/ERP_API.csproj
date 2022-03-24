@@ -1,0 +1,1287 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2DE6AD32-648F-4EB7-A061-89052A05EB76}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ERP_API</RootNamespace>
+    <AssemblyName>ERP_API</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <Use64BitIISExpress />
+    <IISExpressSSLPort>44362</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Facebook, Version=6.0.10.0, Culture=neutral, PublicKeyToken=58cb4f2111d1e6de, processorArchitecture=MSIL">
+      <HintPath>..\packages\Facebook.7.0.6\lib\net45\Facebook.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis, Version=1.38.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.1.38.0\lib\net45\Google.Apis.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Auth, Version=1.38.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Auth.1.38.0\lib\net45\Google.Apis.Auth.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Auth.PlatformServices, Version=1.38.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Auth.1.38.0\lib\net45\Google.Apis.Auth.PlatformServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Core, Version=1.38.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Core.1.38.0\lib\net45\Google.Apis.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Gmail.v1, Version=1.38.0.1543, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Gmail.v1.1.38.0.1543\lib\net45\Google.Apis.Gmail.v1.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.PlatformServices, Version=1.38.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.1.38.0\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.4.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.4.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Facebook, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Facebook.4.0.1\lib\net45\Microsoft.Owin.Security.Facebook.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebHelpers.3.2.7\lib\net45\Microsoft.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web.Cors, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.7\lib\net45\System.Web.Cors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.7\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.Cors, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Cors.5.2.7\lib\net45\System.Web.Http.Cors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.7\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest">
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.4\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.4\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="WebGrease">
+      <Private>True</Private>
+      <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
+    </Reference>
+    <Reference Include="Antlr3.Runtime">
+      <Private>True</Private>
+      <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="WebMatrix.Data, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.Data.3.2.7\lib\net45\WebMatrix.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="WebMatrix.WebData, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.WebData.3.2.7\lib\net45\WebMatrix.WebData.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.2\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.2\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.2\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.4.0.0\lib\net451\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.4.0.0\lib\net451\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Google">
+      <HintPath>..\packages\Microsoft.Owin.Security.Google.4.0.0\lib\net451\Microsoft.Owin.Security.Google.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Twitter">
+      <HintPath>..\packages\Microsoft.Owin.Security.Twitter.4.0.0\lib\net451\Microsoft.Owin.Security.Twitter.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.MicrosoftAccount">
+      <HintPath>..\packages\Microsoft.Owin.Security.MicrosoftAccount.4.0.0\lib\net451\Microsoft.Owin.Security.MicrosoftAccount.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.4.0.0\lib\net451\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Owin.5.2.4\lib\net45\System.Web.Http.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.DiagnosticSource">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.4.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.TelemetryCorrelation">
+      <HintPath>..\packages\Microsoft.AspNet.TelemetryCorrelation.1.0.0\lib\net45\Microsoft.AspNet.TelemetryCorrelation.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\IdentityConfig.cs" />
+    <Compile Include="App_Start\Providers\FacebookAuthProvider.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Areas\HelpPage\ApiDescriptionExtensions.cs" />
+    <Compile Include="Areas\HelpPage\App_Start\HelpPageConfig.cs" />
+    <Compile Include="Areas\HelpPage\Controllers\HelpController.cs" />
+    <Compile Include="Areas\HelpPage\HelpPageAreaRegistration.cs" />
+    <Compile Include="Areas\HelpPage\HelpPageConfigurationExtensions.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\CollectionModelDescription.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\ComplexTypeModelDescription.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\DictionaryModelDescription.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\EnumTypeModelDescription.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\EnumValueDescription.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\IModelDocumentationProvider.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\KeyValuePairModelDescription.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\ModelDescription.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\ModelDescriptionGenerator.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\ModelNameAttribute.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\ModelNameHelper.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\ParameterAnnotation.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\ParameterDescription.cs" />
+    <Compile Include="Areas\HelpPage\ModelDescriptions\SimpleTypeModelDescription.cs" />
+    <Compile Include="Areas\HelpPage\Models\HelpPageApiModel.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\HelpPageSampleGenerator.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\HelpPageSampleKey.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\ImageSample.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\InvalidSample.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\ObjectGenerator.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
+    <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Contanst\General.cs" />
+    <Compile Include="Controllers\API_CartController.cs" />
+    <Compile Include="Controllers\Api_DM_NHOMSANPHAMController.cs" />
+    <Compile Include="Controllers\API_InvoiceController.cs" />
+    <Compile Include="Controllers\API_PageNewController.cs" />
+    <Compile Include="Controllers\API_PageSetupController.cs" />
+    <Compile Include="Controllers\API_SlideController.cs" />
+    <Compile Include="Controllers\GetDataController.cs" />
+    <Compile Include="Controllers\GroupDetailsController.cs" />
+    <Compile Include="Controllers\MainKissyController.cs" />
+    <Compile Include="Controllers\NgheSyTinDungController.cs" />
+    <Compile Include="Controllers\PageDetailsController.cs" />
+    <Compile Include="Controllers\View_AccountController.cs" />
+    <Compile Include="Controllers\API_AccountController.cs" />
+    <Compile Include="Controllers\View_CategoriesController.cs" />
+    <Compile Include="Controllers\View_ChopDealController.cs" />
+    <Compile Include="Controllers\View_LoginController.cs" />
+    <Compile Include="Controllers\View_LoginSocialController.cs" />
+    <Compile Include="Controllers\View_Page_CategoryPostController.cs" />
+    <Compile Include="Controllers\View_Page_NewController.cs" />
+    <Compile Include="Controllers\View_Page_SetupController.cs" />
+    <Compile Include="Controllers\View_Page_SlideController.cs" />
+    <Compile Include="Controllers\View_PLayoutController.cs" />
+    <Compile Include="Controllers\View_CartController.cs" />
+    <Compile Include="Controllers\API_CategoriesController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\API_LoginController.cs" />
+    <Compile Include="Controllers\API_ProductsController.cs" />
+    <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Controllers\View_ProductController.cs" />
+    <Compile Include="EnumData\EnumCartProduct.cs" />
+    <Compile Include="EnumData\EnumCreateUser.cs" />
+    <Compile Include="EnumData\EnumSortProduct.cs" />
+    <Compile Include="Filters\AuthorByThuc.cs" />
+    <Compile Include="Filters\BasicAuthenticationMessageHandler.cs" />
+    <Compile Include="Filters\Common.cs" />
+    <Compile Include="Filters\EncryptionHelper.cs" />
+    <Compile Include="Filters\FacebookBackChannelHandler.cs" />
+    <Compile Include="Filters\Globals.cs" />
+    <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
+    <Compile Include="Filters\UpdateDataModel.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AccountBindingModels.cs" />
+    <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Account\AccountModel.cs" />
+    <Compile Include="Models\Account_Contract.cs" />
+    <Compile Include="Models\Account_ContractLease.cs" />
+    <Compile Include="Models\Account_ContractSell.cs" />
+    <Compile Include="Models\Account_InfoPartyA.cs" />
+    <Compile Include="Models\Account_MemberCard.cs" />
+    <Compile Include="Models\Account_MemberCardDetail.cs" />
+    <Compile Include="Models\Account_Payment.cs" />
+    <Compile Include="Models\Account_PaymentDetail.cs" />
+    <Compile Include="Models\Account_ProcessPayment.cs" />
+    <Compile Include="Models\Account_Receipt.cs" />
+    <Compile Include="Models\Account_ReceiptDetail.cs" />
+    <Compile Include="Models\Account_Transaction.cs" />
+    <Compile Include="Models\Account_TransactionLiabilities.cs" />
+    <Compile Include="Models\Account_TransactionRelationship.cs" />
+    <Compile Include="Models\Crm_Answer.cs" />
+    <Compile Include="Models\Crm_Campaign.cs" />
+    <Compile Include="Models\Crm_EmailLog.cs" />
+    <Compile Include="Models\Crm_LogAccumulatePoint.cs" />
+    <Compile Include="Models\Crm_Process.cs" />
+    <Compile Include="Models\Crm_ProcessAction.cs" />
+    <Compile Include="Models\Crm_ProcessApplied.cs" />
+    <Compile Include="Models\Crm_ProcessStage.cs" />
+    <Compile Include="Models\Crm_ProcessStep.cs" />
+    <Compile Include="Models\Crm_Question.cs" />
+    <Compile Include="Models\Crm_SMSLog.cs" />
+    <Compile Include="Models\Crm_Task.cs" />
+    <Compile Include="Models\Crm_Vote.cs" />
+    <Compile Include="Models\DM_BAIVE_YHL.cs" />
+    <Compile Include="Models\DM_BANNER_SLIDER.cs" />
+    <Compile Include="Models\DM_BAOCHI.cs" />
+    <Compile Include="Models\DM_BEST_SELLER.cs" />
+    <Compile Include="Models\DM_CAMNHAN_KHANG.cs" />
+    <Compile Include="Models\DM_CHOP_DEAL.cs" />
+    <Compile Include="Models\DM_DEALHOT.cs" />
+    <Compile Include="Models\DM_LOAIBAI.cs" />
+    <Compile Include="Models\DM_LOAISANPHAM.cs" />
+    <Compile Include="Models\DM_NGHESY_TINDUNG.cs" />
+    <Compile Include="Models\DM_NHOMSANPHAM.cs" />
+    <Compile Include="Models\DM_NHOMTIN.cs" />
+    <Compile Include="Models\DM_TINTUC.cs" />
+    <Compile Include="Models\DM_TINTUC_tags.cs" />
+    <Compile Include="Models\DM_TINTUC_tags_list.cs" />
+    <Compile Include="Models\DM_TIN_KHUYENMAI.cs" />
+    <Compile Include="Models\ecomContext.cs" />
+    <Compile Include="Models\Feedback.cs" />
+    <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\Page_CategoryPost.cs" />
+    <Compile Include="Models\Page_Comment.cs" />
+    <Compile Include="Models\Page_New.cs" />
+    <Compile Include="Models\Page_Setup.cs" />
+    <Compile Include="Models\Page_Slide.cs" />
+    <Compile Include="Models\Page_ViewProductUser.cs" />
+    <Compile Include="Models\RE_Block.cs" />
+    <Compile Include="Models\RE_Condos.cs" />
+    <Compile Include="Models\RE_CondosLayout.cs" />
+    <Compile Include="Models\RE_CondosPrice.cs" />
+    <Compile Include="Models\RE_Floor.cs" />
+    <Compile Include="Models\RE_Project.cs" />
+    <Compile Include="Models\Sale_Commision.cs" />
+    <Compile Include="Models\Sale_Commision_Apply.cs" />
+    <Compile Include="Models\Sale_Commision_Customer.cs" />
+    <Compile Include="Models\Sale_Commision_Staff.cs" />
+    <Compile Include="Models\Sale_CommissionCus.cs" />
+    <Compile Include="Models\Sale_Contact.cs" />
+    <Compile Include="Models\Sale_Customer.cs" />
+    <Compile Include="Models\Sale_CustomerCommitment.cs" />
+    <Compile Include="Models\Sale_CustomerDiscount.cs" />
+    <Compile Include="Models\Sale_Inventory.cs" />
+    <Compile Include="Models\Sale_InventoryByMonth.cs" />
+    <Compile Include="Models\Sale_LogLoyaltyPoint.cs" />
+    <Compile Include="Models\Sale_LogServiceRemminder.cs" />
+    <Compile Include="Models\Sale_LoyaltyPoint.cs" />
+    <Compile Include="Models\Sale_Membership.cs" />
+    <Compile Include="Models\Sale_ObjectAttribute.cs" />
+    <Compile Include="Models\Sale_ObjectAttributeValue.cs" />
+    <Compile Include="Models\Sale_PhysicalInventory.cs" />
+    <Compile Include="Models\Sale_PhysicalInventoryDetail.cs" />
+    <Compile Include="Models\Sale_Product.cs" />
+    <Compile Include="Models\Sale_ProductDamaged.cs" />
+    <Compile Include="Models\Sale_ProductInbound.cs" />
+    <Compile Include="Models\Sale_ProductInboundDetail.cs" />
+    <Compile Include="Models\Sale_ProductInvoice.cs" />
+    <Compile Include="Models\Sale_ProductInvoiceDetail.cs" />
+    <Compile Include="Models\Sale_ProductOutbound.cs" />
+    <Compile Include="Models\Sale_ProductOutboundDetail.cs" />
+    <Compile Include="Models\Sale_Product_samegroup.cs" />
+    <Compile Include="Models\Sale_Product_samesize.cs" />
+    <Compile Include="Models\Sale_Promotion.cs" />
+    <Compile Include="Models\Sale_PromotionDetail.cs" />
+    <Compile Include="Models\Sale_PurchaseOrder.cs" />
+    <Compile Include="Models\Sale_PurchaseOrderDetail.cs" />
+    <Compile Include="Models\Sale_RequestInbound.cs" />
+    <Compile Include="Models\Sale_RequestInboundDetail.cs" />
+    <Compile Include="Models\Sale_SalesReturns.cs" />
+    <Compile Include="Models\Sale_SalesReturnsDetail.cs" />
+    <Compile Include="Models\Sale_Service.cs" />
+    <Compile Include="Models\Sale_ServiceCombo.cs" />
+    <Compile Include="Models\Sale_ServiceInvoice.cs" />
+    <Compile Include="Models\Sale_ServiceInvoiceDetail.cs" />
+    <Compile Include="Models\Sale_ServiceReminder.cs" />
+    <Compile Include="Models\Sale_ServiceReminderGroup.cs" />
+    <Compile Include="Models\Sale_ServiceSchedule.cs" />
+    <Compile Include="Models\Sale_Supplier.cs" />
+    <Compile Include="Models\Sale_TotalDiscountMoneyNT.cs" />
+    <Compile Include="Models\Sale_UsingServiceLog.cs" />
+    <Compile Include="Models\Sale_UsingServiceLogDetail.cs" />
+    <Compile Include="Models\Sale_Warehouse.cs" />
+    <Compile Include="Models\Sale_WarehouseLocationItem.cs" />
+    <Compile Include="Models\Staff_Allowance.cs" />
+    <Compile Include="Models\Staff_Bank.cs" />
+    <Compile Include="Models\Staff_BonusDiscipline.cs" />
+    <Compile Include="Models\Staff_Branch.cs" />
+    <Compile Include="Models\Staff_BranchDepartment.cs" />
+    <Compile Include="Models\Staff_CalendarVisitDrugStore.cs" />
+    <Compile Include="Models\Staff_CheckInOut.cs" />
+    <Compile Include="Models\Staff_DayOff.cs" />
+    <Compile Include="Models\Staff_DocumentAttribute.cs" />
+    <Compile Include="Models\Staff_DocumentField.cs" />
+    <Compile Include="Models\Staff_DocumentType.cs" />
+    <Compile Include="Models\Staff_DotBCBHXH.cs" />
+    <Compile Include="Models\Staff_DotBCBHXHDetail.cs" />
+    <Compile Include="Models\Staff_DotGQCDBHXH.cs" />
+    <Compile Include="Models\Staff_DotGQCDBHXHDetail.cs" />
+    <Compile Include="Models\Staff_FingerPrint.cs" />
+    <Compile Include="Models\Staff_FPMachine.cs" />
+    <Compile Include="Models\Staff_GiamTruThueTNCN.cs" />
+    <Compile Include="Models\Staff_HealthInsurance.cs" />
+    <Compile Include="Models\Staff_HistoryCommissionStaff.cs" />
+    <Compile Include="Models\Staff_Holidays.cs" />
+    <Compile Include="Models\Staff_InternalNotifications.cs" />
+    <Compile Include="Models\Staff_KPICatalog.cs" />
+    <Compile Include="Models\Staff_KPIItem.cs" />
+    <Compile Include="Models\Staff_KPILog.cs" />
+    <Compile Include="Models\Staff_KPILogDetail.cs" />
+    <Compile Include="Models\Staff_KPILogDetail_Item.cs" />
+    <Compile Include="Models\Staff_LabourContract.cs" />
+    <Compile Include="Models\Staff_LabourContractType.cs" />
+    <Compile Include="Models\Staff_LogDocumentAttribute.cs" />
+    <Compile Include="Models\Staff_LuongGiuHopDong.cs" />
+    <Compile Include="Models\Staff_NotificationsDetail.cs" />
+    <Compile Include="Models\Staff_Position.cs" />
+    <Compile Include="Models\Staff_ProcessPay.cs" />
+    <Compile Include="Models\Staff_RegisterForOvertime.cs" />
+    <Compile Include="Models\Staff_SalaryAdvance.cs" />
+    <Compile Include="Models\Staff_SalarySetting.cs" />
+    <Compile Include="Models\Staff_SalarySettingDetail.cs" />
+    <Compile Include="Models\Staff_SalarySettingDetail_Staff.cs" />
+    <Compile Include="Models\Staff_SalaryTable.cs" />
+    <Compile Include="Models\Staff_SalaryTableDetail.cs" />
+    <Compile Include="Models\Staff_SalaryTableDetail_Report.cs" />
+    <Compile Include="Models\Staff_SalaryTableDetail_Staff.cs" />
+    <Compile Include="Models\Staff_Shifts.cs" />
+    <Compile Include="Models\Staff_SocialInsurance.cs" />
+    <Compile Include="Models\Staff_Staff.cs" />
+    <Compile Include="Models\Staff_StaffFamily.cs" />
+    <Compile Include="Models\Staff_SymbolTimekeeping.cs" />
+    <Compile Include="Models\Staff_Tax.cs" />
+    <Compile Include="Models\Staff_TaxIncomePerson.cs" />
+    <Compile Include="Models\Staff_TaxIncomePersonDetail.cs" />
+    <Compile Include="Models\Staff_TaxRate.cs" />
+    <Compile Include="Models\Staff_Technique.cs" />
+    <Compile Include="Models\Staff_ThuNhapChiuThue.cs" />
+    <Compile Include="Models\Staff_Timekeeping.cs" />
+    <Compile Include="Models\Staff_TimekeepingList.cs" />
+    <Compile Include="Models\Staff_TimekeepingSynthesis.cs" />
+    <Compile Include="Models\Staff_TransferWork.cs" />
+    <Compile Include="Models\Staff_WelfarePrograms.cs" />
+    <Compile Include="Models\Staff_WelfareProgramsDetail.cs" />
+    <Compile Include="Models\Staff_WorkingProcess.cs" />
+    <Compile Include="Models\Staff_WorkSchedules.cs" />
+    <Compile Include="Models\sysdiagram.cs" />
+    <Compile Include="Models\System_BOLog.cs" />
+    <Compile Include="Models\System_Category.cs" />
+    <Compile Include="Models\System_Language.cs" />
+    <Compile Include="Models\System_Loc_District.cs" />
+    <Compile Include="Models\System_Loc_Province.cs" />
+    <Compile Include="Models\System_Loc_Ward.cs" />
+    <Compile Include="Models\System_LoginLog.cs" />
+    <Compile Include="Models\System_MetadataField.cs" />
+    <Compile Include="Models\System_Module.cs" />
+    <Compile Include="Models\System_ModuleRelationship.cs" />
+    <Compile Include="Models\System_News.cs" />
+    <Compile Include="Models\System_News_ViewedUser.cs" />
+    <Compile Include="Models\System_Page.cs" />
+    <Compile Include="Models\System_PageMenu.cs" />
+    <Compile Include="Models\System_Setting.cs" />
+    <Compile Include="Models\System_TemplatePrint.cs" />
+    <Compile Include="Models\System_User.cs" />
+    <Compile Include="Models\System_UserPage.cs" />
+    <Compile Include="Models\System_UserSetting.cs" />
+    <Compile Include="Models\System_UserType.cs" />
+    <Compile Include="Models\System_UserTypePage.cs" />
+    <Compile Include="Models\thongtinnguoimuaViewModel.cs" />
+    <Compile Include="Models\ViewModel\AccountModelClient.cs" />
+    <Compile Include="Models\ViewModel\CartCheckOut.cs" />
+    <Compile Include="Models\ViewModel\CartMessage.cs" />
+    <Compile Include="Models\ViewModel\Category_New.cs" />
+    <Compile Include="Models\ViewModel\CheckOutViewModel.cs" />
+    <Compile Include="Models\ViewModel\ChopdealViewModel.cs" />
+    <Compile Include="Models\ViewModel\DanhMuc_Menu3Cap.cs" />
+    <Compile Include="Models\ViewModel\FooterViewModel.cs" />
+    <Compile Include="Models\ViewModel\KhuyenMaiViewModel.cs" />
+    <Compile Include="Models\ViewModel\InfomationUser.cs" />
+    <Compile Include="Models\ViewModel\LoaiSanPhamViewModel.cs" />
+    <Compile Include="Models\ViewModel\Page_Comment_View.cs" />
+    <Compile Include="Models\ViewModel\ProductInvoice.cs" />
+    <Compile Include="Models\ViewModel\ProductViewModel.cs" />
+    <Compile Include="Models\ViewModel\Product_Promotion.cs" />
+    <Compile Include="Models\ViewModel\Sale_ProductInvoiceDetail_View.cs" />
+    <Compile Include="Models\ViewModel\Sale_ProductInvoice_View.cs" />
+    <Compile Include="Models\ViewModel\Sale_Product_View.cs" />
+    <Compile Include="Models\ViewModel\Search_View.cs" />
+    <Compile Include="Models\ViewModel\ShoppingCartItem.cs" />
+    <Compile Include="Models\ViewModel\ShoppingCartItem_hoadon.cs" />
+    <Compile Include="Models\ViewModel\ShoppingCartModels.cs" />
+    <Compile Include="Models\ViewModel\System_Category_View.cs" />
+    <Compile Include="Models\ViewModel\ThuongHieuViewModel.cs" />
+    <Compile Include="Models\vwProduct_PromotionNew.cs" />
+    <Compile Include="Models\Ward.cs" />
+    <Compile Include="Models\webpages_Membership.cs" />
+    <Compile Include="Models\webpages_OAuthMembership.cs" />
+    <Compile Include="Models\webpages_Roles.cs" />
+    <Compile Include="Operation\API\BaiVietOperation.cs" />
+    <Compile Include="Operation\API\CartOperation.cs" />
+    <Compile Include="Operation\API\CategoriesOperation.cs" />
+    <Compile Include="Operation\API\CommentOperation.cs" />
+    <Compile Include="Operation\API\ConvertText.cs" />
+    <Compile Include="Operation\API\DealHotOperation.cs" />
+    <Compile Include="Operation\API\DM_LoaiSanPhamOperation.cs" />
+    <Compile Include="Operation\API\DM_NGHESY_TINDUNGOperation.cs" />
+    <Compile Include="Operation\API\DM_NHOMSANPHAMOperation.cs" />
+    <Compile Include="Operation\API\EmailService.cs" />
+    <Compile Include="Operation\API\FeedBackOperation.cs" />
+    <Compile Include="Operation\API\InvoiceOperation.cs" />
+    <Compile Include="Operation\API\KhuyenMaiOperation.cs" />
+    <Compile Include="Operation\API\PageNewOperation.cs" />
+    <Compile Include="Operation\API\PageSetupOperation.cs" />
+    <Compile Include="Operation\API\ProductOperation.cs" />
+    <Compile Include="Operation\API\QuanHuyenOperation.cs" />
+    <Compile Include="Operation\API\SlideOperation.cs" />
+    <Compile Include="Operation\API\TinTucOperation.cs" />
+    <Compile Include="Operation\API\UserOperation.cs" />
+    <Compile Include="Operation\DataOperation.cs" />
+    <Compile Include="Operation\Nomal\ApiCartOperation.cs" />
+    <Compile Include="Operation\Nomal\ApiCategoryOperation.cs" />
+    <Compile Include="Operation\Nomal\ApiDM_NHOMSANPHAMOperation.cs" />
+    <Compile Include="Operation\Nomal\ApiInvoiceOperation.cs" />
+    <Compile Include="Operation\Nomal\apiOperation.cs" />
+    <Compile Include="Operation\Nomal\ApiPageNewOperation.cs" />
+    <Compile Include="Operation\Nomal\ApiPageSetupOperation.cs" />
+    <Compile Include="Operation\Nomal\ApiPageSileOperation.cs" />
+    <Compile Include="Operation\Nomal\ApiProductOperation.cs" />
+    <Compile Include="Operation\Nomal\ApiResetPasswordOperation.cs" />
+    <Compile Include="Operation\Nomal\ApiSocialOperation.cs" />
+    <Compile Include="Operation\Nomal\ApiUserTokenOperation.cs" />
+    <Compile Include="Operation\Nomal\EncryptionHelper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\ApplicationOAuthProvider.cs" />
+    <Compile Include="Results\ChallengeResult.cs" />
+    <Compile Include="Startup.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Areas\HelpPage\HelpPage.css" />
+    <Content Include="assets\admin\css\ace-ie.min.css" />
+    <Content Include="assets\admin\css\ace-part2.min.css" />
+    <Content Include="assets\admin\css\ace-rtl.min.css" />
+    <Content Include="assets\admin\css\ace-skins.min.css" />
+    <Content Include="assets\admin\css\ace.min.css" />
+    <Content Include="assets\admin\css\bootstrap-colorpicker.min.css" />
+    <Content Include="assets\admin\css\bootstrap-datepicker3.min.css" />
+    <Content Include="assets\admin\css\bootstrap-datetimepicker.min.css" />
+    <Content Include="assets\admin\css\bootstrap-duallistbox.min.css" />
+    <Content Include="assets\admin\css\bootstrap-editable.min.css" />
+    <Content Include="assets\admin\css\bootstrap-multiselect.min.css" />
+    <Content Include="assets\admin\css\bootstrap-timepicker.min.css" />
+    <Content Include="assets\admin\css\bootstrap.min.css" />
+    <Content Include="assets\admin\css\chosen.min.css" />
+    <Content Include="assets\admin\css\colorbox.min.css" />
+    <Content Include="assets\admin\css\Custom.css" />
+    <Content Include="assets\admin\css\daterangepicker.min.css" />
+    <Content Include="assets\admin\css\datetimepicker\jquery.datetimepicker.css" />
+    <Content Include="assets\admin\css\datetimepicker\jquerysctipttop.css" />
+    <Content Include="assets\admin\css\dropzone.min.css" />
+    <Content Include="assets\admin\css\font-awesome.min.css" />
+    <Content Include="assets\admin\css\fonts.googleapis.com.css" />
+    <Content Include="assets\admin\css\fullcalendar.min.css" />
+    <Content Include="assets\admin\css\jquery-ui.custom.min.css" />
+    <Content Include="assets\admin\css\jquery-ui.min.css" />
+    <Content Include="assets\admin\css\jquery.gritter.min.css" />
+    <Content Include="assets\admin\css\prettify.min.css" />
+    <Content Include="assets\admin\css\select2.min.css" />
+    <Content Include="assets\admin\css\ui.jqgrid.min.css" />
+    <Content Include="assets\admin\font-awesome\4.5.0\css\font-awesome.min.css" />
+    <Content Include="assets\admin\font-awesome\4.5.0\fonts\fontawesome-webfont.svg" />
+    <Content Include="assets\admin\fonts\fontawesome-webfont.svg" />
+    <Content Include="assets\admin\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="assets\admin\images\avatars\avatar.png" />
+    <Content Include="assets\admin\images\avatars\avatar1.png" />
+    <Content Include="assets\admin\images\avatars\avatar2.png" />
+    <Content Include="assets\admin\images\avatars\avatar3.png" />
+    <Content Include="assets\admin\images\avatars\avatar4.png" />
+    <Content Include="assets\admin\images\avatars\avatar5.png" />
+    <Content Include="assets\admin\images\avatars\profile-pic.jpg" />
+    <Content Include="assets\admin\images\avatars\user.jpg" />
+    <Content Include="assets\admin\images\bootstrap-colorpicker\alpha-horizontal.png" />
+    <Content Include="assets\admin\images\bootstrap-colorpicker\alpha.png" />
+    <Content Include="assets\admin\images\bootstrap-colorpicker\hue-horizontal.png" />
+    <Content Include="assets\admin\images\bootstrap-colorpicker\hue.png" />
+    <Content Include="assets\admin\images\bootstrap-colorpicker\saturation.png" />
+    <Content Include="assets\admin\images\email\email1.png" />
+    <Content Include="assets\admin\images\email\email2.png" />
+    <Content Include="assets\admin\images\email\email3.png" />
+    <Content Include="assets\admin\images\email\email4.png" />
+    <Content Include="assets\admin\images\gallery\image-1.jpg" />
+    <Content Include="assets\admin\images\gallery\image-2.jpg" />
+    <Content Include="assets\admin\images\gallery\image-3.jpg" />
+    <Content Include="assets\admin\images\gallery\image-4.jpg" />
+    <Content Include="assets\admin\images\gallery\image-5.jpg" />
+    <Content Include="assets\admin\images\gallery\image-6.jpg" />
+    <Content Include="assets\admin\images\gallery\thumb-1.jpg" />
+    <Content Include="assets\admin\images\gallery\thumb-2.jpg" />
+    <Content Include="assets\admin\images\gallery\thumb-3.jpg" />
+    <Content Include="assets\admin\images\gallery\thumb-4.jpg" />
+    <Content Include="assets\admin\images\gallery\thumb-5.jpg" />
+    <Content Include="assets\admin\images\gallery\thumb-6.jpg" />
+    <Content Include="assets\admin\images\placeholder\165x90.png" />
+    <Content Include="assets\admin\images\placeholder\255x150.png" />
+    <Content Include="assets\admin\images\placeholder\530x270.png" />
+    <Content Include="assets\admin\images\placeholder\550x280.png" />
+    <Content Include="assets\admin\js\ace-editable.min.js" />
+    <Content Include="assets\admin\js\ace-elements.min.js" />
+    <Content Include="assets\admin\js\ace-extra.min.js" />
+    <Content Include="assets\admin\js\ace.min.js" />
+    <Content Include="assets\admin\js\autosize.min.js" />
+    <Content Include="assets\admin\js\bootbox.js" />
+    <Content Include="assets\admin\js\bootstrap-colorpicker.min.js" />
+    <Content Include="assets\admin\js\bootstrap-datepicker.min.js" />
+    <Content Include="assets\admin\js\bootstrap-datetimepicker.min.js" />
+    <Content Include="assets\admin\js\bootstrap-datetimepicker.uk.js" />
+    <Content Include="assets\admin\js\bootstrap-editable.min.js" />
+    <Content Include="assets\admin\js\bootstrap-markdown.min.js" />
+    <Content Include="assets\admin\js\bootstrap-multiselect.min.js" />
+    <Content Include="assets\admin\js\bootstrap-tag.min.js" />
+    <Content Include="assets\admin\js\bootstrap-timepicker.min.js" />
+    <Content Include="assets\admin\js\bootstrap-wysiwyg.min.js" />
+    <Content Include="assets\admin\js\bootstrap.min.js" />
+    <Content Include="assets\admin\js\buttons.colVis.min.js" />
+    <Content Include="assets\admin\js\buttons.flash.min.js" />
+    <Content Include="assets\admin\js\buttons.html5.min.js" />
+    <Content Include="assets\admin\js\buttons.print.min.js" />
+    <Content Include="assets\admin\js\chosen.jquery.min.js" />
+    <Content Include="assets\admin\js\dataTables.buttons.min.js" />
+    <Content Include="assets\admin\js\dataTables.select.min.js" />
+    <Content Include="assets\admin\js\daterangepicker.min.js" />
+    <Content Include="assets\admin\js\datetimepicker\jquery.datetimepicker.js" />
+    <Content Include="assets\admin\js\dragdrop\jquery.gridly.js" />
+    <Content Include="assets\admin\js\dropzone.min.js" />
+    <Content Include="assets\admin\js\excanvas.min.js" />
+    <Content Include="assets\admin\js\fullcalendar.min.js" />
+    <Content Include="assets\admin\js\grid.locale-en.js" />
+    <Content Include="assets\admin\js\holder.min.js" />
+    <Content Include="assets\admin\js\html5shiv.min.js" />
+    <Content Include="assets\admin\js\jquery-1.11.3.min.js" />
+    <Content Include="assets\admin\js\jquery-2.1.4.min.js" />
+    <Content Include="assets\admin\js\jquery-additional-methods.min.js" />
+    <Content Include="assets\admin\js\jquery-typeahead.js" />
+    <Content Include="assets\admin\js\jquery-ui.custom.min.js" />
+    <Content Include="assets\admin\js\jquery-ui.min.js" />
+    <Content Include="assets\admin\js\jquery.bootstrap-duallistbox.min.js" />
+    <Content Include="assets\admin\js\jquery.colorbox.min.js" />
+    <Content Include="assets\admin\js\jquery.dataTables.bootstrap.min.js" />
+    <Content Include="assets\admin\js\jquery.dataTables.min.js" />
+    <Content Include="assets\admin\js\jquery.easypiechart.min.js" />
+    <Content Include="assets\admin\js\jquery.flot.min.js" />
+    <Content Include="assets\admin\js\jquery.flot.pie.min.js" />
+    <Content Include="assets\admin\js\jquery.flot.resize.min.js" />
+    <Content Include="assets\admin\js\jquery.gritter.min.js" />
+    <Content Include="assets\admin\js\jquery.hotkeys.index.min.js" />
+    <Content Include="assets\admin\js\jquery.inputlimiter.min.js" />
+    <Content Include="assets\admin\js\jquery.jqGrid.min.js" />
+    <Content Include="assets\admin\js\jquery.knob.min.js" />
+    <Content Include="assets\admin\js\jquery.maskedinput.min.js" />
+    <Content Include="assets\admin\js\jquery.min.js" />
+    <Content Include="assets\admin\js\jquery.mobile.custom.min.js" />
+    <Content Include="assets\admin\js\jquery.nestable.js" />
+    <Content Include="assets\admin\js\jquery.nestable.min.js" />
+    <Content Include="assets\admin\js\jquery.raty.min.js" />
+    <Content Include="assets\admin\js\jquery.sparkline.index.min.js" />
+    <Content Include="assets\admin\js\jquery.ui.touch-punch.min.js" />
+    <Content Include="assets\admin\js\jquery.validate.min.js" />
+    <Content Include="assets\admin\js\markdown.min.js" />
+    <Content Include="assets\admin\js\moment.min.js" />
+    <Content Include="assets\admin\js\prettify.min.js" />
+    <Content Include="assets\admin\js\respond.min.js" />
+    <Content Include="assets\admin\js\select2.min.js" />
+    <Content Include="assets\admin\js\spin.js" />
+    <Content Include="assets\admin\js\spinbox.min.js" />
+    <Content Include="assets\admin\js\tree.min.js" />
+    <Content Include="assets\admin\js\Waiting\waitingJs.js" />
+    <Content Include="assets\admin\js\wizard.min.js" />
+    <Content Include="assets\client\css\all.css" />
+    <Content Include="assets\client\css\all.min.css" />
+    <Content Include="assets\client\css\brands.css" />
+    <Content Include="assets\client\css\brands.min.css" />
+    <Content Include="assets\client\css\css.css" />
+    <Content Include="assets\client\css\custom.css" />
+    <Content Include="assets\client\css\fontawesome.css" />
+    <Content Include="assets\client\css\fontawesome.min.css" />
+    <Content Include="assets\client\css\jquery.bxslider.css" />
+    <Content Include="assets\client\css\nivo-slider.css" />
+    <Content Include="assets\client\css\regular.css" />
+    <Content Include="assets\client\css\regular.min.css" />
+    <Content Include="assets\client\css\slide.css" />
+    <Content Include="assets\client\css\solid.css" />
+    <Content Include="assets\client\css\solid.min.css" />
+    <Content Include="assets\client\css\svg-with-js.css" />
+    <Content Include="assets\client\css\svg-with-js.min.css" />
+    <Content Include="assets\client\css\v4-shims.css" />
+    <Content Include="assets\client\css\v4-shims.min.css" />
+    <Content Include="assets\client\fonts\fa-brands-400.svg" />
+    <Content Include="assets\client\fonts\fa-regular-400.svg" />
+    <Content Include="assets\client\fonts\fa-solid-900.svg" />
+    <Content Include="assets\client\img\atm.jpg" />
+    <Content Include="assets\client\img\baochi.jpg" />
+    <Content Include="assets\client\img\bg_price.jpg" />
+    <Content Include="assets\client\img\bocongthuongyhl.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\client\img\bog-sidebar.jpg" />
+    <Content Include="assets\client\img\bv.png" />
+    <Content Include="assets\client\img\bvhot.jpg" />
+    <Content Include="assets\client\img\camnang.png" />
+    <Content Include="assets\client\img\cart.png" />
+    <Content Include="assets\client\img\cat.jpg" />
+    <Content Include="assets\client\img\category1.jpg" />
+    <Content Include="assets\client\img\category2.jpg" />
+    <Content Include="assets\client\img\category3.jpg" />
+    <Content Include="assets\client\img\category4.jpg" />
+    <Content Include="assets\client\img\category5.jpg" />
+    <Content Include="assets\client\img\circleChopdeal.gif" />
+    <Content Include="assets\client\img\cod.jpg" />
+    <Content Include="assets\client\img\controls.png" />
+    <Content Include="assets\client\img\ctsp1.jpg" />
+    <Content Include="assets\client\img\ctsp2.jpg" />
+    <Content Include="assets\client\img\gioithieu.jpg" />
+    <Content Include="assets\client\img\ico-grid.png" />
+    <Content Include="assets\client\img\ico-list.png" />
+    <Content Include="assets\client\img\icon_remove_filter.png" />
+    <Content Include="assets\client\img\information-icon.png" />
+    <Content Include="assets\client\img\khuyenmai.jpg" />
+    <Content Include="assets\client\img\lang1.png" />
+    <Content Include="assets\client\img\lang2.png" />
+    <Content Include="assets\client\img\lang3.png" />
+    <Content Include="assets\client\img\lang4.png" />
+    <Content Include="assets\client\img\lang5.png" />
+    <Content Include="assets\client\img\left-arrow.png" />
+    <Content Include="assets\client\img\line.png" />
+    <Content Include="assets\client\img\Logo-full-1.png" />
+    <Content Include="assets\client\img\ngesy.png" />
+    <Content Include="assets\client\img\nghesy.jpg" />
+    <Content Include="assets\client\img\right-arrow.png" />
+    <Content Include="assets\client\img\sanpham.jpg" />
+    <Content Include="assets\client\img\search.png" />
+    <Content Include="assets\client\img\slide0.jpg" />
+    <Content Include="assets\client\img\slide1.jpg" />
+    <Content Include="assets\client\img\slide2.jpg" />
+    <Content Include="assets\client\img\slide3.jpg" />
+    <Content Include="assets\client\img\success-icon.png" />
+    <Content Include="assets\client\img\thongtinthem1.png" />
+    <Content Include="assets\client\img\thongtinthem2.png" />
+    <Content Include="assets\client\img\thongtinthem4.png" />
+    <Content Include="assets\client\img\title_L.png" />
+    <Content Include="assets\client\img\title_R.png" />
+    <Content Include="assets\client\img\visa.jpg" />
+    <Content Include="assets\client\img\vongquay.png" />
+    <Content Include="assets\client\img\zalopay.jpg" />
+    <Content Include="assets\client\js\all.js" />
+    <Content Include="assets\client\js\all.min.js" />
+    <Content Include="assets\client\js\brands.js" />
+    <Content Include="assets\client\js\brands.min.js" />
+    <Content Include="assets\client\js\controller\baseController.js" />
+    <Content Include="assets\client\js\controller\cartController.js" />
+    <Content Include="assets\client\js\controller\contactController.js" />
+    <Content Include="assets\client\js\controller\FeedBackController.js" />
+    <Content Include="assets\client\js\controller\userController.js" />
+    <Content Include="assets\client\js\custom.js" />
+    <Content Include="assets\client\js\FacebookAouth.js" />
+    <Content Include="assets\client\js\fontawesome.js" />
+    <Content Include="assets\client\js\fontawesome.min.js" />
+    <Content Include="assets\client\js\GioHang.js" />
+    <Content Include="assets\client\js\java.js" />
+    <Content Include="assets\client\js\jquery.bxslider.min.js" />
+    <Content Include="assets\Kissy\img\Cart.jpg" />
+    <Content Include="assets\Kissy\img\IG.jpg" />
+    <Content Include="assets\Kissy\img\Phone.jpg" />
+    <Content Include="assets\Kissy\js\GioHang.js" />
+    <Content Include="assets\Kissy\js\jquery.bxslider.min.js" />
+    <Content Include="assets\client\js\jquery.min.js" />
+    <Content Include="assets\client\js\jquery.nivo.slider.js" />
+    <Content Include="assets\client\js\login.js" />
+    <Content Include="assets\client\js\owl.carousel.js" />
+    <Content Include="assets\client\js\product.js" />
+    <Content Include="assets\client\js\regular.js" />
+    <Content Include="assets\client\js\regular.min.js" />
+    <Content Include="assets\client\js\solid.js" />
+    <Content Include="assets\client\js\solid.min.js" />
+    <Content Include="assets\client\js\v4-shims.js" />
+    <Content Include="assets\client\js\v4-shims.min.js" />
+    <Content Include="assets\css\images\border.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\css\images\controls.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\css\images\loading.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\css\images\loading_background.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\css\images\maytinhbang.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\css\images\meteorshower2.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\css\images\noimage.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\css\images\overlay.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\css\images\pattern.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\img\ajax-loader.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\img\ajax-loader1.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\img\btn_title_right.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\img\clear.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\img\favicon.ico" />
+    <Content Include="assets\img\footerBG.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\img\loading.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\img\no-avatar.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\img\noavatar.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\img\washing.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\Kissy\css\all.css" />
+    <Content Include="assets\Kissy\css\all.min.css" />
+    <Content Include="assets\Kissy\css\brands.css" />
+    <Content Include="assets\Kissy\css\brands.min.css" />
+    <Content Include="assets\Kissy\css\css.css" />
+    <Content Include="assets\Kissy\css\fontawesome.css" />
+    <Content Include="assets\Kissy\css\fontawesome.min.css" />
+    <Content Include="assets\Kissy\css\jquery.bxslider.css" />
+    <Content Include="assets\Kissy\css\regular.css" />
+    <Content Include="assets\Kissy\css\regular.min.css" />
+    <Content Include="assets\Kissy\css\solid.css" />
+    <Content Include="assets\Kissy\css\solid.min.css" />
+    <Content Include="assets\Kissy\css\svg-with-js.css" />
+    <Content Include="assets\Kissy\css\svg-with-js.min.css" />
+    <Content Include="assets\Kissy\css\v4-shims.css" />
+    <Content Include="assets\Kissy\css\v4-shims.min.css" />
+    <Content Include="assets\Kissy\img\anh-ctsp.jpg" />
+    <Content Include="assets\Kissy\img\anh-nho1.jpg" />
+    <Content Include="assets\Kissy\img\anh-nho2.jpg" />
+    <Content Include="assets\Kissy\img\anh-nho3.jpg" />
+    <Content Include="assets\Kissy\img\banner-blog.jpg" />
+    <Content Include="assets\Kissy\img\baochi.jpg" />
+    <Content Include="assets\Kissy\img\bog-sidebar.jpg" />
+    <Content Include="assets\Kissy\img\bv-noi-bat.jpg" />
+    <Content Include="assets\Kissy\img\bv.png" />
+    <Content Include="assets\Kissy\img\bvhot.jpg" />
+    <Content Include="assets\Kissy\img\cart.png" />
+    <Content Include="assets\Kissy\img\cat.jpg" />
+    <Content Include="assets\Kissy\img\category1.jpg" />
+    <Content Include="assets\Kissy\img\category2.jpg" />
+    <Content Include="assets\Kissy\img\category3.jpg" />
+    <Content Include="assets\Kissy\img\category4.jpg" />
+    <Content Include="assets\Kissy\img\category5.jpg" />
+    <Content Include="assets\Kissy\img\ctsp1.jpg" />
+    <Content Include="assets\Kissy\img\ctsp2.jpg" />
+    <Content Include="assets\Kissy\img\fb.jpg" />
+    <Content Include="assets\Kissy\img\gioithieu.jpg" />
+    <Content Include="assets\Kissy\img\hinh-footer.jpg" />
+    <Content Include="assets\Kissy\img\ico-grid.png" />
+    <Content Include="assets\Kissy\img\ico-list.png" />
+    <Content Include="assets\Kissy\img\icon-cart.png" />
+    <Content Include="assets\Kissy\img\icon-fb.png" />
+    <Content Include="assets\Kissy\img\icon-hotline-ft.png" />
+    <Content Include="assets\Kissy\img\icon-ins.png" />
+    <Content Include="assets\Kissy\img\inb1.jpg" />
+    <Content Include="assets\Kissy\img\itg.jpg" />
+    <Content Include="assets\Kissy\img\lang1.png" />
+    <Content Include="assets\Kissy\img\lang2.png" />
+    <Content Include="assets\Kissy\img\lang3.png" />
+    <Content Include="assets\Kissy\img\lang4.png" />
+    <Content Include="assets\Kissy\img\lang5.png" />
+    <Content Include="assets\Kissy\img\Logo-full-1.png" />
+    <Content Include="assets\Kissy\img\logo-kissy.jpg" />
+    <Content Include="assets\Kissy\img\logokiss.jpg" />
+    <Content Include="assets\Kissy\img\nghesy.jpg" />
+    <Content Include="assets\Kissy\img\sanpham.jpg" />
+    <Content Include="assets\Kissy\img\search.png" />
+    <Content Include="assets\Kissy\img\slide0.jpg" />
+    <Content Include="assets\Kissy\img\slide1.jpg" />
+    <Content Include="assets\Kissy\img\slide2.jpg" />
+    <Content Include="assets\Kissy\img\slide3.jpg" />
+    <Content Include="assets\Kissy\img\tcb.png" />
+    <Content Include="assets\Kissy\img\thumb_bv.png" />
+    <Content Include="assets\Kissy\img\thumb_bv_2.png" />
+    <Content Include="assets\Kissy\img\thumb_bv_3.jpg" />
+    <Content Include="assets\Kissy\img\thumb_sp_1.jpg" />
+    <Content Include="assets\Kissy\img\tnb2.jpg" />
+    <Content Include="assets\Kissy\img\tnb3.jpg" />
+    <Content Include="assets\Kissy\img\tnb4.jpg" />
+    <Content Include="assets\Kissy\img\tuyen-dung.jpg" />
+    <Content Include="assets\Kissy\img\tuyendung.jpg" />
+    <Content Include="assets\Kissy\img\vietcombak.png" />
+    <Content Include="assets\Kissy\img\visa.jpg" />
+    <Content Include="assets\Kissy\img\vongquay.png" />
+    <Content Include="assets\Kissy\img\vt.png" />
+    <Content Include="assets\Kissy\js\custom.js" />
+    <Content Include="assets\Kissy\js\java.js" />
+    <Content Include="assets\Kissy\js\jquery.min.js" />
+    <Content Include="assets\Kissy\webfonts\fa-brands-400.svg" />
+    <Content Include="assets\Kissy\webfonts\fa-regular-400.svg" />
+    <Content Include="assets\Kissy\webfonts\fa-solid-900.svg" />
+    <Content Include="Content\bootstrap-theme.css" />
+    <Content Include="Content\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="favicon.ico" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Global.asax" />
+    <Content Include="img\atm.jpg" />
+    <Content Include="img\baochi.jpg" />
+    <Content Include="img\bocongthuongyhl.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="img\bog-sidebar.jpg" />
+    <Content Include="img\bv.png" />
+    <Content Include="img\bvhot.jpg" />
+    <Content Include="img\cart.png" />
+    <Content Include="img\cat.jpg" />
+    <Content Include="img\category1.jpg" />
+    <Content Include="img\category2.jpg" />
+    <Content Include="img\category3.jpg" />
+    <Content Include="img\category4.jpg" />
+    <Content Include="img\category5.jpg" />
+    <Content Include="img\cod.jpg" />
+    <Content Include="img\ctsp1.jpg" />
+    <Content Include="img\ctsp2.jpg" />
+    <Content Include="img\facebook.png" />
+    <Content Include="img\gioithieu.jpg" />
+    <Content Include="img\ico-grid.png" />
+    <Content Include="img\ico-list.png" />
+    <Content Include="img\information-icon.png" />
+    <Content Include="img\lang1.png" />
+    <Content Include="img\lang2.png" />
+    <Content Include="img\lang3.png" />
+    <Content Include="img\lang4.png" />
+    <Content Include="img\lang5.png" />
+    <Content Include="img\Logo-full-1.png" />
+    <Content Include="img\nghesy.jpg" />
+    <Content Include="img\sanpham.jpg" />
+    <Content Include="img\search.png" />
+    <Content Include="img\slide0.jpg" />
+    <Content Include="img\slide1.jpg" />
+    <Content Include="img\slide2.jpg" />
+    <Content Include="img\slide3.jpg" />
+    <Content Include="img\success-icon.png" />
+    <Content Include="img\thongtinthem1.png" />
+    <Content Include="img\thongtinthem2.png" />
+    <Content Include="img\thongtinthem4.png" />
+    <Content Include="img\visa.jpg" />
+    <Content Include="img\vongquay.png" />
+    <Content Include="img\zalopay.jpg" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Areas\HelpPage\Views\Web.config" />
+    <Content Include="Areas\HelpPage\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\ResourceModel.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\Index.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\TextSample.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\SimpleTypeModelDescription.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\Samples.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\Parameters.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ModelDescriptionLink.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\KeyValuePairModelDescription.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\InvalidSample.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ImageSample.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\HelpPageApiModel.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\EnumTypeModelDescription.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\DictionaryModelDescription.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ComplexTypeModelDescription.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\CollectionModelDescription.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
+    <Content Include="assets\admin\font-awesome\4.5.0\fonts\fontawesome-webfont.eot" />
+    <Content Include="assets\admin\font-awesome\4.5.0\fonts\fontawesome-webfont.ttf" />
+    <Content Include="assets\admin\font-awesome\4.5.0\fonts\fontawesome-webfont.woff" />
+    <Content Include="assets\admin\font-awesome\4.5.0\fonts\fontawesome-webfont.woff2" />
+    <Content Include="assets\admin\fonts\fontawesome-webfont.eot" />
+    <Content Include="assets\admin\fonts\fontawesome-webfont.ttf" />
+    <Content Include="assets\admin\fonts\fontawesome-webfont.woff" />
+    <Content Include="assets\admin\fonts\fontawesome-webfont.woff2" />
+    <Content Include="assets\admin\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="assets\admin\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="assets\admin\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="assets\admin\fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="assets\client\fonts\fa-brands-400.eot" />
+    <Content Include="assets\client\fonts\fa-brands-400.ttf" />
+    <Content Include="assets\client\fonts\fa-brands-400.woff" />
+    <Content Include="assets\client\fonts\fa-brands-400.woff2" />
+    <Content Include="assets\client\fonts\fa-regular-400.eot" />
+    <Content Include="assets\client\fonts\fa-regular-400.ttf" />
+    <Content Include="assets\client\fonts\fa-regular-400.woff" />
+    <Content Include="assets\client\fonts\fa-regular-400.woff2" />
+    <Content Include="assets\client\fonts\fa-solid-900.eot" />
+    <Content Include="assets\client\fonts\fa-solid-900.ttf" />
+    <Content Include="assets\client\fonts\fa-solid-900.woff" />
+    <Content Include="assets\client\fonts\fa-solid-900.woff2" />
+    <Content Include="assets\client\fonts\helveticaneue.ttf" />
+    <Content Include="assets\client\fonts\helveticaneue.woff" />
+    <Content Include="assets\Kissy\webfonts\fa-brands-400.eot" />
+    <Content Include="assets\Kissy\webfonts\fa-brands-400.ttf" />
+    <Content Include="assets\Kissy\webfonts\fa-brands-400.woff" />
+    <Content Include="assets\Kissy\webfonts\fa-brands-400.woff2" />
+    <Content Include="assets\Kissy\webfonts\fa-regular-400.eot" />
+    <Content Include="assets\Kissy\webfonts\fa-regular-400.ttf" />
+    <Content Include="assets\Kissy\webfonts\fa-regular-400.woff" />
+    <Content Include="assets\Kissy\webfonts\fa-regular-400.woff2" />
+    <Content Include="assets\Kissy\webfonts\fa-solid-900.eot" />
+    <Content Include="assets\Kissy\webfonts\fa-solid-900.ttf" />
+    <Content Include="assets\Kissy\webfonts\fa-solid-900.woff" />
+    <Content Include="assets\Kissy\webfonts\fa-solid-900.woff2" />
+    <None Include="Scripts\jquery-3.3.1.intellisense.js" />
+    <Content Include="Scripts\jquery-3.3.1.js" />
+    <Content Include="Scripts\jquery-3.3.1.min.js" />
+    <Content Include="Scripts\jquery-3.3.1.slim.js" />
+    <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Areas\HelpPage\Views\_ViewStart.cshtml" />
+    <Content Include="Content\Site.css" />
+    <Content Include="Views\Web.config" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\View_Account\accountInfo.cshtml" />
+    <Content Include="Views\View_Account\login.cshtml" />
+    <Content Include="Views\View_PLayout\cart.cshtml" />
+    <Content Include="Views\View_PLayout\cartPartial.cshtml" />
+    <Content Include="Views\View_PLayout\FooterPartial.cshtml" />
+    <Content Include="Views\View_PLayout\HeaderPartial.cshtml" />
+    <Content Include="Views\View_PLayout\loginPartial.cshtml" />
+    <Content Include="Views\View_PLayout\lstAllProduct.cshtml" />
+    <Content Include="Views\View_PLayout\lstNew.cshtml" />
+    <Content Include="Views\View_PLayout\lstproduct.cshtml" />
+    <Content Include="Views\View_PLayout\MenuLeftPartial.cshtml" />
+    <Content Include="Views\View_PLayout\newdetail.cshtml" />
+    <Content Include="Views\View_PLayout\OtherPartial.cshtml" />
+    <Content Include="Views\View_PLayout\productdetail.cshtml" />
+    <Content Include="Views\View_PLayout\Main_ListProductPartial.cshtml" />
+    <Content Include="Views\View_PLayout\searchHeaderPartial.cshtml" />
+    <Content Include="Views\View_Product\Search.cshtml" />
+    <Content Include="Views\View_PLayout\Main_NewPartial.cshtml" />
+    <Content Include="Views\View_PLayout\Main_SlidePartial.cshtml" />
+    <Content Include="Views\View_PLayout\HeaderMenuPartial.cshtml" />
+    <Content Include="Views\View_PLayout\lstNewwithCategory.cshtml" />
+    <Content Include="Views\View_Account\ForgotPassword.cshtml" />
+    <Content Include="Views\View_PLayout\commentProductPartial.cshtml" />
+    <Content Include="Views\View_PLayout\showCommentPartial.cshtml" />
+    <Content Include="Views\Shared\_LayoutAdmin.cshtml" />
+    <Content Include="Views\View_Page_Setup\Create.cshtml" />
+    <Content Include="Views\View_Page_Setup\Delete.cshtml" />
+    <Content Include="Views\View_Page_Setup\Details.cshtml" />
+    <Content Include="Views\View_Page_Setup\Edit.cshtml" />
+    <Content Include="Views\View_Page_Setup\Index.cshtml" />
+    <Content Include="Views\View_Page_CategoryPost\Create.cshtml" />
+    <Content Include="Views\View_Page_CategoryPost\Delete.cshtml" />
+    <Content Include="Views\View_Page_CategoryPost\Details.cshtml" />
+    <Content Include="Views\View_Page_CategoryPost\Edit.cshtml" />
+    <Content Include="Views\View_Page_CategoryPost\Index.cshtml" />
+    <Content Include="Views\View_Page_New\Create.cshtml" />
+    <Content Include="Views\View_Page_New\Delete.cshtml" />
+    <Content Include="Views\View_Page_New\Details.cshtml" />
+    <Content Include="Views\View_Page_New\Edit.cshtml" />
+    <Content Include="Views\View_Page_New\Index.cshtml" />
+    <Content Include="Views\View_Page_Slide\Create.cshtml" />
+    <Content Include="Views\View_Page_Slide\Delete.cshtml" />
+    <Content Include="Views\View_Page_Slide\Details.cshtml" />
+    <Content Include="Views\View_Page_Slide\Edit.cshtml" />
+    <Content Include="Views\View_Page_Slide\Index.cshtml" />
+    <Content Include="Views\View_Login\Index.cshtml" />
+    <Content Include="Views\Shared\_LayoutLogin.cshtml" />
+    <Content Include="Views\Home\admin.cshtml" />
+    <Content Include="Views\View_Product\listProductModalPartial.cshtml" />
+    <Content Include="Views\View_PLayout\Main_LoaiSanPham.cshtml" />
+    <Content Include="Views\View_PLayout\Main_SanPham_bestsaller.cshtml" />
+    <Content Include="Views\View_PLayout\Main_LoaiSanPhamKhongCha.cshtml" />
+    <Content Include="Views\View_PLayout\Main_chopdealPartial.cshtml" />
+    <Content Include="Views\View_PLayout\Main_NgheSyTinDungPartial.cshtml" />
+    <Content Include="Views\View_PLayout\Main_BaoChiPartial.cshtml" />
+    <Content Include="Views\View_PLayout\Main_GioiThieuPartial.cshtml" />
+    <Content Include="Views\View_PLayout\login.cshtml" />
+    <Content Include="Views\View_PLayout\register.cshtml" />
+    <Content Include="Views\View_PLayout\HeaderMenuMobilePartial.cshtml" />
+    <Content Include="Views\View_PLayout\lstproductloaisanpham.cshtml" />
+    <Content Include="Views\View_PLayout\lstBestSeller.cshtml" />
+    <Content Include="Views\View_PLayout\cartInfo.cshtml" />
+    <Content Include="Views\View_PLayout\Main_chopdealInformationPartial.cshtml" />
+    <Content Include="Views\View_PLayout\thongtinthanhtoan.cshtml" />
+    <Content Include="Views\View_PLayout\Search.cshtml" />
+    <Content Include="Views\View_PLayout\tintuc.cshtml" />
+    <Content Include="Views\View_PLayout\tintucchitiet.cshtml" />
+    <Content Include="Views\View_PLayout\nhomtintuc.cshtml" />
+    <Content Include="Views\View_PLayout\cartTablePartial.cshtml" />
+    <Content Include="Views\View_Cart\cartTablePartial.cshtml" />
+    <Content Include="Views\View_PLayout\camnhankhachhang.cshtml" />
+    <Content Include="Views\View_PLayout\tintucnoibatkhuyenmai.cshtml" />
+    <Content Include="Views\View_PLayout\tinnoibat.cshtml" />
+    <Content Include="Views\View_PLayout\tinkhuyenmai.cshtml" />
+    <Content Include="Views\View_PLayout\tintuckhuyenmaichitiet.cshtml" />
+    <Content Include="Views\View_PLayout\gioithieuyhl.cshtml" />
+    <Content Include="Views\View_PLayout\chinhsachbaomat.cshtml" />
+    <Content Include="Views\View_PLayout\lienhe.cshtml" />
+    <Content Include="Views\View_PLayout\vanhoa.cshtml" />
+    <Content Include="Views\View_PLayout\phuongthucdathang.cshtml" />
+    <Content Include="Views\View_PLayout\chinhsachvanchuyen.cshtml" />
+    <Content Include="Views\View_PLayout\chinhsachdoitra.cshtml" />
+    <Content Include="Views\View_PLayout\dieukhoanmientru.cshtml" />
+    <Content Include="Views\View_PLayout\tuyendung.cshtml" />
+    <Content Include="Views\View_Account\Message.cshtml" />
+    <Content Include="Views\View_PLayout\buyinfo.cshtml" />
+    <Content Include="Views\View_PLayout\buyinfoDetailPartial.cshtml" />
+    <Content Include="Views\Shared\_LayoutKissy.cshtml" />
+    <Content Include="Views\MainKissy\Index.cshtml" />
+    <Content Include="Views\MainKissy\SliderPartial.cshtml" />
+    <Content Include="Views\MainKissy\TinNoiBatPartial.cshtml" />
+    <Content Include="Views\PageDetails\tintucchitiet.cshtml" />
+    <Content Include="Views\PageDetails\tintucchitietkissy.cshtml" />
+    <Content Include="Views\MainKissy\SanPhamMainPartial.cshtml" />
+    <Content Include="Views\MainKissy\SanPhamMoiMainPartial.cshtml" />
+    <Content Include="Views\MainKissy\SanPhamBanChayMainPartial.cshtml" />
+    <Content Include="Views\MainKissy\TinTucMainPartial.cshtml" />
+    <Content Include="Views\MainKissy\TinTucTuyenDungMainPartial.cshtml" />
+    <Content Include="Views\MainKissy\TinTucPTThanhToanMainPartial.cshtml" />
+    <Content Include="Views\MainKissy\GuiThongTinMainPartial.cshtml" />
+    <Content Include="Views\MainKissy\Header1MainPartial.cshtml" />
+    <Content Include="Views\MainKissy\Header2MainPartial.cshtml" />
+    <Content Include="Views\MainKissy\HeaderMobileMainPartial.cshtml" />
+    <Content Include="Views\GroupDetails\Search.cshtml" />
+    <Content Include="Views\View_PLayout\danhsachsanpham_menu.cshtml" />
+    <Content Include="Views\GroupDetails\lstproduct.cshtml" />
+    <Content Include="Views\PageDetails\sanphamchitiet.cshtml" />
+    <Content Include="Views\PageDetails\baivietchitietkissy.cshtml" />
+    <Content Include="Views\MainKissy\FooterMainPartial.cshtml" />
+    <Content Include="Views\MainKissy\FooterGioiThieuMainPartial.cshtml" />
+    <Content Include="Views\PageDetails\hethongcuahang.cshtml" />
+    <Content Include="Views\PageDetails\danhmuctintuc.cshtml" />
+    <Content Include="Views\PageDetails\FilterProduct.cshtml" />
+    <Content Include="Views\PageDetails\cart.cshtml" />
+    <Content Include="Views\PageDetails\checkout.cshtml" />
+    <Content Include="Views\View_Cart\confirmCheckout.cshtml" />
+    <Content Include="Views\GroupDetails\khuyenmai.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+    <Folder Include="assets\Kissy\font\" />
+    <Folder Include="Views\View_Categories\" />
+    <Folder Include="Views\View_ChopDeal\" />
+    <Folder Include="Views\View_LoginSocial\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\bootstrap.min.css.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\bootstrap.css.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\bootstrap-theme.min.css.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\bootstrap-theme.css.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
+    <Content Include="Scripts\jquery-3.3.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Erp.Domain\Erp.Domain.csproj">
+      <Project>{634130CF-1EA3-4B12-8A08-D858A2B615C1}</Project>
+      <Name>Erp.Domain</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>53902</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:53899/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+</Project>

@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html>
+<body>
+
+    <p>Select a new car from the list.</p>
+
+    <input id="product_barcode2" onkeydown="myFunction2()" type="text" placeholder="[F3] Mã sản phẩm..." autocomplete="off" />
+    <p>When you select a new car, a function is triggered which outputs the value of the selected car.</p>
+
+    <p id="demo"></p>
+
+
+
+
+
+
+
+
+
+    <script>
+        $('#product_barcode2').keypress(function (e) {
+            if (e.which == 13) {
+                alert('ok keypress');
+                e.preventDefault();
+                $('#product_barcode3').trigger('change');
+            }
+        });
+
+        $(window).keydown(function (e) {
+            if (e.which == 114) {
+                e.preventDefault();
+                $("#product_barcode2").focus();
+            }
+        });
+
+        //khi nhập barcode
+        $('#product_barcode2').change(function () {
+            alert('ok reload 2');
+            var $this = $(this);
+            if ($this.val() != '') {
+
+                var barcode = $this.val();
+                //đặt lại giá trị rỗng
+                $this.val('').focus();
+                alert(barcode);
+                var valueSearch = searchProductByBarCodeContain(barcode);
+                if (valueSearch == undefined) {
+                    alert('Không tìm thấy sản phẩm với mã code trên!');
+                    return;
+                }
+
+                $('#productSelectList2').val(valueSearch).trigger("change");
+
+                //kết thúc các lệnh của sự kiện
+            }
+        });
+        function getOrderNO() {
+            if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+                var OrderNo = $('.detailList1 tr').length;
+            } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+                var OrderNo = $('.detailList2 tr').length;
+            } else {
+                var OrderNo = $('.detailList3 tr').length;
+            }
+            return OrderNo;
+        }
+        var tmp = "";
+        function myFunction() {
+            alert("tmp: "+tmp);
+            var valueSearch = searchProductByBarCodeContain(tmp);
+            tmp = "";
+            if (valueSearch == undefined) {
+                alert('Không tìm thấy sản phẩm với mã code trên!');
+                return;
+            }
+
+            $('#productSelectList2').val(valueSearch).trigger("change");
+        }
+        function myFunction2() {
+
+            setTimeout(function () {
+                var x = document.getElementById("mySelect").value;
+                document.getElementById("demo").innerHTML = "" + x;
+                tmp += x;
+            }, 30);
+            setTimeout(function () {
+                myFunction();
+            }, 30);
+        }
+    </script>
+
+</body>
+</html>

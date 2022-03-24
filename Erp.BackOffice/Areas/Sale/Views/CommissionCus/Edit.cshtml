@@ -1,0 +1,1606 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Staff.Models
+@using Erp.BackOffice.Account.Models
+@using Erp.Domain.Staff.Entities
+@model CommissionCusViewModel
+
+@{
+    ViewBag.Title = "Cập nhật khuyến mãi";
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CommissionCus",
+        ActionName = "Edit",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    //IEnumerable<SelectListItem> CategoryList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("product", null, "value");
+    IEnumerable<SelectListItem> typeList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("TypeCommission", null, null);
+    List<Branch> BranchList = ViewBag.BranchList;
+    List<ProductViewModel> Listproduct = (List<ProductViewModel>)ViewBag.productList;
+    List<CustomerViewModel> CustomerList = (List<CustomerViewModel>)ViewBag.CustomerList;
+    List<LoyaltyPointViewModel> loyaltypointList = (List<LoyaltyPointViewModel>)ViewBag.loyaltypointList;
+    List<DM_NHOMSANPHAMViewModel> nhomSP = (List<DM_NHOMSANPHAMViewModel>)ViewBag.nhomSP;
+    int orderNo = 0;
+    List<bool> ObjectApplyFor = ViewBag.ObjectApplyFor;
+    bool ApplyForAllBranch = ViewBag.ApplyForAllBranch;
+    bool IsHH = Model.Type == "HH" ? true : false;
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+<style>
+    .box {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+        margin-top: 0px !important;
+    }
+
+    .slide {
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
+
+    .active-slide {
+        opacity: 1;
+        z-index: 2;
+    }
+
+    #btn_AddItemInvoice {
+        left: 2%;
+    }
+
+    #SetDiscount_Area {
+        height: 50px;
+    }
+
+    #btn_AddItemInvoice {
+        top: 5px;
+    }
+    /*Css Add*/
+    /*.widget-box {
+        border-radius: 10px !important;
+    }*/
+    .widget-header {
+    }
+
+    .CheckAll-Css {
+        padding-left: 20px;
+    }
+
+    .Searh-Css {
+        margin-top: 5px;
+    }
+
+    .Detail-Css {
+        margin-top: 10px;
+    }
+
+    .widget-box {
+    }
+
+    .widget-shadow {
+        border-radius: 2px;
+        box-sizing: border-box !important;
+        box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12) !important;
+        font-family: Roboto,Helvetica Neue,sans-serif;
+    }
+
+    .widget-main {
+    }
+
+    .widget-body {
+    }
+
+    .widget-Css {
+        padding-bottom: 80px;
+        border: none;
+    }
+
+    .header-Css {
+        font-size: 20px !important;
+        height: 30px;
+        padding: 5px;
+        box-shadow: 0 3px 10px 0px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12) !important;
+        font-family: Roboto,Helvetica Neue,sans-serif;
+    }
+
+    .tabbable-Css {
+        box-sizing: border-box !important;
+        box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12) !important;
+    }
+
+    #PromoitonPrice {
+        position: relative;
+        padding-top: 40px;
+        padding-bottom: 10px;
+        margin-top: 12px;
+        float: right;
+    }
+
+    table#tbllistOrderDetail1 {
+    overflow: scroll;
+    display: -webkit-box;
+    height: 90%;
+}
+
+    #btnApdung {
+        border-radius: 10px;
+    }
+
+
+    .control-label-textarea {
+        font-weight: bold !important;
+        background-color: #ffffff !important;
+    }
+
+    .control-label {
+        font-weight: bold !important;
+        background-color: #ffffff !important;
+        border-radius: 5px !important;
+    }
+
+
+    .NoteTxtArea {
+        border-radius: 5px !important;
+    }
+
+    .txtName {
+        border-radius: 5px !important;
+    }
+
+    .type-Css {
+        background-color: #ffffff !important;
+        font-weight: bold;
+        font-family: Roboto,Helvetica Neue,sans-serif !important;
+        /*font-size: 15px !important;*/
+    }
+
+    .Calendar-Css {
+        background-color: white !important;
+        border: 1px solid #e2e2e2 !important;
+        border-radius: 5px !important;
+    }
+
+        .Calendar-Css:hover {
+            color: orange !important;
+            border: 1px solid orange !important;
+        }
+
+    .widget1-Css {
+        border-radius: 2px 2px 0px 0px;
+        background-color: white;
+        height: 40px;
+    }
+
+    .body1-Css {
+        border-radius: 0px 0px 2px 2px !important;
+    }
+
+    .title-Css {
+        font-size: 20px !important;
+        height: 20px;
+        font-family: Roboto,Helvetica Neue,sans-serif;
+        padding: 9px !important;
+        position: absolute;
+        color: #0277bd !important;
+    }
+
+    .Close-toggle {
+        width: 30px;
+        height: 30px;
+    }
+
+        .Close-toggle:hover {
+            background-color: #67a6ca !important;
+            width: 30px;
+            height: 30px;
+            border-radius: 100px !important;
+        }
+
+    .btnAdd_toggle {
+        margin-bottom: 3px;
+        border-radius: 5px;
+        border-radius: 500px;
+        width: 24px;
+        height: 24px;
+        padding: 4px 9px 0px 0px;
+    }
+
+    .chosen-drop {
+        width: 300px !important;
+        margin: 0px 0px 0px 10px;
+    }
+
+    .chosen-single {
+        width: 300px !important;
+        margin: 0px 0px 0px 10px;
+    }
+</style>
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "EditCommissionCus", @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(n => n.CreatedDate)
+    @Html.HiddenFor(n => n.CreatedUserId)
+    @Html.HiddenFor(n => n.ModifiedUserId)
+    <div class="row">
+        <div class="col-sm-7 ">
+            @if (IsHH)
+            {
+                <div id="HH_Area" class="slide active-slide">
+                    <div id="NhomSp">
+                        <table>
+                            <tr>
+                                <td>
+                                    <select class="form-control" id="nhomSpSelectList" style="border-radius:5px;">
+                                        <option value="">- Chọn nhóm sản phẩm -</option>
+                                        @if (nhomSP != null)
+                                        {
+                                            foreach (var item in nhomSP)
+                                            {
+                                                <option value="@item.NHOMSANPHAM_ID">@item.TEN_NHOMSANPHAM</option>
+                                            }
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <a id="btnAdd_NhomSp" class="btn btn-primary btn-mini btnAdd_toggle" style="margin: 1px 0px 0px 4px;"><i class="ace-icon fa fa-plus" style="position: absolute;"></i></a>
+                                </td>
+                                <td class="CheckAll-Css">
+                                    <label class="GetAllSpArea">
+                                        <input id="GetAllSp" type="checkbox" class="group_choice ace" name="GetAllSp" value="1" />
+                                        <span class="lbl">Chọn tất cả sản phẩm</span>
+                                    </label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div id="Search_Product">
+                                        <div class="product-search-box">
+                                            @*<input id="product_barcode" type="text" placeholder="[F3] Mã sản phẩm..." autocomplete="off" />*@
+                                            <select id="productSelectList" name="productSelectList" style="width:400px">
+                                                <option value="">- Tìm sản phẩm -</option>
+                                                @foreach (var item in Listproduct.OrderBy(x => x.Name).ToList())
+                                                {
+                                                    <option value="@item.Id" data-selected="0" data-value="@item.Id | @(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(item.Image_Name, "product-image-folder", "product")) | @(item.Code + " - " + item.Name)|@(item.Origin)|@CommonSatic.ToCurrencyStr(item.PriceOutbound,null)" data-code="@item.Code" data-barcode="@item.Barcode" data-product-type="@item.CategoryCode" data-price="@(item.PriceOutbound)" data-unit="@item.Unit">@item.Name</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div id="detailList1" class="Searh-Css">
+                        <div id="PromoitonPrice" style="padding-top: 0px !important;">
+                            <input name="txtPromotionPrice" type="text" class="txtPromotionPrice" id="txtPromotionPrice" autocomplete="off" placeholder="Giá áp dụng . . ." style="width:135px; border-radius: 10px !important;" />
+                            <button id="btnApdung" type="button" class="btn btn-primary btn-mini">Áp dụng về 1 giá</button>
+                        </div>
+                        <div class="Detail-Css">
+                            <table id="tbllistOrderDetail1" class="table table-bordered" style="margin-bottom:80px">
+                                <thead>
+                                    <tr>
+                                        <th width="30">STT</th>
+                                        <th>Tên mặt hàng</th>
+                                        <th width="150"> Chiết khấu theo</th>
+                                        <th width="120">Giá bán</th>
+                                        <th width="160">Giá trị (% hoặc số tiền)</th>
+                                        <th width="80">Chiết khấu theo tiền</th>
+                                        <th width="73"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="detailList">
+                                    @foreach (var item in Model.DetailList)
+                                    {
+                                        <tr data-id="@orderNo">
+                                            <td>
+                                                @(orderNo + 1)
+                                                @Html.Hidden("DetailList[" + (@orderNo) + "].Id", item.Id)
+                                                @Html.Hidden("DetailList[" + (@orderNo) + "].ProductId", item.ProductId)
+                                                @Html.Hidden("DetailList[" + (@orderNo) + "].Price", item.Price)
+                                                @Html.Hidden("DetailList[" + (@orderNo) + "].Type", item.Type)
+                                                @Html.Hidden("DetailList[" + (@orderNo) + "].ProductCode", item.ProductCode)
+                                            </td>
+                                            <td>@item.ProductName</td>
+                                            <td>@item.ObjectName</td>
+                                            <td class="text-right">@CommonSatic.ToCurrencyStr(item.Price, null)</td>
+                                            <td>
+
+                                                @Html.TextBox("DetailList[" + (@orderNo) + "].CommissionValue", item.CommissionValue, new { style = "width:100px; text-align:right; " + (item.CommissionValue > 0 ? "border:1px solid green; font-weight:bold; color:green" : ""), @class = "input-price numberinput2", autocomplete = "off" })
+                                                @Html.TextBox("DetailList[" + (@orderNo) + "].CommissionValueText", (item.IsMoney != null && item.IsMoney == true ? "VNĐ" : "%"), new { style = "width:40px; text-align:center", @readonly = "readonly" })
+                                            </td>
+                                            <td>
+                                                <label>
+                                                    <input class="detail_item_check ace" type="checkbox" name="DetailList[@orderNo].IsMoney" data-index="@orderNo" id="DetailList_@(orderNo)__IsMoney" value="@(item.IsMoney != null && item.IsMoney == true ? "true" : "false")" @(item.IsMoney != null && item.IsMoney == true ? "checked=\"checked\"" : "") />
+                                                    <span class="lbl"></span>
+                                                </label>
+                                            </td>
+                                            <td class="text-center">
+                                                <a class="btn-delete-item">
+                                                    <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        orderNo++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="HD_Area" class="slide">
+                    <div id="detailList2">
+                        <div id="SetDiscount_Area">
+                            <label class="control-label col-lg-2 col-md-4 col-sm-4" for="">Điều kiện hóa đơn:</label>
+                            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+                                <input id="Minvalue" class="col-xs-12" name="Minvalue" type="text" value="0" placeholder="Mức giá tối thiểu" />
+                            </div>
+                            <a id="btn_AddItemInvoice" class="btn btn-primary btn-mini "><i class="ace-icon fa fa-plus"></i>Chọn</a>
+                        </div>
+                        <table class="table table-bordered" style="margin-bottom:80px">
+                            <thead>
+                                <tr>
+                                    <th width="30">STT</th>
+                                    <th width="200" align="center">Đơn hàng tối thiểu</th>
+                                    <th width="200">Giá trị (% hoặc số tiền)</th>
+                                    <th width="80">Chiết khấu theo tiền</th>
+                                    <th width="30"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="InvoiceDiscountDetail"></tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div id="HD_Area" class="slide active-slide">
+                    <div id="detailList2">
+                        <div id="SetDiscount_Area">
+                            <label class="control-label col-lg-2 col-md-4 col-sm-4" for="">Điều kiện hóa đơn:</label>
+                            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+                                <input id="Minvalue" class="col-xs-12" name="Minvalue" type="text" value="0" placeholder="Mức giá tối thiểu" />
+                            </div>
+                            <a id="btn_AddItemInvoice" class="btn btn-primary btn-mini "><i class="ace-icon fa fa-plus"></i>Chọn</a>
+                        </div>
+                        <table class="table table-bordered" style="margin-bottom:80px">
+                            <thead>
+                                <tr>
+                                    <th width="30">STT</th>
+                                    <th width="200" align="center">Đơn hàng tối thiểu</th>
+                                    <th width="200">Giá trị (% hoặc số tiền)</th>
+                                    <th width="80">Chiết khấu theo tiền</th>
+                                    <th width="30"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="InvoiceDiscountDetail">
+                                @foreach (var item in Model.DetailList)
+                                {
+                                    <tr data-id="@orderNo">
+
+                                        <td>@(orderNo + 1)</td>
+                                        <td><input id="DetailList_@(orderNo)__Minvalue" name="DetailList[@(orderNo)].Minvalue" value="@item.Minvalue" class="input-price numberinput2" autocomplete="off" style="width:150px; text-align:right;" type="text" /></td>
+                                        <td>
+                                            @Html.Hidden("DetailList[" + (@orderNo) + "].Id", item.Id)
+                                            @Html.Hidden("DetailList[" + (@orderNo) + "].ProductId", item.ProductId)
+                                            @Html.Hidden("DetailList[" + (@orderNo) + "].Type", item.Type)
+                                            @Html.TextBox("DetailList[" + (@orderNo) + "].CommissionValue", item.CommissionValue, new { style = "width:100px; text-align:right; " + (item.CommissionValue > 0 ? "border:1px solid green; font-weight:bold; color:green" : ""), @class = "input-price numberinput2", autocomplete = "off" })
+                                            @Html.TextBox("DetailList[" + (@orderNo) + "].CommissionValueText", (item.IsMoney != null && item.IsMoney == true ? "VNĐ" : "%"), new { style = "width:40px; text-align:center", @readonly = "readonly" })
+                                        </td>
+                                        <td>
+                                            <label>
+                                                <input class="detail_item_check ace" type="checkbox" name="DetailList[@orderNo].IsMoney" data-index="@orderNo" id="DetailList_@(orderNo)__IsMoney" value="@(item.IsMoney != null && item.IsMoney == true ? "true" : "false")" @(item.IsMoney != null && item.IsMoney == true ? "checked=\"checked\"" : "") />
+                                                <span class="lbl"></span>
+                                            </label>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="btn-delete-item">
+                                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    orderNo++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="HH_Area" class="slide">
+                    <div id="NhomSp">
+                        <table>
+                            <tr>
+                                <td>
+                                    <select class="form-control" id="nhomSpSelectList" style="border-radius:5px;">
+                                        <option value="">- Chọn nhóm sản phẩm -</option>
+                                        @if (nhomSP != null)
+                                        {
+                                            foreach (var item in nhomSP)
+                                            {
+                                                <option value="@item.NHOMSANPHAM_ID">@item.TEN_NHOMSANPHAM</option>
+                                            }
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <a id="btnAdd_NhomSp" class="btn btn-primary btn-mini btnAdd_toggle" style="margin: 1px 0px 0px 4px;"><i class="ace-icon fa fa-plus" style="position: absolute;"></i></a>
+                                </td>
+                                <td class="CheckAll-Css">
+                                    <label class="GetAllSpArea">
+                                        <input id="GetAllSp" type="checkbox" class="group_choice ace" name="GetAllSp" value="1" />
+                                        <span class="lbl">Chọn tất cả sản phẩm</span>
+                                    </label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div id="Search_Product">
+                                        <div class="product-search-box">
+                                            @*<input id="product_barcode" type="text" placeholder="[F3] Mã sản phẩm..." autocomplete="off" />*@
+                                            <select id="productSelectList" name="productSelectList" style="width:400px">
+                                                <option value="">- Tìm sản phẩm -</option>
+                                                @foreach (var item in Listproduct.OrderBy(x => x.Name).ToList())
+                                                {
+                                                    <option value="@item.Id" data-selected="0" data-value="@item.Id | @(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(item.Image_Name, "product-image-folder", "product")) | @(item.Code + " - " + item.Name)|@(item.Origin)|@CommonSatic.ToCurrencyStr(item.PriceOutbound,null)" data-code="@item.Code" data-barcode="@item.Barcode" data-product-type="@item.CategoryCode" data-price="@(item.PriceOutbound)" data-unit="@item.Unit">@item.Name</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    @Html.HiddenFor(model => model.CreatedDate)
+                    <div id="detailList1" class="Searh-Css">
+                        <div id="PromoitonPrice" style="padding-top: 0px !important;">
+                            <input name="txtPromotionPrice" type="text" class="txtPromotionPrice" id="txtPromotionPrice" autocomplete="off" placeholder="Giá áp dụng . . ." style="width:135px; border-radius: 10px !important;" />
+                            <button id="btnApdung" type="button" class="btn btn-primary btn-mini">Áp dụng về 1 giá</button>
+                        </div>
+                        <div class="Detail-Css">
+                            <table id="tbllistOrderDetail1" class="table table-bordered" style="margin-bottom:80px">
+                                <thead>
+                                    <tr>
+                                        <th width="30">STT</th>
+                                        <th>Tên mặt hàng</th>
+                                        <th width="150"> Chiết khấu theo</th>
+                                        <th width="120">Giá bán</th>
+                                        <th width="160">Giá trị (% hoặc số tiền)</th>
+                                        <th width="80">Chiết khấu theo tiền</th>
+                                        <th width="73"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="detailList"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-sm-5">
+            <div class="widget-box widget-shadow">
+                <div class="widget-header widget1-Css">
+                    <h5 class="widget-titl title-Css">Thông tin chung khuyến mãi</h5>
+                </div>
+                <div class="widget-body  body1-Css">
+                    <div class="widget-main">
+                        @*<div class="detail-view">*@
+                        <div class="control-group form-group">
+                            @Html.CustomTextboxFor(model => model.Name, null, null, WidthType.span15)
+                        </div>
+
+                        <div class="control-group form-group">
+
+                            <label class="control-label col-lg-5 col-md-4 col-sm-4 type-Css" for="">Loại:</label>
+                            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+                                @if (IsHH)
+                                {
+                                    <label>
+                                        <input id="LoaiKM_1" name="LoaiKM" type="radio" class="LoaiKM ace" value="HH" checked>
+                                        <span class="lbl"> Hàng hóa</span>
+                                    </label>
+                                    <label>
+                                        <input id="LoaiKM_2" name="LoaiKM" data-target="#group_choice_wrap2" type="radio" class="LoaiKM ace" value="HD">
+                                        <span class="lbl"> Hóa đơn</span>
+                                    </label>
+                                }
+                                else
+                                {
+                                    <label>
+                                        <input id="LoaiKM_1" name="LoaiKM" type="radio" class="LoaiKM ace" value="HH">
+                                        <span class="lbl"> Hàng hóa</span>
+                                    </label>
+                                    <label>
+                                        <input id="LoaiKM_2" name="LoaiKM" data-target="#group_choice_wrap2" type="radio" class="LoaiKM ace" value="HD" checked>
+                                        <span class="lbl"> Hóa đơn</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="control-group form-group">
+                            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="">Đối tượng áp dụng:</label>
+                            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important;">
+                                <table style="position:relative; width: 320px;">
+                                    <tr>
+                                        <td>
+                                            <label class="typeCheck">
+                                                @if (ObjectApplyFor[2])
+                                                {
+                                                    <input id="checkbox1" type="checkbox" value="3" class="group_choice ace" name="group_choice" checked />
+                                                }
+                                                else
+                                                {
+                                                    <input id="checkbox1" type="checkbox" value="3" class="group_choice ace" name="group_choice" />
+                                                }
+                                                <span class="lbl"></span>
+                                            </label>
+                                        </td>
+                                        <td style="position:relative">
+                                            <select id="Select_Type3" name="Select_Type3" style="width:120px; height:-5%">
+                                                @if (ApplyForAllBranch)
+                                                {
+                                                    <option value="1"> Cửa hàng</option>
+                                                    <option value="0" selected> Tất cả cửa hàng</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="1" selected> Cửa hàng</option>
+                                                    <option value="0"> Tất cả cửa hàng</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td style="width:30% ;position:relative">
+                                            @if (ObjectApplyFor[1])
+                                            {
+                                                <label class="typeCheck"><input id="checkbox2" type="checkbox" value="2" class="group_choice ace" name="group_choice" checked />  <span class="lbl">Nhóm Vip</span></label>
+                                            }
+                                            else
+                                            {
+                                                <label class="typeCheck"><input id="checkbox2" type="checkbox" value="2" class="group_choice ace" name="group_choice" />  <span class="lbl">Nhóm Vip</span></label>
+                                            }
+                                        </td>
+                                        <td style="width:30%; position:relative">
+                                            @if (ObjectApplyFor[0])
+                                            {
+                                                <label class="typeCheck"><input id="checkbox3" type="checkbox" value="1" class="group_choice ace" name="group_choice" checked />  <span class="lbl">KH cụ thể</span></label>
+                                            }
+                                            else
+                                            {
+                                                <label class="typeCheck"><input id="checkbox3" type="checkbox" value="1" class="group_choice ace" name="group_choice" />  <span class="lbl">KH cụ thể</span></label>
+                                            }
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="control-group form-group">
+                            <label class="control-label no-padding-right control-label col-lg-5 col-md-4 col-sm-4 type-Css" for="StartDate">Ngày bắt đầu</label>
+                            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="width: 240px;">
+                                <div class="clearfix">
+
+                                    <div class="input-group date" id="StartDateId">
+                                        <input class="form-control" data-val="true" data-val-date="The field Ngày bắt đầu must be a date." data-val-required="Bắt buộc nhập" id="StartDate" name="StartDate" style="width:150px;border-radius:5px !important;" type="text" value="@Model.StartDate" aria-required="true" aria-describedby="StartDate-error" aria-invalid="false">
+                                        <span class="input-group-addon Calendar-Css" style="border-radius:5px !important"><span class="glyphicon glyphicon-calendar"></span></span>
+                                    </div>
+
+                                </div>
+                                <div class="clearfix">
+                                    <span class="help-inline field-validation-valid" data-valmsg-for="StartDate" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="control-group form-group">
+                            <label class="control-label no-padding-right control-label col-lg-5 col-md-4 col-sm-4 type-Css" for="EndDate">Ngày kết thúc</label>
+                            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="width: 240px">
+                                <div class="clearfix">
+
+                                    <div class="input-group date" id="EndDateId">
+                                        <input class="form-control" data-val="true" data-val-date="The field Ngày bắt đầu must be a date." data-val-required="Bắt buộc nhập" id="EndDate" name="EndDate" style="width:150px;border-radius:5px !important;" type="text" value="@Model.EndDate" aria-required="true" aria-describedby="EndDate-error" aria-invalid="false">
+                                        <span class="input-group-addon Calendar-Css" style="border-radius:5px !important"><span class="glyphicon glyphicon-calendar"></span></span>
+                                    </div>
+
+                                </div>
+                                <div class="clearfix">
+                                    <span class="help-inline field-validation-valid" data-valmsg-for="EndDate" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        @*</div>*@
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget-box widget-color-blue" style="opacity: 1;">
+                <div class="widget-header">
+                    <h5 class="widget-title bigger lighter" style="color:white;">
+                        <i class="ace-icon fa fa-list"></i> Đối tượng áp dụng
+                    </h5>
+
+                    <div class="widget-toolbar">
+                        <a href="#" data-action="collapse">
+                            <i class="ace-icon fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
+                @*-------------------------------------------------------------------------------------------------------*@
+                <div class="tabbable">
+
+                    <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tabCustomer">
+                        <li class="active" id="tab1_head">
+                            <a id="tab1_head" data-toggle="tab" href="#tab1">Cửa hàng</a>
+                        </li>
+                        <li>
+                            <a id="tab2_head" data-toggle="tab" href="#tab2">Nhóm Vip</a>
+                        </li>
+                        <li>
+                            <a id="tab3_head" data-toggle="tab" href="#tab3">KH cụ thể</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane clearfix active" id="tab1">
+                            <div class="widget-body">
+                                <div class="widget-main clearfix">
+
+                                    <div class="box box-height-max">
+                                        <h4><span>Chọn cửa hàng:</span></h4>
+                                        <div class="product-cate">
+                                            <div class="category-content">
+                                                <label>Danh mục cửa hàng</label>
+                                                @if (ApplyForAllBranch)
+                                                {
+                                                    <select id="productCategory" style="border-radius:5px;" disabled>
+                                                        <option value="" selected> -Rỗng- </option>
+                                                        @foreach (var item in BranchList)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+                                                else
+                                                {
+                                                    <select id="productCategory" style="border-radius:5px;">
+                                                        <option value="" selected> -Rỗng- </option>
+                                                        @foreach (var item in BranchList)
+                                                        {
+                                                            <option value="@item.Id">@item.Name</option>
+                                                        }
+                                                    </select>
+                                                }
+                                                <a id="btnAdd_Branch" class="btn btn-primary btn-mini btnAdd_toggle"><i class=" ace-icon fa fa-plus " style="position: absolute;"></i></a>
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="box box-height-max" style="margin-top:10px">
+                                        <h4><span>Cửa hàng được áp dụng:</span></h4>
+                                        <div class="product-chosen">
+                                            @foreach (var BranchItem in Model.ApplyDetail)
+                                            {
+                                                if (BranchItem.Type == 3)
+                                                {
+                                                    <label class="product-item" data-category="">
+                                                        <i class="fa fa-minus"></i>
+                                                        <input type="checkbox" name="ApplyForBranch" class="" value="@BranchItem.BranchId" checked />
+                                                        <span class="">@BranchItem.BranchName</span>
+                                                    </label>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*tab 2-----------------------------------------------------------------------------------------------*@
+                        <div class="tab-pane clearfix" id="tab2">
+                            <div class="widget-body">
+                                <div style="margin-top:10px">
+                                    <h4><span>Chọn nhóm vip:</span></h4>
+                                    <div class="vip-display" style="border-radius:5px;">
+                                        @{ var ListVip = loyaltypointList.ToList(); }
+                                        @for (int i = 0; i < ListVip.Count; i++)
+                                        {
+                                            <label class="vip-item" data-category="" style="border-radius:100px;">
+                                                <i class="fa fa-plus"></i>
+                                                <input type="checkbox" name="DisplayFor" class="" value="@ListVip[i].Id" />
+                                                <span class="">@ListVip[i].Name</span>
+                                            </label>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="box box-height-max" style="margin-top:10px">
+                                    <h4><span>Nhóm vip được áp dụng:</span></h4>
+                                    <div class="vip-chosen">
+                                        @foreach (var NhomVipItem in Model.ApplyDetail)
+                                        {
+                                            if (NhomVipItem.Type == 2)
+                                            {
+                                                <label class="vip-item" data-category="">
+                                                    <i class="fa fa-minus"></i>
+                                                    <input type="checkbox" name="ApplyForVip" class="" value="@NhomVipItem.BranchId" checked />
+                                                    <span class="">@NhomVipItem.LogVipName</span>
+                                                </label>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*--------------------------------------------------------------------------------------------------------------*@
+                        @*<div class="tab-pane clearfix" id="tab3">
+                                <div class="widget-body">
+                                    <div style="margin-top:10px">
+                                        <h4><span>Tìm KH:</span></h4>
+                                        <div class="product-search-box">
+                                            <select class="chzn-select" id="CustomerSelectList" name="CustomerSelectList" style="width:360px;border-radius:5px;position:absolute;">
+                                                <option value="" data-id="">- Tìm Khách hàng -</option>
+                                                @if (CustomerList != null)
+                                                {
+                                                    foreach (var item in CustomerList.OrderBy(x => x.CreatedDate).ToList())
+                                                    {
+                                                        <option value="@item.Id" data-selected="0" data-id="@item.Id" data-value="@item.Id | @(item.Code + " - " + item.FullName) | @item.Mobile" data-code="@item.Code">@item.FullName - @item.Mobile</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <a id="btnAdd_Customer" class="btn btn-primary btn-mini btnAdd_toggle"><i class="ace-icon fa fa-plus" style="position: absolute;"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="box box-height-max" style="margin-top:10px">
+                                        <h4><span>Khách hàng được chọn:</span></h4>
+                                        <div class="customer-chosen">
+                                            @foreach (var CustomerItem in Model.ApplyDetail)
+                                            {
+                                                if (CustomerItem.Type == 1)
+                                                {
+                                                    <label class="customer-item" data-category="">
+                                                        <i class="fa fa-minus"></i>
+                                                        <input type="checkbox" name="ApplyForCustomer" class="" value="@CustomerItem.BranchId" checked />
+                                                        <span class="">@CustomerItem.CustomerName</span>
+                                                    </label>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>*@
+                        <div class="tab-pane clearfix" id="tab3">
+                            <div class="widget-body">
+                                <div style="margin-top:10px">
+
+                                    <h4><span style="float:left; ">Tìm KH:</span></h4>
+                                    <div class="product-search-box">
+                                        <select class="chzn-select" id="CustomerSelectList" name="CustomerSelectList" style="width:360px;border-radius:5px;position:absolute;">
+                                            <option value="" data-id="">- Tìm Khách hàng -</option>
+                                            @if (CustomerList != null)
+                                            {
+                                                foreach (var item in CustomerList.OrderBy(x => x.CreatedDate).ToList())
+                                                {
+                                                    <option value="@item.Id" data-selected="0" data-id="@item.Id" data-value="@item.Id | @(item.Code + " - " + item.FullName) | @item.Mobile" data-code="@item.Code">@item.FullName - @item.Mobile</option>
+                                                }
+                                            }
+                                        </select>
+                                        <a style="margin: 0px 0px 0px 310px" id="btnAdd_Customer" class="btn btn-primary btn-mini btnAdd_toggle"><i class="ace-icon fa fa-plus" style="position: absolute;"></i></a>
+                                    </div>
+                                </div>
+
+                                <div class="box box-height-max" style="margin-top:10px">
+                                    <h4><span>Khách hàng được chọn:</span></h4>
+                                    <div class="customer-chosen" style="border-radius:5px;">
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*-------------------------------------------------------------------------------------------------------*@
+            </div>
+        </div>
+    </div>
+
+                                            using (Html.BeginButtonContainer(pageSetting))
+                                            {
+                                                <div>
+                                                    <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save" style="border-radius:5px;">
+                                                        <i class="ace-icon fa fa-save"></i>
+                                                        @Wording.ReUpdate
+                                                    </a>
+                                                </div>
+                                                }
+                                            }
+
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy HH:mm:ss")
+
+    <link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+    <script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+    <script>
+        $(':radio:not(:checked)').attr('disabled', true);
+    </script>
+    <script>
+        var urlRefer = '@ViewBag.urlRefer';
+        //truyền từ action create của controller qua khi thực hiện submit và return về lại view create, để nhận biết là được gọi theo dạng popup
+        var closePopup = '@ViewBag.closePopup';
+
+        function d_check() {
+            var dl_sdt = $('#StartDate').val(); //date one
+            var dl_endt = $('#EndDate').val(); //date two
+            var a = new Date(dl_sdt);
+            var b = new Date(dl_endt);
+            var msDateA = Date.UTC(a.getFullYear(), a.getMonth() + 1, a.getDate());
+            var msDateB = Date.UTC(b.getFullYear(), b.getMonth() + 1, b.getDate());
+
+            if (parseFloat(msDateA) < parseFloat(msDateB))
+                return -1;  // lt
+            else if (parseFloat(msDateA) == parseFloat(msDateB))
+                return 0;  // eq
+            else if (parseFloat(msDateA) > parseFloat(msDateB))
+                return 1;  // gt
+            else
+                return null;  // error
+
+        }
+
+        $(document).ready(function () {
+
+            $('#StartDateId').datetimepicker({
+
+                showTodayButton: true,
+                format: 'DD/MM/YYYY HH:mm',
+                showClose: true,
+                showClear: true,
+                toolbarPlacement: 'top',
+                stepping: 15,
+                sideBySide: true
+
+            });
+            $('#EndDateId').datetimepicker({
+
+                showTodayButton: true,
+                format: 'DD/MM/YYYY HH:mm',
+                showClose: true,
+                showClear: true,
+                toolbarPlacement: 'top',
+                stepping: 15,
+                sideBySide: true,
+                useCurrent: false
+            });
+            $("#StartDateId").on("dp.change", function (e) {
+                $('#EndDateId').data("DateTimePicker").minDate(e.date);
+            });
+            $("#EndDateId").on("dp.change", function (e) {
+                $('#StartDateId').data("DateTimePicker").maxDate(e.date);
+            });
+
+            LoadNumberInput();
+            $(".detail_item_check").change(function () {
+                var index = $(this).data("index");
+                if ($(this).prop("checked")) {
+                    $("#DetailList_" + index + "__IsMoney").val(true);
+                    $("#DetailList_" + index + "__CommissionValueText").val("VNĐ");
+                }
+                else {
+                    $("#DetailList_" + index + "__IsMoney").val(false);
+                    $("#DetailList_" + index + "__CommissionValueText").val("%");
+                }
+            });
+
+            $('#productSelectList').radComboBox({
+                colTitle: 'ID, Hình, Tên sản phẩm, Xuất xứ, Giá nhập',
+                colValue: 1,
+                colImage: 2,
+                colHide: '1',
+                colSize: '0px,70px,250px,100px,100px',
+                colClass: ',,',
+                //width: 600,
+                height: 500,
+                boxSearch: true,
+                colSearch: 2
+            });
+            //Hiển thị giá và tính thành tiền khi chọn sản phẩm
+            $('#productSelectList').on('change', function () {
+                debugger
+                //alert("laij vao day");
+                var $this = $(this);
+                var selected = $this.find("option:selected");
+
+                if (selected.val() == '')// || $('#product_item_' + selected.val()).length > 0)
+                    return;
+
+                var OrderNo = $('.detailList tr').length;
+                var ProductId = selected.val();
+                var ProductName = selected.text();
+                var Price = selected.data("price");
+                var ProductCode = selected.data("code");
+
+
+                //begin hoapd kiem tra trung san pham
+                var tontai = 0;
+                $("#tbllistOrderDetail1 TBODY TR").each(function () {
+                    var row = $(this).val();
+                    var ProductCode1 = $(this).closest('tr').find("td:eq(0) input:nth-child(5)").val();
+
+                    if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                        //alert(ProductCode1);
+                        tontai = 1;
+                        return;
+                    }
+
+
+                });
+
+                //end hoapd kiem tra trung san pham
+
+                if (tontai == 0) {
+                    var STT = OrderNo + 1;
+                    var AddRow = '<tr data-id="' + OrderNo + '">';
+                    AddRow += '<td>' + STT ;
+                    AddRow += '<input id="DetailList_' + OrderNo + '__Id" name="DetailList[' + OrderNo + '].Id" type="hidden"  value="' + ProductId + '" />'
+                    AddRow += '<input id="DetailList_' + OrderNo + '__ProductId" name="DetailList[' + OrderNo + '].ProductId" type="hidden"  value="' + ProductId + '" />'
+                    AddRow += '<input id="DetailList_' + OrderNo + '__Price" name="DetailList[' + OrderNo + '].Price" type="hidden"  value="' + Price + '" />'
+                    AddRow += '<input id="DetailList_' + OrderNo + '__Type" name="DetailList[' + OrderNo + '].Type" type="hidden"  value="' + ProductId + '" />'
+                    AddRow += '<input id="DetailList_' + OrderNo + '__ProductCode" name="DetailList[' + OrderNo + '].Id" type="hidden"  value="' + ProductCode + '" />'
+                    AddRow +=  '</td>';
+
+                    AddRow += '<td>' + ProductCode + '-' + ProductName + '</td>';
+                    AddRow += '<td>  sản phẩm </td>';
+                    AddRow += '<td>' + Price + '</td>';
+                    AddRow += '<td> <input id="DetailList_' + OrderNo + '__CommissionValue" name="DetailList[' + OrderNo + '].CommissionValue" class="input-price numberinput2" autocomplete="off" style="width:100px; text-align:right; border:1px solid green; font-weight:bold; color:green" value="0" />';
+                    AddRow += '<input id="DetailList_' + OrderNo + '__ProductId" name="DetailList[' + OrderNo + '].ProductId" type="hidden"  value="' + ProductId + '" />'
+                    AddRow += '<input id="DetailList_' + OrderNo + '__Type" name="DetailList[' + OrderNo + '].Type" type="hidden"  value="' + 1 + '" />'
+                    AddRow += '<input id="DetailList_' + OrderNo + '__CommissionValueText" name="DetailList[' + OrderNo + '].CommissionValueText" style="width:40px; text-align:center" type="text" value="%" readonly="readonly" /></td>';
+                    AddRow += '<td><label>'
+                        + ' <input class="detail_item_check ace" type="checkbox" name="DetailList[' + OrderNo + '].IsMoney" data-index="' + OrderNo + '" id="DetailList_' + OrderNo + '__IsMoney" />'
+                        + ' <span class="lbl"></span>'
+                        + ' </label>'
+                        + '</td > ';
+                    AddRow += '<td><a class="btn-delete-item"> <i class="fa fa-close" style ="cursor:pointer;color: #dd5a43;font-size: 20px; text-align: center; position: inherit; transform: translate(1 %, 50 %); " ></i> </a></td>';
+                    AddRow += '</tr>'
+                    $('.detailList').prepend(AddRow);
+                }
+
+            });
+            $('#product_barcode').keypress(function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    $('#product_barcode').trigger('change');
+                }
+            });
+
+            $(window).keydown(function (e) {
+                if (e.which == 114) {
+                    e.preventDefault();
+                    $("#product_barcode").focus();
+                }
+            });
+
+            //khi nhập barcode
+            $('#product_barcode').change(function () {
+                var $this = $(this);
+                if ($this.val() != '') {
+
+                    var barcode = $this.val();
+                    //đặt lại giá trị rỗng
+                    $this.val('').focus();
+
+                    var valueSearch = searchProductByBarCodeContain(barcode);
+                    if (valueSearch == undefined) {
+                        alert('Không tìm thấy sản phẩm với mã code trên!');
+                        return;
+                    }
+
+                    $('#productSelectList').val(valueSearch).trigger("change");
+
+                    //kết thúc các lệnh của sự kiện
+                }
+            });
+
+            $('#EditCommissionCus').delegate("#Save", 'click', function () {
+                //validate
+                if ($('#checkbox1').is(':checked') && $('.product-chosen').children().length == 0 && $('#Select_Type3').val() == 1) {
+                    alert('Chưa chọn Cửa hàng. Xin vui lòng kiểm tra lại!')
+                    return;
+                }
+
+                //if (d_check() == -1)
+                //{
+                //    alert('Thời gian kết thúc phải lớn hơn thời gian bắt đầu, xin vui lòng kiểm tra lại!')
+                //    return;
+                //}
+
+                if ($('#checkbox2 ').is(':checked') && $('.vip-chosen').children().length == 0) {
+                    alert('Chưa chọn nhóm vip. Xin vui lòng kiểm tra lại!')
+                    return;
+                }
+                if ($('#checkbox3 ').is(':checked') && $('.customer-chosen').children().length == 0) {
+                    alert('Chưa chọn khách hàng. Xin vui lòng kiểm tra lại!')
+                    return;
+                }
+                if ($('#LoaiKM_1 ').is(':checked') && $('.detailList tr').length == 0) {
+                    alert('Chưa chọn hàng hóa cần KM. Xin vui lòng kiểm tra lại!')
+                    return
+                }
+
+                ShowLoading();
+                var CommissionCusId = $("#Id").val();
+                ClearFormatBeforeSubmit($("#EditCommissionCus"));
+                $("#EditCommissionCus").submit();
+                //HideLoading();
+            });
+            //-------------------------------------------------------------------------------------------------------------------------
+            // hiện filter theo loại khuyến mãi
+            $(".LoaiKM").on('change', function () {
+                $(".group_choice_wrap").css('height', 'initial');
+                if ($('#LoaiKM_2').is(":checked")) {
+                    //$(".group_choice_wrap").hide();
+                    $('#HH_Area').removeClass('active-slide')
+                    $('#HD_Area').show()
+                    $('#HH_Area').hide()
+                    $('#HD_Area').addClass('active-slide')
+
+                    //xóa các item đã chọn trong HH
+                    $('.detailList').children().remove();
+                }
+                else {
+                    $('#HD_Area').removeClass('active-slide')
+                    $('#HH_Area').show()
+                    $('#HD_Area').hide()
+                    $('#HH_Area').addClass('active-slide')
+
+                    //xóa các item đã chọn trong HD
+                    $('.InvoiceDiscountDetail').children().remove();
+                }
+            });
+            //-------------------------------------------------------------------------------------------------------------------------
+            @*var CommissionCusId = $("#Id").val();
+            var OrderNo = $("OrderNo").val();
+            var ProductId = $("ProductId").val();
+            var ProductName = $("ProductName").val();
+            var formdata = {
+                CommissionCusId: CommissionCusId,
+                OrderNo :  OrderNo,
+                ProductId: ProductId,
+                ProductName: ProductName
+            };
+            $('#detailList').html("");
+            //Thêm dòng mới
+            ClickEventHandler   (true, "/CommissionCus/LoadProduct", "#detailList", formdata);
+
+            //nếu là được gọi theo dạng popup từ form khác thì chạy đoạn code bên dưới
+            if (closePopup != '') {
+                var option = '<option value="@Model.Id" >@Model.Name</option>';
+                //tên funtion có thể khác theo từng công việc riêng (đây chỉ là mẫu khi thêm mới sẽ gọi lại)
+                window.parent.ClosePopupAndAppendSelect(option);
+            }
+            //nếu có url thì gọi hàm này để trang ngoài iframe nhảy trang
+            if (urlRefer != '') {
+                window.parent.ClosePopupAndRedirectToURL(urlRefer);
+            }*@
+
+            $(document).on('change', '#EditCommissionCus .product-item input', function () {
+                var $this = $(this);
+                $parent = $this.closest('label');
+                if ($parent.find('i.fa-minus').length > 0) { //thêm
+
+                    var branchValue = $parent.find('input').val();
+                    var branchText = $parent.find('span').text();
+                    var option = '<option value="' + branchValue + '" >' + branchText + '</option>';
+                    $('#productCategory').append(option);
+                    // set lại hidden input
+                    $('#Branch_' + branchValue).attr('name', 'DisplayForBranch')
+                    $parent.remove();
+                }
+            });
+
+            $(document).on('change', '#EditCommissionCus .customer-item input', function () {
+                var $this = $(this);
+                $parent = $this.closest('label');
+                if ($parent.find('i.fa-minus').length > 0) { //thêm
+                    var Id = $parent.find('input').val();
+                    var FullName = $parent.find('span').text();
+                    var option = '<option value="' + Id + '" >' + FullName + '</option>';
+                    $('#CustomerSelectList').append(option);
+                    // set lại hidden input
+                    $('#Customer_' + Id).attr('name', 'DisplayForCustomer')
+                    $parent.remove();
+                }
+            });
+
+            $('#EditCommissionCus .vip-item input').change(function () {
+                var $this = $(this);
+                $parent = $this.closest('label');
+
+                if ($parent.find('i.fa-plus').length > 0) { //thêm
+                    $parent.find('input').prop('checked', true);
+                    $parent.find('input').attr('name', 'ApplyForVip')
+                    $parent.find('i').removeClass('fa-plus').addClass('fa-minus');
+
+                    $parent.prependTo('.vip-chosen');
+                } else { // xóa
+                    $parent.find('input').prop('checked', false);
+                    $parent.find('input').attr('name', 'DisplayForVip')
+                    $parent.find('i').removeClass('fa-minus').addClass('fa-plus');
+
+                    $parent.prependTo('.vip-display');
+                }
+            });
+
+            //$('.accordion-section-content').hide();
+            $('.accordion-section-title').click(function () {
+                var $i = $(this).find('i');
+                if ($i.hasClass('fa-angle-double-right')) {
+                    $i.removeClass('fa-angle-double-right').addClass('fa-angle-double-down');
+                } else {
+                    $i.removeClass('fa-angle-double-down').addClass('fa-angle-double-right');
+                }
+
+                var $nextDiv = $(this).next();
+                var $visibleSiblings = $nextDiv.siblings('div:visible');
+
+                if ($visibleSiblings.length) {
+                    $visibleSiblings.slideUp('fast', function () {
+                        $nextDiv.slideToggle('fast');
+                    });
+                } else {
+                    $nextDiv.slideToggle('fast');
+                }
+            });
+
+            setTimeout(function () {
+                //$('.accordion-section:first-child .accordion-section-title').trigger('click');
+            }, 500);
+
+            //-------------------------------------------------------------------------------------------------------------------------
+            // xóa sản phẩm
+            $('.detailList').on('click', '.btn-delete-item', function () {
+                $(this).closest('tr').remove();
+                console.log($(this).closest('tr').attr('id'));
+                if ($(this).closest('tr').attr('id') == 'AllSp') {
+                    $("#GetAllSp").prop("checked", false);
+                    $('.rcb-input-search').prop('disabled', false)
+                    $('#nhomSpSelectList').prop('disabled', false)
+                    $('#btnAdd_NhomSp').show();
+                }
+            });
+
+            //xóa hóa đơn
+            $('.InvoiceDiscountDetail').on('click', '.btn-delete-item', function () {
+                $(this).closest('tr').remove();
+            });
+            //-------------------------------------------------------------------------------------------------------------------------
+            $('#btnAdd_Branch').on('click', function () {
+                var branchValue = $('#productCategory option:selected').val();
+                var branchText = $('#productCategory option:selected').text();
+                // kiểm tra kiểu int
+                console.log(branchValue)
+                if (branchValue != "") {
+                    if (branchText == "") {
+                        alert('cửa hàng không hợp lệ!');
+                        return
+                    }
+                    $('#productCategory option:selected').remove();
+                    var branchLabel = '<label class="product-item">'
+                        + '<i class="fa fa-minus"></i>'
+                        + '<input type="checkbox"name="ApplyForBranch" class="" value="' + branchValue + '" checked />'
+                        + '<span class=""><strong>' + branchText + '</strong></span>'
+                        + '</label>'
+                    $('#Branch_' + branchValue).attr('name', 'ApplyForBranch')
+                    $('.product-chosen').append(branchLabel);
+                }
+                else {
+                    alert('Chưa chọn cửa hàng!')
+                }
+            })
+
+            $('#btnAdd_Customer').on('click', function () {
+                var IdCustomer = $('#CustomerSelectList option:selected').data('id');
+                var FullName = $('#CustomerSelectList option:selected').text();
+                // kiểm tra kiểu int
+                if (IdCustomer != "") {
+                    $('#CustomerSelectList option:selected').remove();
+                    var CustomerLabel = '<label class="customer-item">'
+                        + '<i class="fa fa-minus"></i>'
+                        + '<input type="checkbox"name="ApplyForCustomer" class="" value="' + IdCustomer + '" checked />'
+                        + '<span class=""><strong>' + FullName + '</strong></span>'
+                        + '</label>'
+
+                    $('#Customer_' + IdCustomer).attr('name', 'ApplyForCustomer')
+                    $('.customer-chosen').append(CustomerLabel);
+                }
+                else {
+                    alert('Chưa chọn khách hàng!')
+                }
+            })
+
+            $("#btnAdd_NhomSp").on('click', function () {
+
+                var $getNhomSpSelect = $('#nhomSpSelectList option:selected');
+                var OrderNoLastRow = parseInt($('.detailList tr:last').data('id')) + 1;
+                console.log(OrderNoLastRow);
+                console.log($getNhomSpSelect.val());
+
+                alert($getNhomSpSelect.val());
+
+                if ($getNhomSpSelect.val() != "") {
+                    var OrderNo = isNaN(OrderNoLastRow) ? 0 : OrderNoLastRow
+                    var STT = OrderNo + 1
+                    var AddRow = '<tr data-id="' + OrderNo + '">';
+                    AddRow += '<td>' + STT + '</td>';
+                    AddRow += '<td>' + $getNhomSpSelect.text() + '</td>';
+                    AddRow += '<td> Nhóm sản phẩm </td>';
+                    AddRow += '<td></td>';
+                    AddRow += '<td> <input id="DetailList_' + OrderNo + '__CommissionValue" name="DetailList[' + OrderNo + '].CommissionValue" class="input-price numberinput2" autocomplete="off" style="width:100px; text-align:right; border:1px solid green; font-weight:bold; color:green" value="0" />';
+                    AddRow += '<input id="DetailList_' + OrderNo + '__ProductId" name="DetailList[' + OrderNo + '].ProductId" type="hidden"  value="' + $getNhomSpSelect.val() + '" />'
+                    AddRow += '<input id="DetailList_' + OrderNo + '__Type" name="DetailList[' + OrderNo + '].Type" type="hidden"  value="' + 2 + '" />'
+                    AddRow += '<input id="DetailList_' + OrderNo + '__CommissionValueText" name="DetailList[' + OrderNo + '].CommissionValueText" style="width:40px; text-align:center" type="text" value="%" readonly="readonly" /></td>';
+                    AddRow += '<td><label>'
+                        + ' <input class="detail_item_check ace" type="checkbox" name="DetailList[' + OrderNo + '].IsMoney" data-index="' + OrderNo + '" id="DetailList_' + OrderNo + '__IsMoney" />'
+                       + ' <span class="lbl"></span>'
+                       + ' </label>'
+                       + '</td > ';
+                    AddRow += '<td><a class="btn-delete-item"> <i class="fa fa-close" style ="cursor:pointer;color: #dd5a43;font-size: 20px; text-align: center; position: inherit; transform: translate(1 %, 50 %); " ></i> </a></td>';
+                    AddRow += '</tr>'
+                    $('.detailList').append(AddRow);
+                }
+                else {
+                    alert('Chưa chọn nhóm!')
+                }
+            })
+
+            //format money
+            function currencyFormatDE(num) {
+                return (
+                    num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+                )
+            }
+
+            $('#Minvalue').on('change', function () {
+                var value = $(this).val()
+                if (value) {
+                    $(this).val(currencyFormatDE(value))
+                }
+            })
+
+            $('#btn_AddItemInvoice').on('click', function () {
+                var Minvalue = $('#Minvalue').val()
+                console.log('minvalue:' + Minvalue)
+                var OrderNoLastRow = parseInt($('.InvoiceDiscountDetail tr:last').data('id')) + 1;
+                if (Minvalue) {
+                    var OrderNo = isNaN(OrderNoLastRow) ? 0 : OrderNoLastRow
+                    var STT = OrderNo + 1
+                    var AddRow = '<tr data-id="' + OrderNo + '">';
+                    AddRow += '<td>' + STT + '</td>';
+                    AddRow += '<td>' + '<input id="DetailList_' + OrderNo + '__Minvalue" name="DetailList[' + OrderNo + '].Minvalue"  value="' + Minvalue + '"  class="input-price numberinput2" autocomplete="off" style="width:150px; text-align:right;" type="text" />' + '</td>';
+                    AddRow += '<td> <input id="DetailList_' + OrderNo + '__CommissionValue" name="DetailList[' + OrderNo + '].CommissionValue" class="input-price numberinput2" autocomplete="off" style="width:100px; text-align:right; border:1px solid green; font-weight:bold; color:green" type="text" value="0" />';
+                    AddRow += '<input id="DetailList_' + OrderNo + '__Type" name="DetailList[' + OrderNo + '].Type" type="hidden"  value="' + 4 + '" />'
+                    AddRow += '<input id="DetailList_' + OrderNo + '__CommissionValueText" name="DetailList[' + OrderNo + '].CommissionValueText" style="width:40px; text-align:center" type="text" value="%" readonly="readonly" /></td>';
+                    AddRow += '<td><label>'
+                        + ' <input class="detail_item_check ace" type="checkbox" name="DetailList[' + OrderNo + '].IsMoney" data-index="' + OrderNo + '" id="DetailList_' + OrderNo + '__IsMoney" />'
+                        + ' <span class="lbl"></span>'
+                        + ' </label>'
+                        + '</td > ';
+                    AddRow += '<td><a class="btn-delete-item"> <i class="fa fa-close" style ="cursor:pointer;color: #dd5a43;font-size: 15px; text-align: center; position: inherit; transform: translate(1 %, 50 %);" ></i> </a></td>';
+                    AddRow += '</tr>'
+                    $('.InvoiceDiscountDetail').append(AddRow);
+                }
+                else {
+                    alert('Chưa nhập mức giá tối thiểu!')
+                }
+            })
+
+            $("#EditCommissionCus").delegate(".detail_item_check", 'change', function () {
+                var index = $(this).data("index");
+                if ($(this).prop("checked")) {
+                    $("#DetailList_" + index + "__IsMoney").val(true);
+                    $("#DetailList_" + index + "__CommissionValueText").val("VNĐ");
+                }
+                else {
+                    $("#DetailList_" + index + "__IsMoney").val(false);
+                    $("#DetailList_" + index + "__CommissionValueText").val("%");
+                }
+            });
+            // trigger tab-pane
+
+            $('.typeCheck input[type=checkbox]').change(function () {
+                var $getcheckbox = $(this);
+                var checkValue = $getcheckbox.val();
+                if (checkValue == 3) {
+                    if ($getcheckbox.is(':checked')) {
+                        $('[href="#tab1"]').closest('li').show();
+                        $('[href="#tab1"]').trigger('click');
+                        $('#tab1').css('display:block');
+                        $('#tab1').addClass('active')
+                    }
+                    else {
+                        $('[href="#tab1"]').closest('li').hide();
+                        $('#tab1').css('display:none');
+                        $('#tab1').removeClass('active')
+                        var $getAllCheckBox = $('.typeCheck input[type=checkbox]:checked')
+                        console.log($getAllCheckBox)
+                        if ($getAllCheckBox.length > 0) {
+                            // do vaue của check box và tab đang ngược nhau
+                            var NextTab = $getAllCheckBox[0].value
+                            if (NextTab == 1) {
+                                NextTab = 3
+                            }
+                            else if (NextTab == 3) {
+                                NextTab = 1
+                            }
+
+                            $('[href="#tab' + NextTab + '"]').trigger('click')
+                        }
+                    }
+                }
+                else if (checkValue == 2) {
+                    if ($getcheckbox.is(':checked')) {
+                        $('[href="#tab2"]').closest('li').show();
+                        $('[href="#tab2"]').trigger('click');
+                        $('#tab2').css('display:block');
+                        $('#tab2').addClass('active')
+                    }
+                    else {
+                        $('[href="#tab2"]').closest('li').hide();
+                        $('#tab2').css('display:none');
+                        $('#tab2').removeClass('active')
+                        var $getAllCheckBox = $('.typeCheck input[type=checkbox]:checked')
+                        console.log($getAllCheckBox)
+                        if ($getAllCheckBox.length > 0) {
+                            // do vaue của check box và tab đang ngược nhau
+                            var NextTab = $getAllCheckBox[0].value
+                            if (NextTab == 1) {
+                                NextTab = 3
+                            }
+                            else if (NextTab == 3) {
+                                NextTab = 1
+                            }
+
+                            $('[href="#tab' + NextTab + '"]').trigger('click')
+                        }
+                    }
+                }
+                else {
+                    if ($getcheckbox.is(':checked')) {
+                        $('[href="#tab3"]').closest('li').show();
+                        $('[href="#tab3"]').trigger('click');
+                        $('#tab3').css('display:block');
+                        $('#tab3').addClass('active')
+                    }
+                    else {
+                        $('[href="#tab3"]').closest('li').hide();
+                        $('#tab3').css('display:none');
+                        $('#tab3').removeClass('active')
+                        var $getAllCheckBox = $('.typeCheck input[type=checkbox]:checked')
+                        console.log($getAllCheckBox)
+                        if ($getAllCheckBox.length > 0) {
+                            // do vaue của check box và tab đang ngược nhau
+                            var NextTab = $getAllCheckBox[0].value
+                            if (NextTab == 1) {
+                                NextTab = 3
+                            }
+                            else if (NextTab == 3) {
+                                NextTab = 1
+                            }
+
+                            $('[href="#tab' + NextTab + '"]').trigger('click')
+                        }
+                    }
+                }
+            })
+
+            $('#Select_Type3').on('change', function () {
+                if ($(this).val() == 0) {
+                    $('#productCategory').prop('disabled', true);
+                }
+                else {
+                    $('#productCategory').prop('disabled', false);
+                }
+            })
+        });
+
+        $('#GetAllSp').on('change', function () {
+            //xóa tất cả sp đã chọn
+            $('.detailList').children().remove();
+            $('.rcb-input-search').prop('disabled', true)
+            $('#nhomSpSelectList').prop('disabled', true)
+            $('#btnAdd_NhomSp').hide();
+
+            if ($(this).is(':checked')) {
+                var OrderNoLastRow = parseInt($('.detailList tr:last').data('id')) + 1;
+                var OrderNo = isNaN(OrderNoLastRow) ? 0 : OrderNoLastRow
+                var STT = OrderNo + 1
+                var AddRow = '<tr id="AllSp" data-id="' + OrderNo + '">';
+                AddRow += '<td>' + STT + '</td>';
+                AddRow += '<td> Tất cả sản phẩm </td>';
+                AddRow += '<td></td>';
+                AddRow += '<td></td>';
+                AddRow += '<td> <input id="DetailList_' + OrderNo + '__CommissionValue" name="DetailList[' + OrderNo + '].CommissionValue" class="input-price numberinput2" autocomplete="off" style="width:100px; text-align:right; border:1px solid green; font-weight:bold; color:green" value="0" />';
+                AddRow += '<input id="DetailList_' + OrderNo + '__ProductId" name="DetailList[' + OrderNo + '].ProductId" type="hidden"  value="' + 0 + '" />'
+                AddRow += '<input id="DetailList_' + OrderNo + '__Type" name="DetailList[' + OrderNo + '].Type" type="hidden"  value="' + 3 + '" />'
+                AddRow += '<input id="DetailList_' + OrderNo + '__CommissionValueText" name="DetailList[' + OrderNo + '].CommissionValueText" style="width:40px; text-align:center" type="text" value="%" readonly="readonly" /></td>';
+                AddRow += '<td><label>'
+                    + ' <input class="detail_item_check ace" type="checkbox" name="DetailList[' + OrderNo + '].IsMoney" data-index="' + OrderNo + '" id="DetailList_' + OrderNo + '__IsMoney" />'
+                    + ' <span class="lbl"></span>'
+                    + ' </label>'
+                    + '</td > ';
+                AddRow += '<td><a class="btn-delete-item"> <i class="ace-icon fa fa-close" style ="cursor:pointer;color: #dd5a43;font-size: 30px; text-align: center;    position: inherit;transform: translate(1 %, 50 %);" ></i> </a></td>';
+                AddRow += '</tr>'
+                $('.detailList').append(AddRow);
+            }
+            else {
+                $('#AllSp').remove();
+                $('.rcb-input-search').prop('disabled', false)
+                $('#nhomSpSelectList').prop('disabled', false)
+                $('#btnAdd_NhomSp').show();
+            }
+        })
+    </script>
+    <script>
+        var format = function (num) {
+            var str = num.toString().replace("$", ""), parts = false, output = [], i = 1, formatted = null;
+            if (str.indexOf(".") > 0) {
+                parts = str.split(".");
+                str = parts[0];
+            }
+            str = str.split("").reverse();
+            for (var j = 0, len = str.length; j < len; j++) {
+                if (str[j] != ",") {
+                    output.push(str[j]);
+                    if (i % 3 == 0 && j < (len - 1)) {
+                        output.push(".");
+                    }
+                    i++;
+                }
+            }
+            formatted = output.reverse().join("");
+            return (formatted + ((parts) ? "." + parts[1].substr(0, 2) : ""));
+        };
+        function formatAmountNoDecimals(number) {
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(number)) {
+                number = number.replace(rgx, '$1' + '.' + '$2');
+            }
+            return number;
+        }
+
+        //$('#txtPromotionPrice').keyup(function () {
+        //    $(this).val(formatNumber($(this).val()));
+        //});
+        $('#txtPromotionPrice').keyup(function (event) {
+
+            // skip for arrow keys
+            if (event.which >= 37 && event.which <= 40) {
+                event.preventDefault();
+            }
+
+            $(this).val(function (index, value) {
+                return value
+                    .replace(/\D/g, "")
+                    //.replace(/([0-9])([0-9])$/, '$1.$2')
+                    .replace(/\B(?=(\d{3})+(?!\d)\.?)/g, ".")
+                ;
+            });
+        });
+        $('body').delegate('#btnApdung', 'click', function () {
+            var r = confirm("Bạn có chắc áp đặt các sản phẩm về cùng 1 giá ?");
+            if (r == true) {
+                //alert("You pressed OK!");
+                var inputAp = $('#txtPromotionPrice').val();
+                if (inputAp != "") {
+                    $("#tbllistOrderDetail1 TBODY TR").each(function () {
+                        var row = $(this).val();
+                        var checkboxes = $(this).closest('tr').find(':checkbox');
+                        if ((checkboxes).is(':checked')) {
+                            checkboxes.prop('checked', true);
+                        } else {
+                            checkboxes.trigger('click').prop('checked', true);
+                        }
+
+                        var Pnumber = $(this).closest('tr').find("td:eq(3)").text();
+                        var total = removeComma(Pnumber) - removeComma(inputAp);
+                        $(this).closest('tr').find(".input-price").val(format(total));
+
+                    });
+                } else {
+                    $("#tbllistOrderDetail1 TBODY TR").each(function () {
+                        var checkboxes = $(this).closest('tr').find(':checkbox');
+                        if ((checkboxes).is(':checked')) {
+                            checkboxes.trigger('click').prop('checked', false);
+                        } else {
+                            checkboxes.prop('checked', false);
+                        }
+                        $(this).closest('tr').find(".input-price").val(0);
+
+                    });
+                }
+
+            }
+
+        })
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#StartDateId').on("dp.change", function () {
+                //debugger
+                var start = $('#StartDate').val();
+                console.log(start);
+                $.ajax({
+                    url: '/CommissionCus/CheckStartDate',
+                    type: "POST",
+                    data: JSON.stringify({ Start: start }),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (r) {
+                        if (r == 1) {
+                            $(".startDate").css("display", "block").slideDown();
+                        } else if (r == 0) {
+                            $(".startDate").css("display", "none").slideUp();
+                        }
+                    }
+                });
+            })
+
+            $('#EndDateId').on("dp.change", function () {
+                //debugger
+                var end = $('#EndDate').val();
+                //console.log(start);
+                $.ajax({
+                    url: '/CommissionCus/CheckEndDate',
+                    type: "POST",
+                    data: JSON.stringify({ End: end }),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (r) {
+                        if (r == 1) {
+                            $(".endDate").css("display", "block").fadeIn();
+                        } else if (r == 0) {
+                            $(".endDate").css("display", "none").fadeOut();
+                        }
+                    }
+                });
+            })
+        });
+    </script>
+}

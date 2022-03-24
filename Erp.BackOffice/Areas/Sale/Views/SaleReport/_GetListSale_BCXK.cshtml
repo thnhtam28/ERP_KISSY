@@ -1,0 +1,120 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_BaoCaoXuatKhoViewModel>
+@{
+    Layout = null;
+    int index = 1;
+    var total = Model.Sum(x => (x.service + x.invoice + x._internal));
+     var setting = Erp.BackOffice.Helpers.Common.GetSetting("hiden_solo_handung");
+    var setting2 = Erp.BackOffice.Helpers.Common.GetSetting("hiden_gianhap");
+}
+<style>
+    .display_none {
+        display: none;
+    }
+</style>
+<table id="cTable" class="table table-bordered">
+    <thead>
+        <tr class="" style="display:none">
+            <th class="" colspan="14" style="text-align:center"><h4>BÁO CÁO XUẤT KHO TỪ @ViewBag.StartDate ĐẾN @ViewBag.EndDate</h4></th>
+        </tr>
+        <tr>
+            <th style="width:40px;text-align:center">STT</th>
+            <th style="width:100px;text-align:center">Mã sản phẩm</th>
+            <th style="width:200px;text-align:center">Tên sản phẩm</th>
+            @*<th style="width:100px;text-align:center">Danh mục sản phẩm</th>*@
+            @*<th style="width:100px;text-align:center">Nhà sản xuất</th>*@
+            <th style="width:150px;text-align:center">Kho</th>
+            @if (setting == "true")
+            {
+                <th class="display_none" style="width:100px;text-align:center">Số Lô</th>
+                <th class="display_none" style="width:100px;text-align:center">Hạn dùng</th>
+            }
+            else if (setting == "false")
+            {
+                <th style="width:100px;text-align:center">Số Lô</th>
+                <th style="width:100px;text-align:center">Hạn dùng</th>
+            }
+            @if (setting2 == "true")
+            {
+                <th class="display_none" style="width:100px;text-align:center">Đơn giá</th>
+
+            }
+            else if (setting2 == "false")
+            {
+                <th style="width:100px;text-align:center">Đơn giá</th>
+            }
+
+            <th style="width:100px;text-align:center">Đơn vị tính</th>
+            <th style="width:100px;text-align:center">Xuất bán</th>
+            <th style="width:100px;text-align:center">Xuất vận chuyển</th>
+            <th style="width:100px;text-align:center">Xuất sử dụng</th>
+            <th style="width:100px;text-align:center">Tổng xuất</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            var total_row = item.invoice + item._internal + item.service;
+        <tr class="@(index%2==0?"alert-warning":"")">
+            <td>
+                <span>@(index++)</span>
+            </td>
+            <td>@(item.ProductCode)</td>
+            <td>@(item.ProductName)</td>
+            @*<td>@(item.CategoryCode)</td>*@
+            @*<td>@(item.Manufacturer)</td>*@
+            <td>@(item.WarehouseName)</td>
+            @if (setting == "true")
+            {
+                <td class="display_none">@(item.LoCode)</td>
+                <td class="display_none">@(item.ExpiryDate == null ? "" : item.ExpiryDate.Value.ToString("dd/MM/yyyy"))</td>
+            }
+            else if (setting == "false")
+            {
+                <td>@(item.LoCode)</td>
+                <td>@(item.ExpiryDate == null ? "" : item.ExpiryDate.Value.ToString("dd/MM/yyyy"))</td>
+            }
+
+            @if (setting2 == "true")
+            {
+                <td class="display_none" style="text-align:right">@(CommonSatic.ToCurrencyStr(item.Price, null))</td>
+
+            }
+            else if (setting2 == "false")
+            {
+                <td style="text-align:right">@(CommonSatic.ToCurrencyStr(item.Price, null))</td>
+            }
+
+            <td>@(item.Unit)</td>
+            <td style="text-align:right">@(Common.PhanCachHangNgan(item.invoice))</td>
+            <td style="text-align:right">@(Common.PhanCachHangNgan(item._internal))</td>
+            <td style="text-align:right">@(Common.PhanCachHangNgan(item.service))</td>
+            <td style="text-align:right">@(Common.PhanCachHangNgan(total_row))</td>
+        </tr>
+        }
+    </tbody>
+    <thead style="position:fixed;bottom: 80px;right: 0.7%; width: 29%">
+        <tr>
+            <td colspan="6" style="text-align:right;width:100px"><b>Tổng</b></td>
+            <td style="text-align:right; width: 90px; resize: initial">@(Common.PhanCachHangNgan(Model.Sum(x => x.invoice)))</td>
+            <td style="text-align:right; width: 90px">@(Common.PhanCachHangNgan(Model.Sum(x => x._internal)))</td>
+            <td style="text-align:right; width: 90px">@(Common.PhanCachHangNgan(Model.Sum(x => x.service)))</td>
+            <td style="text-align:right; width: 90px">@(Common.PhanCachHangNgan(total))</td>
+        </tr>
+    </thead>
+</table>
+
+<script src="~/Scripts/jquery.floatThead.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#cTable").floatThead({ top: 30 });
+    });
+</script>
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

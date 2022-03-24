@@ -1,0 +1,148 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.Domain.Sale.Entities
+
+@{
+    ViewBag.Title = "Cập nhật độ ưu tiên";
+
+
+
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+
+
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Product",
+        ActionName = "UpdateSTTProductHot",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    IEnumerable<ProductViewModel> listProduct = (IEnumerable<ProductViewModel>)ViewBag.listProduct;
+}
+
+
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+
+@if (listProduct != null)
+{
+
+    var a = 0;
+    foreach (var i in listProduct)
+    {
+        a = a + 1;
+    }
+
+    <p>Tổng số: <b>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan(a)</b></p>
+
+
+}
+
+
+
+
+
+<body>
+    <div class="table-responsive">
+
+        <table id="tblNewProducts" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="width:130px">ID</th>
+                    <th style="width:130px">Mã sản phẩm</th>
+                    <th style="width:110px">Tên sản phẩm</th>
+                    <th style="width:120px">Độ ưu tiên hiện tại</th>
+                    <th style="width:120px">Độ ưu tiên mới</th>
+
+
+                </tr>
+            </thead>
+            <tbody class="detailList">
+                @if (listProduct != null)
+                {
+                    foreach (var i in listProduct)
+                    {
+                        <tr>
+                            <td>@i.Id</td>
+                            <td>@i.Code</td>
+                            <td>@i.Name</td>
+                            <td class="text-right">@Common.PhanCachHangNgan(i.STT_ISHOT)</td>
+                            <td><input style="width:120px" name="@i.Id" id="@i.Id" value="" /></td>
+
+
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <br />
+    <button class="btn btn-mini btn-light" id="btnBack" onClick="history.go(-1); return false;"><i class="ace-icon fa fa-hand-o-left"></i>Trở lại</button>
+    <button class="btn btn-mini btn-primary" id="btnSave" value="Cập nhật"><i class="ace-icon fa fa-save"></i>Cập nhật</button>
+
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+    <script type="text/javascript">
+
+
+        $("body").on("click", "#btnSave", function () {
+            //Loop through the Table rows and build a JSON array.
+            ShowLoading();
+            var newproducts = new Array();
+            $("#tblNewProducts TBODY TR").each(function () {
+                var row = $(this);
+                var newproduct = {};
+                newproduct.Id = row.find("TD").eq(0).html();
+                newproduct.STT_Cu = row.find("TD").eq(3).html();
+
+                $(this).closest('tr').find("input").each(function () {
+                    newproduct.STT_Moi = this.value;
+                });
+
+                newproducts.push(newproduct);
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "/Product/UpdateSTTProductHot",
+                data: JSON.stringify(newproducts),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (r) {
+                    location.reload();
+                    HideLoading();
+                }
+            });
+
+        });
+
+        //Send the JSON array to Controller using AJAX.
+
+
+
+    </script>
+
+</body>
+
+
+
+
+

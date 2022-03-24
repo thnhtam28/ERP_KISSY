@@ -1,0 +1,139 @@
+﻿@using AutoMapper.Internal
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@model IEnumerable<YHL_KIENHANG_GUIViewModel>
+
+    @{
+        ViewBag.Title = "Danh Sách Đơn Hàng Gửi";
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "ProductInvoice",
+            ActionName = "DonHang",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false,
+            AdvancedSearch = false,
+            SearchOjectAttr = ViewBag.ListOjectAttrSearch
+        };
+    }
+    @helper BuildCheckAll()
+    {
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+    }
+    @helper GridColumnCommand(int id)
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("DeleteDonHangGui", "ProductInvoice", "Sale"))
+        {
+            <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+                <button name="Delete" value="Delete" type="submit" class="btn btn-minier btn-danger">
+                    <i class="ace-icon fa fa-trash"></i>
+                </button>
+            </div>
+        }
+    }
+
+    @helper CheckDeleteColumns(int Id)
+    {
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+            <span class="lbl"></span>
+        </label>
+    }
+    @helper ShowDetail(int id)
+    {
+        <a id="@id" href="@Url.Action("IndexDonHang", "ProductInvoice", new { Id = id })"> Chi Tiết</a>
+    }
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+
+    }
+
+    @using (Html.BeginForm("DeleteDonHangGui", "ProductInvoice", FormMethod.Post))
+    {
+        <div class="table-responsive">
+            <div id="test">
+                @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(40).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.KIENHANG_GUI_ID));
+               columns.Add(u => u.NGUOI_NHAN).Titled("Người Nhận").SetWidth(30);
+               columns.Add(u => u.NGAY_GUI).Titled("Ngày Gửi").SetWidth(50).ToString();
+               columns.Add(u => u.DONVI_GIAONHAN).Titled("Đơn vị Giao Nhận").SetWidth(50);
+               columns.Add(u => u.GHI_CHU).Titled("Ghi Chú").SetWidth(30);
+               columns.Add().Titled("Chi Tiết").Sanitized(false).Encoded(false).RenderValueAs(u => ShowDetail(u.KIENHANG_GUI_ID)).SetWidth(30);
+               columns.Add(u => u.KIENHANG_GUI_ID).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.KIENHANG_GUI_ID)).SetWidth(85);
+           }).WithPaging(30)
+            </div>
+        </div>
+        using (Html.BeginButtonContainer(pageSetting))
+        {
+            @*if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("CreateNT", "ProductInvoice", "Sale"))
+                {
+                    <a class="btn btn-mini btn-primary" href="@Url.Action("Create", pageSetting.ModuleName)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        @Wording.CreateNew
+                    </a>
+                }*@
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("DeleteDonHangGui", "ProductInvoice", "Sale"))
+            {
+                <button class="btn btn-white btn-sm btn-danger" type="submit" name="DeleteAll" value="DeleteAll" onclick="return CheckIsval();">
+                    <i class="ace-icon fa fa-trash"></i>
+                    @Wording.Delete
+                </button>
+            }
+        }
+    }
+    <script>
+
+        $('#test').find('table.table.table-striped.grid-table').first().attr('id', 'CTable');
+
+
+    </script>
+    
+    <script src="~/Scripts/jquery.freezeheader.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#CTable").freezeHeader({ 'offset': '30px' });
+        })
+    </script>
+    @section Scripts {
+        <script type="text/javascript">
+
+            function CheckIsval() {
+                if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                    alert("Phải chọn ít nhất 1 item.");
+                    return false;
+                }
+                else {
+                    if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+
+            $('[name="Delete"]').click(function () {
+                if (confirm('Bạn có chắc muốn xóa item ?')) {
+                    $(this).closest('tr').children('td').each(function (i, e) {
+                        $(this).find("input.class-delete-all").prop("checked", true);
+                        return true;
+                    })
+                }
+                else {
+                    return false;
+                }
+
+            })
+        </script>
+
+    }

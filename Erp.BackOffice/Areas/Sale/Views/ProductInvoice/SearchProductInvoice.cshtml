@@ -1,0 +1,282 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+@model List<InventoryViewModel>
+    @{
+        Layout = null;
+
+    }
+    @section HeadOfPage {
+        @Html.ScriptTop_ChosenStyle()
+        <style type="text/css">
+            .imgproduct :hover{
+               border-color:antiquewhite
+            }
+        </style>
+    }
+
+    <div class="product-search-box">
+        <input id="product_barcode1" type="text" placeholder="[F3] Mã sản phẩm 0..." autocomplete="off" />
+        <select id="productSelectList" name="productSelectList" style="width:400px">
+            <option value="">- Tìm sản phẩm 0 -</option>
+            @foreach (var item in Model)
+            {
+                <option value="@item.Id" data-selected="0" data-value="@item.Id | @(Common.KiemTraTonTaiHinhAnh(item.Image_Name,"product-image-folder","product")) | @(item.ProductCode + " - " + item.ProductName)|@item.LoCode|@(item.ExpiryDate==null?"":item.ExpiryDate.Value.ToShortDateString())|@item.Origin|@(Common.PhanCachHangNgan(item.Quantity))" data-code="@item.ProductCode" data-lo-code="@item.LoCode" data-expiry-date="@(item.ExpiryDate==null?"":item.ExpiryDate.Value.ToString("dd/MM/yyyy"))" data-product-type="@item.CategoryCode" data-price="@(item.ProductPriceOutbound)" data-unit="@item.ProductUnit" data-product-id="@item.ProductId" data-quantity-inventory="@(item.Quantity==null?0:item.Quantity.Value)" data-origin="@item.Origin" data-tax-fee="@item.TaxFee">@item.ProductName</option>
+            }
+        </select>
+
+        <div class="row" style="margin-left:10px;">
+            <div>
+
+            </div>
+            @foreach (var item in Model)
+            {
+                @*<form action="/ProductInvoice/LoadProductItemNT" method="post">*@
+
+                @*<input type="hidden"  value="0" name="OrderNo" />
+                    <input type="hidden" value="@item.ProductId" name="ProductId" />
+                    <input type="hidden" value="@item.ProductName" name="ProductName" />
+                    <input type="hidden" value="@item.CategoryCode" name="ProductType" />
+                    <input type="hidden" value="@item.TaxFee" name="TaxFee" />
+                    <input type="hidden" value="@item.ProductCode" name="ProductCode" />
+                    <input type="hidden" value="@item.ProductPriceOutbound" name="Price" />
+                    <input type="hidden" value="1" name="Quantity" />
+                    <input type="hidden" value="@item.ProductUnit" name="Unit" />
+                    <input type="hidden" value="@(item.ExpiryDate==null?"":item.ExpiryDate.Value.ToShortDateString())" name="ExpiryDate" />
+                    <input type="hidden" value="@item.LoCode" name="LoCode" />
+                    <input type="hidden" value="@(item.Quantity==null?0:item.Quantity.Value)" name="QuantityInventory" />*@
+
+                <a class="imgproduct" href="javascript:getdataimg(@item.ProductId,'@item.ProductName','@item.ProductUnit',@(item.ProductPriceOutbound),'@item.CategoryCode','@item.ProductCode',@(item.Quantity==null?0:item.Quantity.Value),'@item.LoCode','@(item.ExpiryDate==null?"":item.ExpiryDate.Value.ToString("dd/MM/yyyy"))',@item.TaxFee)" data-id="@item.ProductId" value="@item.Id" data-selected="0" data-value="@item.Id | @(Common.KiemTraTonTaiHinhAnh(item.Image_Name,"product-image-folder","product")) | @(item.ProductCode + " - " + item.ProductName)|@item.LoCode|@(item.ExpiryDate==null?"":item.ExpiryDate.Value.ToShortDateString())|@item.Origin|@(Common.PhanCachHangNgan(item.Quantity))" data-code="@item.ProductCode" data-lo-code="@item.LoCode" data-expiry-date="@(item.ExpiryDate==null?"":item.ExpiryDate.Value.ToString("dd/MM/yyyy"))" data-product-type="@item.CategoryCode" data-price="@(item.ProductPriceOutbound)" data-unit="@item.ProductUnit" data-product-name="@item.ProductName" data-product-id="@item.ProductId" data-quantity-inventory="@(item.Quantity==null?0:item.Quantity.Value)" data-origin="@item.Origin" data-tax-fee="@item.TaxFee" style="font-weight:700;background-size:100% 100%;background-image:url(/Uploads/product/@item.Image_Name); width:17%;height:150px;float:left;margin:5px;">
+                    @item.ProductName
+                </a>
+                @*</form>*@
+
+
+            }
+
+
+            <div style="background-image:url(/Uploads/product/item.Image_Name); width:17%;height:150px;float:left;margin:5px;">
+                <p>abcd</p>
+            </div>
+            <div style="bo background-color:chartreuse; width:17%;height:150px;float:left;margin:5px;">
+                <p>abcd</p>
+            </div>
+            <div style="background-color:chartreuse; width:17%;height:150px;float:left;margin:5px;">
+                <p>abcd</p>
+            </div>
+            <div style="hover:cl background-color:chartreuse; width:17%;height:150px;float:left;margin:5px;">
+                <p>abcd</p>
+            </div>
+            <div style="background-color:chartreuse; width:17%;height:150px;float:left;margin:5px;">
+                <p>abcd</p>
+            </div>
+            <div style="background-color:chartreuse; width:17%;height:150px;float:left;margin:5px;">
+                <p>abcd</p>
+            </div>
+            <div style="background-color:chartreuse; width:17%;height:150px;float:left;margin:5px;">
+                <p>abcd</p>
+            </div>
+            <div style="background-color:chartreuse; width:17%;height:150px;float:left;margin:5px;">
+                <p>abcd</p>
+            </div>
+            <div style="background-color:chartreuse; width:17%;height:150px;float:left;margin:5px;">
+                <p>abcd</p>
+            </div>
+            <div style="background-color:chartreuse; width:17%;height:150px;float:left;margin:5px;">
+                <p>abcd</p>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+
+
+    <link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+    <script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+    <script>
+        function getdataimg(ProductId, ProductName, Unit, Price, ProductType, ProductCode, QuantityInventory, LoCode, ExpiryDate, TaxFee) {
+
+            var $this = $(this);
+            if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+                var OrderNo = $('.detailList1 tr').length;
+                var Istab = 1;
+            } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+                var OrderNo = $('.detailList2 tr').length;
+                var Istab = 2;
+            } else {
+                var OrderNo = $('.detailList3 tr').length;
+                var Istab = 3;
+            }
+            var Quantity = 1;
+            var formdata = {
+                OrderNo: OrderNo,
+                ProductId: ProductId,
+                ProductName: ProductName,
+                Unit: Unit,
+                Quantity: Quantity,
+                Price: Price,
+                ProductCode: ProductCode,
+                ProductType: ProductType,
+                QuantityInventory: QuantityInventory,
+                LoCode: LoCode,
+                ExpiryDate: ExpiryDate,
+                TaxFee: TaxFee,
+                Istab: Istab
+            }
+
+            ClickEventHandler(true, "/ProductInvoice/LoadProductItemNT", ".detailList2", formdata, function () {
+                if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+                    $('#ProductItemCount1').val($('#listOrderDetail1 .detailList1 tr').length);
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+                    $('#ProductItemCount2').val($('#listOrderDetail2.detailList2 tr').length);
+                } else {
+                    $('#ProductItemCount3').val($('#listOrderDetail3 .detailList3 tr').length);
+                }
+
+                $.mask.definitions['~'] = '[+-]';
+                $('.input-mask-date').mask('99/99/9999');
+                LoadNumberInput();
+               
+                if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+                    tinh_tong_tien1();
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+                    tinh_tong_tien2();
+                } else {
+                    tinh_tong_tien3();
+                }
+
+            });
+
+        }
+      
+        $('#productSelectList').radComboBox({
+            colTitle: 'ID, Hình, Tên sản phẩm, Lô, HSD, Xuất xứ, Tồn kho',
+            colValue: 1,
+            colImage: 2,
+            colHide: '1',
+            colSize: '0px,50px,275px,70px,70px,100px,70px',
+            colClass: ',,',
+            width: 600,
+            height: 300,
+            boxSearch: true,
+            colSearch: 2
+        });
+        //Hiển thị giá và tính thành tiền khi chọn sản phẩm
+
+
+        $('#productSelectList').on('change', function () {
+            var $this = $(this);
+            var selected = $this.find("option:selected");
+
+            if (selected.val() == '' || $('#product_item_' + selected.val()).length > 0)
+                return;
+            if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+                var OrderNo = $('.detailList1 tr').length;
+                var Istab = 1;
+            } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+                var OrderNo = $('.detailList2 tr').length;
+                var Istab = 2;
+            } else {
+                var OrderNo = $('.detailList3 tr').length;
+                var Istab = 3;
+            }
+
+            var ProductId = selected.data("product-id");
+            var ProductName = selected.text();
+            var Unit = selected.data("unit");
+            var Quantity = 1;
+            var Price = selected.data("price");
+            var ProductType = selected.data("product-type");
+            var ProductCode = selected.data("code");
+            var QuantityInventory = selected.data("quantity-inventory");
+            var LoCode = selected.data("lo-code");
+            var ExpiryDate = selected.data("expiry-date");
+            var TaxFee = selected.data("tax-fee");
+            var formdata = {
+                OrderNo: OrderNo,
+                ProductId: ProductId,
+                ProductName: ProductName,
+                Unit: Unit,
+                Quantity: Quantity,
+                Price: Price,
+                ProductCode: ProductCode,
+                ProductType: ProductType,
+                QuantityInventory: QuantityInventory,
+                LoCode: LoCode,
+                ExpiryDate: ExpiryDate,
+                TaxFee: TaxFee,
+                Istab: Istab
+            };
+
+            //Thêm dòng mới
+            ClickEventHandler(true, "/ProductInvoice/LoadProductItemNT", ".detailList2", formdata, function () {
+                if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+                    $('#ProductItemCount1').val($('#listOrderDetail1 .detailList1 tr').length);
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+                    $('#ProductItemCount2').val($('#listOrderDetail2.detailList2 tr').length);
+                } else {
+                    $('#ProductItemCount3').val($('#listOrderDetail3 .detailList3 tr').length);
+                }
+
+                $.mask.definitions['~'] = '[+-]';
+                $('.input-mask-date').mask('99/99/9999');
+                LoadNumberInput();
+                if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+                    tinh_tong_tien1();
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+                    tinh_tong_tien2();
+                } else {
+                    tinh_tong_tien3();
+                }
+                //var _product_id = $("#DetailList_" + OrderNo + "__ProductId").val();
+                //var _LoCode = $("#DetailList_" + OrderNo + "__LoCode").val();
+                //var _ExpiryDate = $("#DetailList_" + OrderNo + "__ExpiryDate").val();
+                //var _quantity_inventory = $("#DetailList_" + OrderNo + "__Quantity").data("quantity-inventory");
+                //var _qty = $("#DetailList_" + OrderNo + "__Quantity").val();
+                //var selector = '.detailList tr';
+                //var quantity_used = 0;
+                //$(selector).each(function (index, elem) {
+                //    if (index != OrderNo) {
+                //        var product_id = $("#DetailList_" + index + "__ProductId").val();
+                //        var LoCode = $("#DetailList_" + index + "__LoCode").val();
+                //        var ExpiryDate = $("#DetailList_" + index + "__ExpiryDate").val();
+                //        var Quantity = $("#DetailList_" + index + "__Quantity").val();
+                //        if (product_id == _product_id && LoCode == _LoCode && ExpiryDate == _ExpiryDate) { // la số thì mới tính
+                //            quantity_used += parseInt(removeComma(Quantity));
+                //        }
+                //    }
+                //});
+                //var inventory_qty = parseInt(_quantity_inventory) - parseInt(quantity_used);
+                //var _quantity = parseInt(removeComma(_qty));
+                //$("#status").text("");
+                //if (_quantity > inventory_qty) {
+                //    $("#DetailList_" + OrderNo + "__Quantity").val(inventory_qty);
+                //    $("#status").text("Tổng số lượng xuất ra không được lớn hơn số lượng tồn kho hiện tại!!");
+                //}
+                //tinh_thanh_tien_moi_dong(OrderNo);
+                //tinh_tong_tien();
+            });
+        });
+
+
+
+        function getOrderNO() {
+            if (tab3 == 0 && tab1 == 1 && tab2 == 0) {
+                var OrderNo = $('.detailList1 tr').length;
+            } else if (tab3 == 0 && tab1 == 0 && tab2 == 1) {
+                var OrderNo = $('.detailList2 tr').length;
+            } else {
+                var OrderNo = $('.detailList3 tr').length;
+            }
+            return OrderNo;
+        }
+        $(document).ready(function () {
+         
+
+        });
+
+    </script>

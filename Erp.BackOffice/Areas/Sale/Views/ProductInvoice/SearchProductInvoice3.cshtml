@@ -1,0 +1,528 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+@model List<InventoryViewModel>
+    @{
+        Layout = null;
+
+    }
+    @section HeadOfPage {
+        @Html.ScriptTop_ChosenStyle()
+        <style type="text/css">
+            .imgproduct :hover {
+                border-color: antiquewhite;
+            }
+
+            .icon {
+                padding: 10px;
+                color: green;
+                min-width: 50px;
+                text-align: center;
+            }
+        </style>
+    }
+    @*cái này tìm sản phâm anh*@
+
+    <div class="search">
+
+        <select id="productSelectList2" name="productSelectList2" style="width:40%">
+            <option value="">-tab 1 -</option>
+            @foreach (var item in Model)
+            {
+                <option value="@item.Id" data-selected="0" data-value="@item.Id |-|@("<pr style='font-size: 20px;'>"+item.ProductCode + " - " + item.ProductName +"</pr>"+ "<br>" +"<b style='font-size: 16px;'>Giá:"+ @Common.PhanCachHangNgan2(item.ProductPriceOutbound)+ "</b>" +"<pr  style='font-size: 16px;'> (Size:" + item.Size + " Color:" + item.color + ") <pr>" )|@(Common.PhanCachHangNgan(item.Quantity))" data-code="@item.ProductCode" data-lo-code="@item.LoCode" data-expiry-date="@(item.ExpiryDate==null?"":item.ExpiryDate.Value.ToString("dd/MM/yyyy"))" data-product-type="@item.CategoryCode" data-price="@(item.ProductPriceOutbound)" data-unit="@item.ProductUnit" data-product-id="@item.ProductId" data-quantity-inventory="@(item.Quantity==null?0:item.Quantity.Value)" data-origin="@item.Origin" data-tax-fee="@item.TaxFee">@item.ProductName</option>
+            }
+        </select>
+
+    </div>
+
+
+
+    <link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+    <script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+    <script>
+
+        $('#productSelectList2').radComboBox({
+            colTitle: 'ID, ID, Sản phẩm, Tồn kho',
+            colValue: 1,
+            //colImage: 2,
+            colHide: '1',
+            colSize: '0%,0%,85%,10%',
+            colClass: ',,',
+            width: 460,
+            height: 300,
+            boxSearch: true,
+            colSearch: 2
+        });
+        //Hiển thị giá và tính thành tiền khi chọn sản phẩm
+        $('#productSelectList2').on('change', function () {
+
+            var $this = $(this);
+            var selected = $this.find("option:selected");
+
+            if (selected.val() == '' || $('#product_item_' + selected.val()).length > 0)
+                return;
+            if (tab3 == 0 && tab1 == 1 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                var OrderNo = $('.detailList1 tr').length;
+                var Istab = 1;
+                var customerId = $("#CustomerId1").val();
+                if (customerId === "" || customerId === null) {
+                    customerId = "0";
+                }
+            } else if (tab3 == 0 && tab1 == 0 && tab2 == 1 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                var OrderNo = $('.detailList2 tr').length;
+                var Istab = 2;
+                var customerId = $("#CustomerId2").val();
+                if (customerId === "" || customerId === null) {
+                    customerId = "0";
+                }
+            } else if (tab3 == 1 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                var OrderNo = $('.detailList3 tr').length;
+                var Istab = 3;
+                var customerId = $("#CustomerId3").val();
+                if (customerId === "" || customerId === null) {
+                    customerId = "0";
+                }
+            } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 1 && tab5 == 0 && tab6 == 0) {
+                var OrderNo = $('.detailList4 tr').length;
+                var Istab = 4;
+                var customerId = $("#CustomerId4").val();
+                if (customerId === "" || customerId === null) {
+                    customerId = "0";
+                }
+            } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 1 && tab6 == 0) {
+                var OrderNo = $('.detailList5 tr').length;
+                var Istab = 5;
+                var customerId = $("#CustomerId5").val();
+                if (customerId === "" || customerId === null) {
+                    customerId = "0";
+                }
+            } else {
+                var OrderNo = $('.detailList6 tr').length;
+                var Istab = 6;
+                var customerId = $("#CustomerId6").val();
+                if (customerId === "" || customerId === null) {
+                    customerId = "0";
+                }
+            }
+
+            var ProductId = selected.data("product-id");
+            var ProductName = selected.text();
+            var Unit = selected.data("unit");
+            var Quantity = 1;
+            var Price = selected.data("price");
+            var ProductType = selected.data("product-type");
+            var ProductCode = selected.data("code");
+
+            var QuantityInventory = selected.data("quantity-inventory");
+            var LoCode = selected.data("lo-code");
+            var ExpiryDate = selected.data("expiry-date");
+            var TaxFee = selected.data("tax-fee");
+            var formdata = {
+                OrderNo: OrderNo,
+                ProductId: ProductId,
+                ProductName: ProductName,
+                Unit: Unit,
+                Quantity: Quantity,
+                Price: Price,
+                ProductCode: ProductCode,
+                ProductType: ProductType,
+                QuantityInventory: QuantityInventory,
+                LoCode: LoCode,
+                ExpiryDate: ExpiryDate,
+                TaxFee: TaxFee,
+                Istab: Istab,
+                CustomerID: customerId
+            };
+
+            //begin hoapd su ly neu co roi thi cong 1 don vi  can them cho nay
+            if (tab3 == 0 && tab1 == 1 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                $("#tbllistOrderDetail1 TBODY TR").each(function () {
+                    var row = $(this);
+
+                    var ProductCode1 = $(this).closest('tr').find("td:eq(5) input").val();
+
+                    // alert($('#product_barcode3').val());
+                    $(this).removeClass('selected_grey').addClass("text_data");
+
+                    if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                        //alert(ProductCode);
+                        $(this).closest('tr').find("td:eq(2) input").val(parseInt($(this).closest('tr').find("td:eq(2) input").val()) + 1);
+                        $(this).closest('tr').find("td:eq(2) input").trigger('change');
+                        $(this).addClass('selected_grey');
+                        formdata = {};
+                        return;
+                    }
+                    //alert(ProductCode);
+
+                });
+            } else if (tab3 == 0 && tab1 == 0 && tab2 == 1 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                $("#tbllistOrderDetail2 TBODY TR").each(function () {
+                    var row = $(this);
+
+                    var ProductCode1 = $(this).closest('tr').find("td:eq(5) input").val();
+
+                    // alert($('#product_barcode3').val());
+                    $(this).removeClass('selected_grey').addClass("text_data");
+
+                    if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                        //alert(ProductCode);
+                        $(this).closest('tr').find("td:eq(2) input").val(parseInt($(this).closest('tr').find("td:eq(2) input").val()) + 1);
+                        $(this).closest('tr').find("td:eq(2) input").trigger('change');
+                        $(this).addClass('selected_grey');
+                        formdata = {};
+                        return;
+                    }
+                    //alert(ProductCode);
+
+                });
+            } else if (tab3 == 1 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                $("#tbllistOrderDetail3 TBODY TR").each(function () {
+                    var row = $(this);
+
+                    var ProductCode1 = $(this).closest('tr').find("td:eq(5) input").val();
+
+                    // alert($('#product_barcode3').val());
+                    $(this).removeClass('selected_grey').addClass("text_data");
+
+                    if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                        //alert(ProductCode);
+                        $(this).closest('tr').find("td:eq(2) input").val(parseInt($(this).closest('tr').find("td:eq(2) input").val()) + 1);
+                        $(this).closest('tr').find("td:eq(2) input").trigger('change');
+                        $(this).addClass('selected_grey');
+                        formdata = {};
+                        return;
+                    }
+                    //alert(ProductCode);
+
+                });
+            } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 1 && tab5 == 0 && tab6 == 0) {
+                $("#tbllistOrderDetail4 TBODY TR").each(function () {
+                    var row = $(this);
+
+                    var ProductCode1 = $(this).closest('tr').find("td:eq(5) input").val();
+
+                    // alert($('#product_barcode3').val());
+                    $(this).removeClass('selected_grey').addClass("text_data");
+
+                    if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                        //alert(ProductCode);
+                        $(this).closest('tr').find("td:eq(2) input").val(parseInt($(this).closest('tr').find("td:eq(2) input").val()) + 1);
+                        $(this).closest('tr').find("td:eq(2) input").trigger('change');
+                        $(this).addClass('selected_grey');
+                        formdata = {};
+                        return;
+                    }
+                    //alert(ProductCode);
+
+                });
+            } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 1 && tab6 == 0) {
+                $("#tbllistOrderDetail5 TBODY TR").each(function () {
+                    var row = $(this);
+
+                    var ProductCode1 = $(this).closest('tr').find("td:eq(5) input").val();
+
+                    // alert($('#product_barcode3').val());
+                    $(this).removeClass('selected_grey').addClass("text_data");
+
+                    if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                        //alert(ProductCode);
+                        $(this).closest('tr').find("td:eq(2) input").val(parseInt($(this).closest('tr').find("td:eq(2) input").val()) + 1);
+                        $(this).closest('tr').find("td:eq(2) input").trigger('change');
+                        $(this).addClass('selected_grey');
+                        formdata = {};
+                        return;
+                    }
+                    //alert(ProductCode);
+
+                });
+            } else {
+                $("#tbllistOrderDetail6 TBODY TR").each(function () {
+                    var row = $(this);
+
+                    var ProductCode1 = $(this).closest('tr').find("td:eq(5) input").val();
+
+                    // alert($('#product_barcode3').val());
+                    $(this).removeClass('selected_grey').addClass("text_data");
+
+                    if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                        //alert(ProductCode);
+                        $(this).closest('tr').find("td:eq(2) input").val(parseInt($(this).closest('tr').find("td:eq(2) input").val()) + 1);
+                        $(this).closest('tr').find("td:eq(2) input").trigger('change');
+                        $(this).addClass('selected_grey');
+                        formdata = {};
+                        return;
+                    }
+                    //alert(ProductCode);
+
+                });
+            }
+            //alert(alert);
+
+            //end hoapd su ly neu co roi thi cong 1 don vi
+
+
+            //Thêm dòng mới
+            ClickEventHandler2(true, "/ProductInvoice/LoadProductItemNT", ".detailList2", formdata, ProductCode, function () {
+                isone = 0;
+                if (tab3 == 0 && tab1 == 1 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                    $('#ProductItemCount1').val($('#listOrderDetail1 .detailList1 tr').length);
+
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 1 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                    $('#ProductItemCount2').val($('#listOrderDetail2.detailList2 tr').length);
+                } else if (tab3 == 1 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                    $('#ProductItemCount3').val($('#listOrderDetail3 .detailList3 tr').length);
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 1 && tab5 == 0 && tab6 == 0) {
+                    $('#ProductItemCount4').val($('#listOrderDetail4 .detailList4 tr').length);
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 1 && tab6 == 0) {
+                    $('#ProductItemCount5').val($('#listOrderDetail5 .detailList5 tr').length);
+                } else {
+                    $('#ProductItemCount6').val($('#listOrderDetail6 .detailList6 tr').length);
+                }
+                $.mask.definitions['~'] = '[+-]';
+                $('.input-mask-date').mask('99/99/9999');
+                LoadNumberInput();
+                if (tab3 == 0 && tab1 == 1 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                    var tmp1 = $("#TotalProduct1").val();
+                    tmp1 = tmp1 + 1;
+                    $("#TotalProduct1").val(tmp1);
+                    tinh_tong_tien1();
+                    $("#tbllistOrderDetail1 TBODY TR").each(function () {
+                        var row = $(this);
+
+                        var ProductCode1 = $(this).closest('tr').find("td:eq(5) input").val();
+                        //alert(ProductCode);
+                        // alert($('#product_barcode3').val());
+                        $(this).removeClass('selected_grey').addClass("text_data");
+
+                        if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                            //alert(ProductCode);
+                            $(this).addClass('selected_grey');
+                            formdata = {};
+                            return;
+                        }
+                        //alert(ProductCode);
+
+                    });
+
+
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 1 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                    var tmp2 = $("#TotalProduct2").val();
+                    tmp2 = tmp2 + 1;
+                    $("#TotalProduct1").val(tmp2);
+                    tinh_tong_tien2();
+
+                    $("#tbllistOrderDetail2 TBODY TR").each(function () {
+                        var row = $(this);
+
+                        var ProductCode1 = $(this).closest('tr').find("td:eq(5) input").val();
+                        //alert(ProductCode);
+                        // alert($('#product_barcode3').val());
+                        $(this).removeClass('selected_grey').addClass("text_data");
+
+                        if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                            //alert(ProductCode);
+                            $(this).addClass('selected_grey');
+                            formdata = {};
+                            return;
+                        }
+                        //alert(ProductCode);
+
+                    });
+
+                } else if (tab3 == 1 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                    var tmp3 = $("#TotalProduct3").val();
+                    tmp3 = tmp3 + 1;
+                    $("#TotalProduct3").val(tmp3);
+                    tinh_tong_tien3();
+
+                    $("#tbllistOrderDetail3 TBODY TR").each(function () {
+                        var row = $(this);
+
+                        var ProductCode1 = $(this).closest('tr').find("td:eq(5) input").val();
+                        //alert(ProductCode);
+                        // alert($('#product_barcode3').val());
+                        $(this).removeClass('selected_grey').addClass("text_data");
+
+                        if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                            //alert(ProductCode);
+                            $(this).addClass('selected_grey');
+                            formdata = {};
+                            return;
+                        }
+                        //alert(ProductCode);
+
+                    });
+
+
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 1 && tab5 == 0 && tab6 == 0) {
+                    var tmp4 = $("#TotalProduct4").val();
+                    tmp4 = tmp4 + 1;
+                    $("#TotalProduct4").val(tmp4);
+                    tinh_tong_tien4();
+
+                    $("#tbllistOrderDetail4 TBODY TR").each(function () {
+                        var row = $(this);
+
+                        var ProductCode1 = $(this).closest('tr').find("td:eq(5) input").val();
+                        //alert(ProductCode);
+                        // alert($('#product_barcode3').val());
+                        $(this).removeClass('selected_grey').addClass("text_data");
+
+                        if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                            //alert(ProductCode);
+                            $(this).addClass('selected_grey');
+                            formdata = {};
+                            return;
+                        }
+                        //alert(ProductCode);
+
+                    });
+
+                } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 1 && tab6 == 0) {
+                    var tmp5 = $("#TotalProduct5").val();
+                    tmp5 = tmp5 + 1;
+                    $("#TotalProduct5").val(tmp5);
+                    tinh_tong_tien5();
+
+                    $("#tbllistOrderDetail5 TBODY TR").each(function () {
+                        var row = $(this);
+
+                        var ProductCode1 = $(this).closest('tr').find("td:eq(5) input").val();
+                        //alert(ProductCode);
+                        // alert($('#product_barcode3').val());
+                        $(this).removeClass('selected_grey').addClass("text_data");
+
+                        if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                            //alert(ProductCode);
+                            $(this).addClass('selected_grey');
+                            formdata = {};
+                            return;
+                        }
+                        //alert(ProductCode);
+
+                    });
+
+
+                } else {
+                    var tmp6 = $("#TotalProduct6").val();
+                    tmp6 = tmp6 + 1;
+                    $("#TotalProduct6").val(tmp6);
+                    tinh_tong_tien6();
+
+
+                    $("#tbllistOrderDetail6 TBODY TR").each(function () {
+                        var row = $(this);
+
+                        var ProductCode1 = $(this).closest('tr').find("td:eq(5) input").val();
+                        //alert(ProductCode);
+                        // alert($('#product_barcode3').val());
+                        $(this).removeClass('selected_grey').addClass("text_data");
+
+                        if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                            //alert(ProductCode);
+                            $(this).addClass('selected_grey');
+                            formdata = {};
+                            return;
+                        }
+                        //alert(ProductCode);
+
+                    });
+                }
+            });
+        });
+
+        //$('#productSelectList2').keypress(function (e) {
+        //    alert("ok cuong");
+        //    if (e.which == 13) {
+        //        e.preventDefault();
+        //        $('#product_barcode3').trigger('change');
+        //    }
+        //});
+
+        //$(window).keypress(function (e) {
+        //    if (e.which == 50||e.which == 51) {
+
+        //        e.preventDefault();
+        //        $('#inpBarcode').trigger('change');
+
+        //    }
+
+        //    var barcode = $('#inpBarcode').val();
+        //    var valueSearch = searchProductByBarCodeContain(barcode);
+
+        //    if (valueSearch.length > 0) {
+        //        //alert("productidbacode" + valueSearch);
+        //        $('#productSelectList2').val(valueSearch).trigger("change");
+        //        $('#inpBarcode').val('');
+        //    }
+        //});
+
+
+        //$('#idboxsearch1').keypress(function () {
+        //    alert("ok");
+
+        //});
+        //$('#inpBarcode').on('keypress', '.abcbarcode', function (e) {
+        //    alert("ok keypress");
+        //    if (e.which == 13) {
+        //        e.preventDefault();
+        //        $("#productCode").focus();
+        //    }
+        //});
+        $('#inpBarcode').keyup(function () {
+            var barcode = $('#inpBarcode').val();
+
+            var valueSearch = searchProductByBarCodeContain(barcode);
+            if (valueSearch.length > 0) {
+                $('#productSelectList2').val(valueSearch).trigger("change");
+                $('#inpBarcode').val('');
+            }
+
+
+        });
+        $('#idboxsearch1').keyup(function () {
+            var barcode = $('#idboxsearch1').val();
+            //đặt lại giá trị rỗng
+            //$this.val('').focus();
+            //alert(barcode);
+            var valueSearch = searchProductByBarCodeContain(barcode);
+            //if (valueSearch == undefined) {
+            //    //alert('Không tìm thấy sản phẩm với mã code trên!');
+            //    return;
+            //}
+            //}
+            //if ( valueSearch.length === 1) {
+            //    $('#productSelectList2').val(valueSearch).trigger("change");
+
+            //    //kết thúc các lệnh của sự kiện
+            //}
+            if (valueSearch.length > 0) {
+                $('#productSelectList2').val(valueSearch).trigger("change");
+                $('#idboxsearch1').val('');
+            }
+
+
+        });
+        function getOrderNO() {
+            if (tab3 == 0 && tab1 == 1 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                var OrderNo = $('.detailList1 tr').length;
+            } else if (tab3 == 0 && tab1 == 0 && tab2 == 1 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                var OrderNo = $('.detailList2 tr').length;
+            } else if (tab3 == 1 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 0 && tab6 == 0) {
+                var OrderNo = $('.detailList3 tr').length;
+            } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 1 && tab5 == 0 && tab6 == 0) {
+                var OrderNo = $('.detailList4 tr').length;
+            } else if (tab3 == 0 && tab1 == 0 && tab2 == 0 && tab4 == 0 && tab5 == 1 && tab6 == 0) {
+                var OrderNo = $('.detailList5 tr').length;
+            } else {
+                var OrderNo = $('.detailList6 tr').length;
+            }
+            return OrderNo;
+        }
+
+        $(document).ready(function () {
+
+        });
+
+    </script>
